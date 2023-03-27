@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Pss</string>
+    <string name="pss_title">Pharmaceutical Systems Strengthening Insights tool v2</string>
+    <string name="syncing">Syncing Your Configurations</string>
+    <string name="navigation">navigation</string>
+    <string name="base_url">navigation</string>
+
+    <string-array name="navigation_drawer_items_array">
+        <item>Connect</item>
+        <item>Fixtures</item>
+        <item>Table</item>
+    </string-array>
+
+    <string-array name="submit_options">
+        <item>Draft</item>
+        <item>Submit</item>
+    </string-array>
+
+</resources>

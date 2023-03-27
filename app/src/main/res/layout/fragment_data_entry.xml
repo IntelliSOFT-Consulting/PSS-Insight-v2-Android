@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:padding="16dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="85dp"
+        android:layout_height="match_parent">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please answer these questions"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textStyle="bold" />
+
+        <!-- Select Year Label -->
+        <TextView
+            android:layout_marginTop="20dp"
+            android:id="@+id/year_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Year*"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Year Edit Text -->
+        <EditText
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:background="@drawable/edittext_border"
+            android:id="@+id/etPeriod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="Enter Year"/>
+
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                tools:listitem="@layout/data_entry_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+
+    <!-- Submit and Close Buttons -->
+    <LinearLayout
+        android:background="@color/dataEntry"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:layout_marginBottom="10dp"
+            android:background="@color/gray"
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"/>
+
+        <LinearLayout
+            android:padding="10dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Close Button -->
+            <Button
+                android:textAllCaps="false"
+                android:layout_weight="1"
+                android:background="@color/gray"
+                android:id="@+id/saveDraft"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save Draft" />
+
+            <!-- Submit Button -->
+            <Button
+                android:layout_marginStart="10dp"
+                android:textAllCaps="false"
+                android:layout_weight="1"
+                android:background="@color/gray"
+                android:id="@+id/submitSurvey"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Submit Survey" />
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+</RelativeLayout>

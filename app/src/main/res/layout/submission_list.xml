@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TableRow
+        android:background="@drawable/submission_border">
+
+        <!-- Status icon -->
+        <ImageView
+            android:padding="7dp"
+            android:id="@+id/statusIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_submitted_synced" />
+
+
+        <LinearLayout
+            android:background="@drawable/submission_border"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <!-- Date text -->
+            <TextView
+                android:padding="5dp"
+                android:id="@+id/tvDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="12/03/2023" />
+
+
+
+            <!-- Status text -->
+            <TextView
+                android:padding="5dp"
+                android:background="@drawable/submission_border"
+                android:id="@+id/tvSubmitted"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="16sp"
+                android:text="Submitted" />
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:id="@+id/linearView"
+            android:layout_marginEnd="10dp"
+            android:padding="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <!-- Status icon -->
+            <ImageView
+                android:id="@+id/ic_status_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_synch" />
+
+            <!-- Status text -->
+            <TextView
+                android:layout_marginStart="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="View" />
+
+        </LinearLayout>
+
+    </TableRow>
+
+
+
+
+
+
+</TableLayout>
