@@ -33,6 +33,7 @@ class Login : AppCompatActivity() {
         usernameEdittext = findViewById(R.id.usernameEdittext)
         passwordEdittext = findViewById(R.id.passwordEdittext)
 
+        serverUrlEdittext.setText("http://pssnational.intellisoftkenya.com/")
         findViewById<Button>(R.id.loginButton).setOnClickListener {
 
             var progressDialog = ProgressDialog(this)

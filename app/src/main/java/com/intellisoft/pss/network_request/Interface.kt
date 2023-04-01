@@ -12,7 +12,7 @@ interface Interface {
     @POST("data-entry/response/save")
     suspend fun submitData(@Body dbSaveDataEntry: DbSaveDataEntry): Response<Any>
 
-    @GET("national-instance/indicators")
+    @GET("national-template/published-indicators")
     suspend fun getDataEntry(): Response<DbDataEntry>
 
 }

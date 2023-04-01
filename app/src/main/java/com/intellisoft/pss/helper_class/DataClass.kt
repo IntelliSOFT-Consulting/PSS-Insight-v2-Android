@@ -34,7 +34,8 @@ data class DbIndicatorsDetails(
 data class DbIndicators(
     val code: String,
     val name: String,
-    val id: String
+    val id: String,
+    val valueType: String
 )
 
 data class DbSaveDataEntry(

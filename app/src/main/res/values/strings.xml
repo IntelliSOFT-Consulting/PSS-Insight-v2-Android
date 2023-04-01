@@ -4,6 +4,10 @@
     <string name="syncing">Syncing Your Configurations</string>
     <string name="navigation">navigation</string>
     <string name="base_url">navigation</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign In</string>
+    <string name="username">Username</string>
+    <string name="server_url">Server URL</string>
 
     <string-array name="navigation_drawer_items_array">
         <item>Connect</item>

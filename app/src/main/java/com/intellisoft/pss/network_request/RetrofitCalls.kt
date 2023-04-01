@@ -46,17 +46,17 @@ class RetrofitCalls {
                     val apiService = RetrofitBuilder.getRetrofit(baseUrl).create(Interface::class.java)
                     try {
                         val apiInterface = apiService.submitData(dbSaveDataEntry)
-                        if (apiInterface.isSuccessful){
+                        messageToast = if (apiInterface.isSuccessful){
                             val statusCode = apiInterface.code()
                             val body = apiInterface.body()
                             if (statusCode == 200 || statusCode == 201){
-                                messageToast = "Saved successfully"
+                                "Saved successfully"
                             }else{
-                                messageToast = "Error: Body is null"
+                                "Error: Body is null"
                             }
 
                         }else{
-                            messageToast = "Error: The request was not successful"
+                            "Error: The request was not successful"
                         }
 
 
