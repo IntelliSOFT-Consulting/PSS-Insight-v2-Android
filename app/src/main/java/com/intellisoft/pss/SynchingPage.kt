@@ -27,6 +27,7 @@ class SynchingPage : AppCompatActivity() {
     super.onStart()
 
     retrofitCalls.getDataEntry(this)
+    retrofitCalls.getOrganizations(this)
 
     CoroutineScope(Dispatchers.IO).launch { test() }
   }

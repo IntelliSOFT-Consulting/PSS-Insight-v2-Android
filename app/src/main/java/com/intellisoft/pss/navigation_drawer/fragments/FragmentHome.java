@@ -11,7 +11,7 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import com.intellisoft.pss.helper_class.FormatterClass;
-import com.intellisoft.pss.NavigationValues;
+import com.intellisoft.pss.helper_class.NavigationValues;
 import com.intellisoft.pss.R;
 import com.intellisoft.pss.navigation_drawer.MainActivity;
 

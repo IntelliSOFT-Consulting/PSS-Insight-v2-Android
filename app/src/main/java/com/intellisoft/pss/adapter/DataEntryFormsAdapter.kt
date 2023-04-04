@@ -17,7 +17,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.intellisoft.pss.DbIndicators
+import com.intellisoft.pss.helper_class.DbIndicators
 import com.intellisoft.pss.R
 import com.intellisoft.pss.helper_class.FormatterClass
 import com.intellisoft.pss.room.Comments
@@ -104,6 +104,7 @@ class DataEntryFormsAdapter(
     val indicatorId = dbDataEntryFormList[position].id
     val valueType = dbDataEntryFormList[position].valueType
 
+    Log.e("indicatorId", "indicatorId $indicatorId")
     Log.e("valueType", "valueType $valueType")
     when (valueType) {
       "BOOLEAN" -> {

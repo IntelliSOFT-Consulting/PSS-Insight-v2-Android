@@ -39,4 +39,15 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
         repository.getSubmitData(context)
     }
 
+    fun addOrganizations(organizationData: Organizations) {
+        repository.addOrganizations(organizationData)
+    }
+    fun getOrganizations(context: Context) = runBlocking{
+        repository.getAllOrganizations(context)
+    }
+
+    fun getSubmission(submissionId: String, context: Context)= runBlocking {
+        repository.getSubmission(submissionId,context)
+    }
+
 }

@@ -10,8 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,27 +24,31 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.resources.MaterialAttributes;
-import com.intellisoft.pss.DbDataEntry;
-import com.intellisoft.pss.DbDataEntryDetails;
-import com.intellisoft.pss.DbDataEntryForm;
-import com.intellisoft.pss.DbIndicators;
-import com.intellisoft.pss.DbIndicatorsDetails;
-import com.intellisoft.pss.DbSaveDataEntry;
-import com.intellisoft.pss.NavigationValues;
+import com.google.android.material.textfield.TextInputLayout;
+import com.intellisoft.pss.helper_class.DbDataEntry;
+import com.intellisoft.pss.helper_class.DbDataEntryDetails;
+import com.intellisoft.pss.helper_class.DbDataEntryForm;
+import com.intellisoft.pss.helper_class.DbIndicators;
+import com.intellisoft.pss.helper_class.DbIndicatorsDetails;
+import com.intellisoft.pss.helper_class.DbSaveDataEntry;
+import com.intellisoft.pss.helper_class.NavigationValues;
 import com.intellisoft.pss.helper_class.FormatterClass;
 import com.intellisoft.pss.R;
-import com.intellisoft.pss.SubmissionsStatus;
+import com.intellisoft.pss.helper_class.SubmissionQueue;
+import com.intellisoft.pss.helper_class.SubmissionsStatus;
 import com.intellisoft.pss.adapter.DataEntryAdapter;
 import com.intellisoft.pss.navigation_drawer.MainActivity;
 import com.intellisoft.pss.network_request.RetrofitCalls;
 import com.intellisoft.pss.room.Converters;
 import com.intellisoft.pss.room.IndicatorsData;
+import com.intellisoft.pss.room.Organizations;
 import com.intellisoft.pss.room.PssViewModel;
 import com.intellisoft.pss.room.Submissions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FragmentDataEntry extends Fragment {
     private PssViewModel myViewModel;
@@ -52,8 +58,18 @@ public class FragmentDataEntry extends Fragment {
 
     private MaterialButton saveDraft, submitSurvey, btnCancel, btnNext;
     private EditText etPeriod;
+    private TextView progressLabel;
     private RetrofitCalls retrofitCalls = new RetrofitCalls();
     private LinearLayoutManager linearLayoutManager;
+
+    private Map<String, String> stringMap;
+    private String organizationsCode;
+
+    private List<Organizations> organizationsList;
+    private List<String> stringList;
+    private AutoCompleteTextView autoCompleteTextView;
+    private TextInputLayout textInputLayout;
+    private ArrayAdapter adapter;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
@@ -68,16 +84,17 @@ public class FragmentDataEntry extends Fragment {
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
 
-
-
         myViewModel = new PssViewModel(((Application) requireContext().getApplicationContext()));
 
         saveDraft = rootView.findViewById(R.id.saveDraft);
         submitSurvey = rootView.findViewById(R.id.submitSurvey);
         btnCancel = rootView.findViewById(R.id.btn_cancel);
         btnNext = rootView.findViewById(R.id.btn_next);
+        progressLabel = rootView.findViewById(R.id.progress_label);
 
         etPeriod = rootView.findViewById(R.id.etPeriod);
+        autoCompleteTextView = rootView.findViewById(R.id.act_organization);
+        textInputLayout = rootView.findViewById(R.id.til_organization);
 
         saveDraft.setOnClickListener(view -> {
             String period = etPeriod.getText().toString();
@@ -86,7 +103,13 @@ public class FragmentDataEntry extends Fragment {
                 etPeriod.requestFocus();
                 return;
             }
-            saveSubmission(SubmissionsStatus.DRAFT.name(),period);
+            String organizationsCode = autoCompleteTextView.getText().toString();
+            if (TextUtils.isEmpty(period)) {
+                textInputLayout.setError("Field cannot be empty..");
+                autoCompleteTextView.requestFocus();
+                return;
+            }
+            saveSubmission(SubmissionsStatus.DRAFT.name(), period, organizationsCode);
             Intent intent = new Intent(requireContext(), MainActivity.class);
             startActivity(intent);
 
@@ -99,7 +122,13 @@ public class FragmentDataEntry extends Fragment {
                 etPeriod.requestFocus();
                 return;
             }
-            saveSubmission(SubmissionsStatus.SUBMITTED.name(),period);
+            String organizationsCode = autoCompleteTextView.getText().toString();
+            if (TextUtils.isEmpty(period)) {
+                textInputLayout.setError("Field cannot be empty..");
+                autoCompleteTextView.requestFocus();
+                return;
+            }
+            saveSubmission(SubmissionsStatus.SUBMITTED.name(), period, organizationsCode);
             DbSaveDataEntry dataEntry = myViewModel.getSubmitData(requireContext());
             if (dataEntry != null) {
                 retrofitCalls.submitData(requireContext(), dataEntry);
@@ -112,19 +141,34 @@ public class FragmentDataEntry extends Fragment {
 
         });
 
+        loadInitial();
 
         return rootView;
+    }
+
+    private void loadInitial() {
+        String submissionId = formatterClass.getSharedPref(SubmissionQueue.INITIATED.name(), requireContext());
+        if (submissionId != null) {
+            /*
+             * Load the submission per ID*/
+            Submissions submission=myViewModel.getSubmission(submissionId,requireContext());
+            Log.e("Submission","Submission Id"+submission);
+            if (submission!=null){
+                autoCompleteTextView.setText(submission.getOrganization());
+                etPeriod.setText(submission.getPeriod());
+            }
+        }
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                Log.e("Current", "Current State" + newState);
                 handleButtonClicks();
             }
         });
@@ -150,10 +194,35 @@ public class FragmentDataEntry extends Fragment {
             }
             handleButtonClicks();
         });
+
+
+        loadOrganizations();
+    }
+
+    private void loadOrganizations() {
+        organizationsList = myViewModel.getOrganizations(requireContext());
+        stringMap = new HashMap<>();
+        stringList = new ArrayList<>();
+        for (Organizations organization : organizationsList) {
+            stringList.add(organization.getDisplayName());
+            stringMap.put(organization.getIdcode(), organization.getDisplayName());
+        }
+        adapter = new ArrayAdapter(requireContext(),
+                android.R.layout.simple_list_item_1, stringList);
+        Log.e("stringList", "stringList:::::" + stringList);
+
+        autoCompleteTextView.setAdapter(adapter);
+        autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
+            organizationsCode = getOrganizationsCode(autoCompleteTextView.getText().toString());
+        });
+    }
+
+    private String getOrganizationsCode(String toString) {
+        return stringMap.get(toString);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void saveSubmission(String status,String period) {
+    private void saveSubmission(String status, String period, String organizationsCode) {
 
         //Create a entity of the date it was pressed
         String userId = formatterClass.getSharedPref("username", requireContext());
@@ -161,6 +230,7 @@ public class FragmentDataEntry extends Fragment {
             String date = formatterClass.getCurrentDate();
             Submissions submissions = new Submissions(
                     date,
+                    organizationsCode,
                     status,
                     userId,
                     period
@@ -169,7 +239,6 @@ public class FragmentDataEntry extends Fragment {
         }
         formatterClass.saveSharedPref(NavigationValues.NAVIGATION.name(),
                 NavigationValues.SUBMISSION.name(), requireContext());
-
 
     }
 
@@ -211,15 +280,19 @@ public class FragmentDataEntry extends Fragment {
 
             formatterClass.saveSharedPref("indicatorSize",
                     String.valueOf(indicatorSize), requireContext());
-
             handleButtonClicks();
         }
+    }
+
+    private void updateProgress(int count) {
+
     }
 
     private void handleButtonClicks() {
         LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
         int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
         int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+        int totalItemCount = mRecyclerView.getAdapter().getItemCount();
 
         if (firstVisibleItemPosition == 0) {
             // The first visible item is active, disable the back button
@@ -231,7 +304,7 @@ public class FragmentDataEntry extends Fragment {
             submitSurvey.setVisibility(View.GONE);
         }
 
-        if (lastVisibleItemPosition == mRecyclerView.getAdapter().getItemCount() - 1) {
+        if (lastVisibleItemPosition == totalItemCount - 1) {
             // The last visible item is active, remove the next button
             btnNext.setVisibility(View.GONE);
             submitSurvey.setVisibility(View.VISIBLE);
@@ -241,7 +314,14 @@ public class FragmentDataEntry extends Fragment {
             submitSurvey.setVisibility(View.GONE);
         }
 
+        int activeItemCount;
+        if (firstVisibleItemPosition == -1 || lastVisibleItemPosition == -1) {
+            activeItemCount = 1;
+        } else {
+            activeItemCount = lastVisibleItemPosition - firstVisibleItemPosition + 1;
+        }
 
-
+        String activeItemText = "Page " + activeItemCount + " / " + totalItemCount;
+        progressLabel.setText(activeItemText);
     }
 }

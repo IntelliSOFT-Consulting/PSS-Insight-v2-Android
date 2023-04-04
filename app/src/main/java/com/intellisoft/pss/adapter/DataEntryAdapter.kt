@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.intellisoft.pss.DbDataEntryForm
+import com.intellisoft.pss.helper_class.DbDataEntryForm
 import com.intellisoft.pss.R
 
 class DataEntryAdapter (private var dbDataEntryFormList: ArrayList<DbDataEntryForm>,

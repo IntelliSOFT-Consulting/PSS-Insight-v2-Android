@@ -1,4 +1,6 @@
-package com.intellisoft.pss
+package com.intellisoft.pss.helper_class
+
+import com.intellisoft.pss.R
 
 enum class NavigationValues {
   NAVIGATION,
@@ -11,11 +13,20 @@ enum class SubmissionsStatus {
   DRAFT
 }
 
+enum class SubmissionQueue {
+  INITIATED,
+  COMPLETED
+}
+
 data class DbSubmission(val date: String, val status: String)
 
 data class DbDataEntry(val count: Int, val details: List<DbDataEntryDetails>)
 
 data class DbDataEntryDetails(val categoryName: String, val indicators: List<DbIndicatorsDetails>)
+
+data class DbOrganizationEntry(val count: Int, val details: List<DbOrganizationEntryDetails>)
+
+data class DbOrganizationEntryDetails(val id: String, val displayName: String)
 
 data class DbIndicatorsDetails(
     val categoryId: String?,

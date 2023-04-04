@@ -35,9 +35,19 @@ data class Comments(
 @Entity(tableName = "submissions")
 data class Submissions(
     var date: String ,
+    var organization: String ,
     val status: String,
     var userId: String ,
     var period: String ,
+){
+    @PrimaryKey(autoGenerate = true)
+    var id: Int? = null
+}
+
+@Entity(tableName = "organizations")
+data class Organizations(
+    var idcode: String ,
+    val displayName: String,
 ){
     @PrimaryKey(autoGenerate = true)
     var id: Int? = null

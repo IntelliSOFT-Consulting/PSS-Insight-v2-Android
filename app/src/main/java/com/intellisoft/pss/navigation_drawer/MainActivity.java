@@ -17,7 +17,7 @@ import android.widget.ListView;
 
 import com.intellisoft.pss.Login;
 import com.intellisoft.pss.helper_class.FormatterClass;
-import com.intellisoft.pss.NavigationValues;
+import com.intellisoft.pss.helper_class.NavigationValues;
 import com.intellisoft.pss.R;
 import com.intellisoft.pss.navigation_drawer.drawer.DataModel;
 import com.intellisoft.pss.navigation_drawer.drawer.DrawerItemCustomAdapter;
@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         drawerItem[4] = new DataModel();
         drawerItem[5] = new DataModel(R.drawable.about, "About");
         drawerItem[6] = new DataModel(R.drawable.help_desk, "Help Desk");
+//        drawerItem[7] = new DataModel(R.drawable.baseline_maps_home_work_24, "Organizations");
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Log.e("Main","Item:::::::"+position);
             selectItem(position);
         }
 
@@ -128,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 finish();
                 break;
             case 4:
-//                fragment = new FragmentAbout();
+//                fragment = new OrganizationFragment();
                 break;
             case 5:
                 fragment = new FragmentAbout();

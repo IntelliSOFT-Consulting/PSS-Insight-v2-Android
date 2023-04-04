@@ -12,6 +12,7 @@ import androidx.room.TypeConverters
         IndicatorResponse::class,
         Submissions::class,
         Comments::class,
+        Organizations::class,
     ],
     version = 1,
     exportSchema = false)

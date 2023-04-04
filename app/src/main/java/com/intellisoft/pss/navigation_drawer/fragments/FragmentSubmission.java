@@ -14,11 +14,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.intellisoft.pss.SubmissionsStatus;
-import com.intellisoft.pss.adapter.DataEntryAdapter;
+import com.intellisoft.pss.helper_class.SubmissionsStatus;
 import com.intellisoft.pss.adapter.SubmissionAdapter;
 import com.intellisoft.pss.helper_class.FormatterClass;
-import com.intellisoft.pss.NavigationValues;
+import com.intellisoft.pss.helper_class.NavigationValues;
 import com.intellisoft.pss.R;
 import com.intellisoft.pss.navigation_drawer.MainActivity;
 import com.intellisoft.pss.room.PssViewModel;
@@ -70,6 +69,7 @@ public class FragmentSubmission extends Fragment {
             String year = formatterClass.getYear();
             Submissions submissions = new Submissions(
                     date,
+                    "",
                     status,
                     userId,
                     year
