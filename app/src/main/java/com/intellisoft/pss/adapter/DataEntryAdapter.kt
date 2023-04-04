@@ -29,9 +29,8 @@ class DataEntryAdapter (private var dbDataEntryFormList: ArrayList<DbDataEntryFo
             recyclerView.setHasFixedSize(true)
 
         }
-
         override fun onClick(p0: View?) {
-            TODO("Not yet implemented")
+//            TODO("Not yet implemented")
         }
 
     }
@@ -51,9 +50,9 @@ class DataEntryAdapter (private var dbDataEntryFormList: ArrayList<DbDataEntryFo
 
     override fun onBindViewHolder(holder: Pager2ViewHolder, position: Int) {
 
-        val indicatorCode = dbDataEntryFormList[position].indicatorCode
+        val indicatorCode = dbDataEntryFormList[position].categoryName
         val indicatorName = dbDataEntryFormList[position].indicatorName
-        val indicatorId = dbDataEntryFormList[position].indicatorId
+        val indicatorId = dbDataEntryFormList[position].categoryId
         val formsList = dbDataEntryFormList[position].forms
 
         holder.pssCode.text = indicatorCode

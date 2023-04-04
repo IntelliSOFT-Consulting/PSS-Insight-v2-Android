@@ -8,6 +8,18 @@
     <string name="sign_in">Sign In</string>
     <string name="username">Username</string>
     <string name="server_url">Server URL</string>
+    <string name="pss_insight_v2_data_entry">PSS INSIGHT V2 DATA ENTRY</string>
+    <string name="quick_actions">QUICK ACTIONS</string>
+    <string name="your_submissions">Your Submissions</string>
+    <string name="new_survey">New Survey</string>
+    <string name="back">Back</string>
+    <string name="submit">Submit</string>
+    <string name="safe_draft">Safe Draft</string>
+    <string name="please_answer_these_questions">Please answer these questions</string>
+    <string name="_20_done">20% done</string>
+    <string name="select_year">Select Year*</string>
+    <string name="next">Next</string>
+    <string name="current_page">Page 1/2</string>
 
     <string-array name="navigation_drawer_items_array">
         <item>Connect</item>
