@@ -3,9 +3,9 @@ package com.intellisoft.pss.adapter
 import android.app.Application
 import android.app.Dialog
 import android.content.Context
+import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -17,16 +17,19 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.intellisoft.pss.helper_class.DbIndicators
 import com.intellisoft.pss.R
+import com.intellisoft.pss.helper_class.DbIndicators
 import com.intellisoft.pss.helper_class.FormatterClass
+import com.intellisoft.pss.navigation_drawer.fragments.FragmentDataEntry
 import com.intellisoft.pss.room.Comments
 import com.intellisoft.pss.room.IndicatorResponse
 import com.intellisoft.pss.room.PssViewModel
 
 class DataEntryFormsAdapter(
     private var dbDataEntryFormList: ArrayList<DbIndicators>,
-    private val context: Context
+    private val context: Context,
+    private val submissionId: String,
+    private val fragmentDataEntry: FragmentDataEntry
 ) : RecyclerView.Adapter<DataEntryFormsAdapter.Pager2ViewHolder>() {
 
   inner class Pager2ViewHolder(itemView: View) :
@@ -52,9 +55,11 @@ class DataEntryFormsAdapter(
           val pos = adapterPosition
           val id = dbDataEntryFormList[pos].id
           val name = dbDataEntryFormList[pos].name
-
-          val indicatorResponse = IndicatorResponse(userId.toString(), id, "Yes")
+          val indicatorResponse = IndicatorResponse(userId.toString(), submissionId, id, "Yes")
           myViewModel.addResponse(indicatorResponse)
+          Handler().postDelayed({
+            fragmentDataEntry.updateProgress()
+          }, 2000)
         }
       }
       radioNo.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -62,9 +67,11 @@ class DataEntryFormsAdapter(
           val pos = adapterPosition
           val id = dbDataEntryFormList[pos].id
           val name = dbDataEntryFormList[pos].name
-
-          val indicatorResponse = IndicatorResponse(userId.toString(), id, "No")
+          val indicatorResponse = IndicatorResponse(userId.toString(), submissionId, id, "No")
           myViewModel.addResponse(indicatorResponse)
+          Handler().postDelayed({
+            fragmentDataEntry.updateProgress()
+          }, 2000)
         }
       }
     }
@@ -87,8 +94,11 @@ class DataEntryFormsAdapter(
       val name = dbDataEntryFormList[pos].name
       val value = p0.toString()
 
-      val indicatorResponse = IndicatorResponse(userId.toString(), id, value)
+      val indicatorResponse = IndicatorResponse(userId.toString(), submissionId, id, value)
       myViewModel.addResponse(indicatorResponse)
+      Handler().postDelayed({
+        fragmentDataEntry.updateProgress()
+      }, 2000)
     }
   }
 
@@ -102,11 +112,8 @@ class DataEntryFormsAdapter(
     val code = dbDataEntryFormList[position].code
     val name = dbDataEntryFormList[position].name
     val indicatorId = dbDataEntryFormList[position].id
-    val valueType = dbDataEntryFormList[position].valueType
 
-    Log.e("indicatorId", "indicatorId $indicatorId")
-    Log.e("valueType", "valueType $valueType")
-    when (valueType) {
+    when (dbDataEntryFormList[position].valueType) {
       "BOOLEAN" -> {
         holder.radioGroup.visibility = VISIBLE
         holder.etValue.visibility = GONE
@@ -122,7 +129,7 @@ class DataEntryFormsAdapter(
     }
 
     // Get saved responses
-    val value = holder.myViewModel.getMyResponse(context, indicatorId)
+    val value = holder.myViewModel.getMyResponse(context, indicatorId, submissionId)
     if (value != null) {
       holder.etValue.setText(value)
       if (value == "Yes") {

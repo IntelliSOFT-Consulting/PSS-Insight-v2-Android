@@ -33,7 +33,8 @@ class Login : AppCompatActivity() {
         usernameEdittext = findViewById(R.id.usernameEdittext)
         passwordEdittext = findViewById(R.id.passwordEdittext)
 
-        serverUrlEdittext.setText("http://pssnational.intellisoftkenya.com/")
+        populateInital()
+
         findViewById<Button>(R.id.loginButton).setOnClickListener {
 
             var progressDialog = ProgressDialog(this)
@@ -91,8 +92,6 @@ class Login : AppCompatActivity() {
 
                     }
 
-
-
                 }
 
             }else{
@@ -102,9 +101,14 @@ class Login : AppCompatActivity() {
                 if (TextUtils.isEmpty(password)) passwordEdittext.error = "Password cannot be found."
             }
 
-
         }
 
+    }
+
+    private fun populateInital() {
+        serverUrlEdittext.setText("http://pssnational.intellisoftkenya.com/")
+        usernameEdittext.setText("admin")
+        passwordEdittext.setText("district")
     }
 
     override fun onStart() {

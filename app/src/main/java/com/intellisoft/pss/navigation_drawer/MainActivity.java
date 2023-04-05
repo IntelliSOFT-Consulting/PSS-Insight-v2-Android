@@ -7,18 +7,25 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.app.Application;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.intellisoft.pss.Login;
+import com.intellisoft.pss.helper_class.DbSaveDataEntry;
 import com.intellisoft.pss.helper_class.FormatterClass;
 import com.intellisoft.pss.helper_class.NavigationValues;
 import com.intellisoft.pss.R;
+import com.intellisoft.pss.helper_class.SubmissionsStatus;
 import com.intellisoft.pss.navigation_drawer.drawer.DataModel;
 import com.intellisoft.pss.navigation_drawer.drawer.DrawerItemCustomAdapter;
 import com.intellisoft.pss.navigation_drawer.fragments.FragmentAbout;
@@ -28,19 +35,54 @@ import com.intellisoft.pss.navigation_drawer.fragments.FragmentHome;
 import com.intellisoft.pss.navigation_drawer.fragments.FragmentSetPin;
 import com.intellisoft.pss.navigation_drawer.fragments.FragmentSettings;
 import com.intellisoft.pss.navigation_drawer.fragments.FragmentSubmission;
+import com.intellisoft.pss.network_request.RetrofitCalls;
+import com.intellisoft.pss.room.PssViewModel;
+import com.intellisoft.pss.room.Submissions;
 
+import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     private String[] mNavigationDrawerItemTitles;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     Toolbar toolbar;
     private CharSequence mTitle;
-
+    private RetrofitCalls retrofitCalls = new RetrofitCalls();
     ActionBarDrawerToggle mDrawerToggle;
     private FormatterClass formatterClass = new FormatterClass();
+    private PssViewModel myViewModel;
+
+    private BroadcastReceiver myBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("dhis2")) {
+                // Call your function here
+                autoSyncSubmissions();
+            }
+        }
+    };
+
+    private void autoSyncSubmissions() {
+
+        List<Submissions> submissionList = myViewModel.getUnsyncedSubmissions(this, SubmissionsStatus.SUBMITTED.name());
+        for (Submissions sm : submissionList) {
+            DbSaveDataEntry dataEntry = myViewModel.getSubmitSync(this, sm);
+            if (dataEntry != null) {
+                retrofitCalls.submitSyncData(this, dataEntry,sm,myViewModel);
+
+            }
+        }
+//        Toast.makeText(this, "MyService is running", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(myBroadcastReceiver);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mTitle = "Connect";
-        mNavigationDrawerItemTitles= getResources().getStringArray(R.array.navigation_drawer_items_array);
+        mNavigationDrawerItemTitles = getResources().getStringArray(R.array.navigation_drawer_items_array);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
@@ -65,6 +107,9 @@ public class MainActivity extends AppCompatActivity {
         drawerItem[6] = new DataModel(R.drawable.help_desk, "Help Desk");
 //        drawerItem[7] = new DataModel(R.drawable.baseline_maps_home_work_24, "Organizations");
 
+        IntentFilter intentFilter = new IntentFilter("dhis2");
+        registerReceiver(myBroadcastReceiver, intentFilter);
+        myViewModel = new PssViewModel(((Application) this.getApplicationContext()));
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(true);
 
@@ -76,11 +121,12 @@ public class MainActivity extends AppCompatActivity {
 
         setupDrawerToggle();
     }
+
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Log.e("Main","Item:::::::"+position);
+            Log.e("Main", "Item:::::::" + position);
             selectItem(position);
         }
 
@@ -91,19 +137,17 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         String navigation = formatterClass.getSharedPref(NavigationValues.NAVIGATION.name(), this);
-        if (navigation == null){
+        if (navigation == null) {
             selectItem(0);
-        }else {
-            if (navigation.equals(NavigationValues.SUBMISSION.name())){
+        } else {
+            if (navigation.equals(NavigationValues.SUBMISSION.name())) {
                 selectItem(7);
-            }else if (navigation.equals(NavigationValues.DATA_ENTRY.name())) {
+            } else if (navigation.equals(NavigationValues.DATA_ENTRY.name())) {
                 selectItem(8);
-            }else {
+            } else {
                 selectItem(0);
             }
         }
-
-
 
 
     }
@@ -185,14 +229,14 @@ public class MainActivity extends AppCompatActivity {
         mDrawerToggle.syncState();
     }
 
-    void setupToolbar(){
+    void setupToolbar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
-    void setupDrawerToggle(){
-        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,toolbar,R.string.app_name, R.string.app_name);
+    void setupDrawerToggle() {
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name);
         //This is necessary to change the icon of the Drawer Toggle upon state change.
         mDrawerToggle.syncState();
     }

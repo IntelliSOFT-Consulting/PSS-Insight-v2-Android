@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.intellisoft.pss.helper_class.SubmissionQueue;
 import com.intellisoft.pss.helper_class.SubmissionsStatus;
 import com.intellisoft.pss.adapter.SubmissionAdapter;
 import com.intellisoft.pss.helper_class.FormatterClass;
@@ -32,13 +33,14 @@ public class FragmentSubmission extends Fragment {
     private FormatterClass formatterClass = new FormatterClass();
     private PssViewModel myViewModel;
     private RecyclerView mRecyclerView;
+    ArrayList<Submissions> submissionArrayList;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_submission, container, false);
-
+        submissionArrayList = new ArrayList<>();
         myViewModel = new PssViewModel(((Application) requireContext().getApplicationContext()));
         mRecyclerView = rootView.findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
@@ -61,10 +63,10 @@ public class FragmentSubmission extends Fragment {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void saveSubmission(String status){
+    private void saveSubmission(String status) {
         //Create a entity of the date it was pressed
         String userId = formatterClass.getSharedPref("username", requireContext());
-        if (userId != null){
+        if (userId != null) {
             String date = formatterClass.getCurrentDate();
             String year = formatterClass.getYear();
             Submissions submissions = new Submissions(
@@ -72,9 +74,10 @@ public class FragmentSubmission extends Fragment {
                     "",
                     status,
                     userId,
-                    year
+                    year,false
             );
-            myViewModel.addSubmissions(submissions);
+            myViewModel.initiateSubmissions(submissions);
+            formatterClass.saveSharedPref(SubmissionQueue.INITIATED.name(), "", requireContext());
         }
     }
 
@@ -88,9 +91,8 @@ public class FragmentSubmission extends Fragment {
     private void getSubmissions() {
 
         List<Submissions> submissionList = myViewModel.getSubmissions(requireContext());
+
         SubmissionAdapter dataEntryAdapter = new SubmissionAdapter((ArrayList<Submissions>) submissionList, requireContext());
         mRecyclerView.setAdapter(dataEntryAdapter);
-
-
     }
 }

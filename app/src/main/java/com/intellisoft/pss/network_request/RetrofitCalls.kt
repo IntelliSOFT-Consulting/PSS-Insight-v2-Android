@@ -9,10 +9,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.intellisoft.pss.helper_class.DbSaveDataEntry
 import com.intellisoft.pss.helper_class.FormatterClass
-import com.intellisoft.pss.room.Converters
-import com.intellisoft.pss.room.IndicatorsData
-import com.intellisoft.pss.room.Organizations
-import com.intellisoft.pss.room.PssViewModel
+import com.intellisoft.pss.room.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -28,6 +25,21 @@ class RetrofitCalls {
           .join()
     }
   }
+  fun submitSyncData(
+      context: Context,
+      dbSaveDataEntry: DbSaveDataEntry,
+      sm: Submissions,
+      myViewModel: PssViewModel
+  ) {
+
+    CoroutineScope(Dispatchers.Main).launch {
+      val job = Job()
+
+      CoroutineScope(Dispatchers.IO + job)
+          .launch { submitSyncDataBackground(context, dbSaveDataEntry, sm, myViewModel) }
+          .join()
+    }
+  }
   private suspend fun submitDataBackground(context: Context, dbSaveDataEntry: DbSaveDataEntry) {
 
     val job1 = Job()
@@ -37,7 +49,7 @@ class RetrofitCalls {
       progressDialog.setMessage("Posting data in progress..")
       progressDialog.setCanceledOnTouchOutside(false)
       progressDialog.show()
-      Log.e("Submit","Submitted Report $dbSaveDataEntry")
+      Log.e("Submit", "Submitted Report $dbSaveDataEntry")
 
       var messageToast = ""
       val job = Job()
@@ -73,6 +85,60 @@ class RetrofitCalls {
         Toast.makeText(context, messageToast, Toast.LENGTH_LONG).show()
       }
     }
+  }
+  private suspend fun submitSyncDataBackground(
+      context: Context,
+      dbSaveDataEntry: DbSaveDataEntry,
+      sm: Submissions,
+      myViewModel: PssViewModel
+  ) {
+
+    val job1 = Job()
+    CoroutineScope(Dispatchers.Main + job1).launch {
+      var messageToast = ""
+      val job = Job()
+      CoroutineScope(Dispatchers.IO + job)
+          .launch {
+            val formatterClass = FormatterClass()
+            val baseUrl = formatterClass.getSharedPref("serverUrl", context)
+
+            if (baseUrl != null) {
+              val apiService = RetrofitBuilder.getRetrofit(baseUrl).create(Interface::class.java)
+              try {
+                val apiInterface = apiService.submitData(dbSaveDataEntry)
+                messageToast =
+                    if (apiInterface.isSuccessful) {
+                      val statusCode = apiInterface.code()
+                      val body = apiInterface.body()
+                      if (statusCode == 200 || statusCode == 201) {
+                        updateSubmission(context, sm, "Saved and synced successfully", myViewModel)
+                      } else {
+                        "Error: Body is null"
+                      }
+                    } else {
+                      "Error: The request was not successful"
+                    }
+              } catch (e: Exception) {
+                messageToast = "There was an issue with the server"
+              }
+            }
+          }
+          .join()
+      CoroutineScope(Dispatchers.Main).launch {
+
+        //        Toast.makeText(context, messageToast, Toast.LENGTH_LONG).show()
+      }
+    }
+  }
+
+  private fun updateSubmission(
+      context: Context,
+      sm: Submissions,
+      message: String,
+      viewModel: PssViewModel
+  ): String {
+    viewModel.markSynced(context, sm.id.toString())
+    return message
   }
 
   fun getDataEntry(context: Context) {
@@ -128,12 +194,12 @@ class RetrofitCalls {
 
                   for (i in 0 until jsonArray.size()) {
                     val jsonObject = jsonArray.get(i).asJsonObject
-                    val id=jsonObject.get("id").asString
-                    val displayName=jsonObject.get("displayName").asString
-                    val organizationData = Organizations(idcode = id,displayName=displayName)
+                    val id = jsonObject.get("id").asString
+                    val displayName = jsonObject.get("displayName").asString
+                    val organizationData = Organizations(idcode = id, displayName = displayName)
                     myViewModel.addOrganizations(organizationData)
                   }
-                }catch (e:Exception){
+                } catch (e: Exception) {
                   e.printStackTrace()
                 }
               }

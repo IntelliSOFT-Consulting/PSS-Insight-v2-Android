@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,7 +59,7 @@ public class FragmentDataEntry extends Fragment {
 
     private MaterialButton saveDraft, submitSurvey, btnCancel, btnNext;
     private EditText etPeriod;
-    private TextView progressLabel;
+    private TextView progressLabel, progressText;
     private RetrofitCalls retrofitCalls = new RetrofitCalls();
     private LinearLayoutManager linearLayoutManager;
 
@@ -70,6 +71,9 @@ public class FragmentDataEntry extends Fragment {
     private AutoCompleteTextView autoCompleteTextView;
     private TextInputLayout textInputLayout;
     private ArrayAdapter adapter;
+    private String submissionId = "";
+    private ProgressBar progressBar;
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
@@ -83,7 +87,6 @@ public class FragmentDataEntry extends Fragment {
         linearLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
-
         myViewModel = new PssViewModel(((Application) requireContext().getApplicationContext()));
 
         saveDraft = rootView.findViewById(R.id.saveDraft);
@@ -91,6 +94,8 @@ public class FragmentDataEntry extends Fragment {
         btnCancel = rootView.findViewById(R.id.btn_cancel);
         btnNext = rootView.findViewById(R.id.btn_next);
         progressLabel = rootView.findViewById(R.id.progress_label);
+        progressBar = rootView.findViewById(R.id.progressBar);
+        progressText = rootView.findViewById(R.id.progressText);
 
         etPeriod = rootView.findViewById(R.id.etPeriod);
         autoCompleteTextView = rootView.findViewById(R.id.act_organization);
@@ -104,7 +109,7 @@ public class FragmentDataEntry extends Fragment {
                 return;
             }
             String organizationsCode = autoCompleteTextView.getText().toString();
-            if (TextUtils.isEmpty(period)) {
+            if (TextUtils.isEmpty(organizationsCode)) {
                 textInputLayout.setError("Field cannot be empty..");
                 autoCompleteTextView.requestFocus();
                 return;
@@ -131,7 +136,7 @@ public class FragmentDataEntry extends Fragment {
             saveSubmission(SubmissionsStatus.SUBMITTED.name(), period, organizationsCode);
             DbSaveDataEntry dataEntry = myViewModel.getSubmitData(requireContext());
             if (dataEntry != null) {
-                retrofitCalls.submitData(requireContext(), dataEntry);
+//                retrofitCalls.submitData(requireContext(), dataEntry);
                 Intent intent = new Intent(requireContext(), MainActivity.class);
                 startActivity(intent);
 
@@ -147,16 +152,22 @@ public class FragmentDataEntry extends Fragment {
     }
 
     private void loadInitial() {
-        String submissionId = formatterClass.getSharedPref(SubmissionQueue.INITIATED.name(), requireContext());
-        if (submissionId != null) {
-            /*
-             * Load the submission per ID*/
-            Submissions submission=myViewModel.getSubmission(submissionId,requireContext());
-            Log.e("Submission","Submission Id"+submission);
-            if (submission!=null){
+        String id = formatterClass.getSharedPref(SubmissionQueue.INITIATED.name(), requireContext());
+
+        if (id != null) {
+            Submissions submission = myViewModel.getSubmission(id, requireContext());
+            if (submission != null) {
                 autoCompleteTextView.setText(submission.getOrganization());
                 etPeriod.setText(submission.getPeriod());
+                submissionId = id;
+            } else {
+                Submissions submission1 = myViewModel.getLatestSubmission(requireContext());
+                if (submission1 != null) {
+                    submissionId = submission1.getId().toString();
+                    formatterClass.saveSharedPref(SubmissionQueue.INITIATED.name(), submissionId, requireContext());
+                }
             }
+            updateProgress();
         }
     }
 
@@ -195,7 +206,6 @@ public class FragmentDataEntry extends Fragment {
             handleButtonClicks();
         });
 
-
         loadOrganizations();
     }
 
@@ -209,7 +219,6 @@ public class FragmentDataEntry extends Fragment {
         }
         adapter = new ArrayAdapter(requireContext(),
                 android.R.layout.simple_list_item_1, stringList);
-        Log.e("stringList", "stringList:::::" + stringList);
 
         autoCompleteTextView.setAdapter(adapter);
         autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
@@ -233,9 +242,14 @@ public class FragmentDataEntry extends Fragment {
                     organizationsCode,
                     status,
                     userId,
-                    period
+                    period, false
             );
-            myViewModel.addSubmissions(submissions);
+            Log.e("Data Entry", "Button Clicked...." + submissionId + "code" + organizationsCode);
+            if (submissionId == null) {
+                myViewModel.addSubmissions(submissions);
+            } else {
+                myViewModel.updateSubmissions(submissions, submissionId);
+            }
         }
         formatterClass.saveSharedPref(NavigationValues.NAVIGATION.name(),
                 NavigationValues.SUBMISSION.name(), requireContext());
@@ -275,17 +289,44 @@ public class FragmentDataEntry extends Fragment {
 
                 }
             }
-            DataEntryAdapter dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext());
+            Log.e("Data Entry", "Submission Id" + submissionId);
+            DataEntryAdapter dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId,FragmentDataEntry.this);
             mRecyclerView.setAdapter(dataEntryAdapter);
 
             formatterClass.saveSharedPref("indicatorSize",
                     String.valueOf(indicatorSize), requireContext());
+            Log.e("Data Entry", "indicatorSize::::::" + indicatorSize);
             handleButtonClicks();
+            controlPagination(dataEntry.getCount());
         }
     }
 
-    private void updateProgress(int count) {
+    private void controlPagination(int count) {
+        if (count == 1) {
+            btnCancel.setVisibility(View.INVISIBLE);
+            btnNext.setVisibility(View.GONE);
+            saveDraft.setVisibility(View.VISIBLE);
+            submitSurvey.setVisibility(View.VISIBLE);
+        }
+    }
 
+    public void updateProgress() {
+        String indicatorSize = formatterClass.getSharedPref("indicatorSize", requireContext());
+        Integer answers = myViewModel.getSubmissionResponses(requireContext(), submissionId);
+        try {
+            double total = Double.parseDouble(indicatorSize);
+            double answered = answers;
+
+            double percent = (answered / total) * 100;
+            int percentInt = (int) percent;
+            progressBar.setProgress(percentInt);
+            progressText.setText( percentInt+"% done");
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("Data Entry", "indicatorSize:::::: error" + e.getMessage());
+        }
     }
 
     private void handleButtonClicks() {

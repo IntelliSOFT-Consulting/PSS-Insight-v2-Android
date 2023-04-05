@@ -1,14 +1,18 @@
 package com.intellisoft.pss
 
 import android.app.Application
-import com.intellisoft.pss.sync.SyncScheduler
+import android.content.Intent
+import com.intellisoft.pss.sync.Dhis2
 
 class App : Application() {
 
   override fun onCreate() {
     super.onCreate()
-
-    val syncScheduler = SyncScheduler(this)
-    syncScheduler.schedule() // Schedule the job to run every 5 minutes
+    try {
+      val serviceIntent = Intent(this, Dhis2::class.java)
+      startService(serviceIntent)
+    } catch (e: Exception) {
+      e.printStackTrace()
+    }
   }
 }

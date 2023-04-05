@@ -16,6 +16,7 @@ data class IndicatorsData(
 @Entity(tableName = "responses")
 data class IndicatorResponse(
     var userId: String ,
+    val submissionId: String,
     val indicatorId: String,
     val value: String,
 ){
@@ -39,10 +40,13 @@ data class Submissions(
     val status: String,
     var userId: String ,
     var period: String ,
+    @ColumnInfo(name = "is_synced")
+    var isSynced: Boolean = false
 ){
     @PrimaryKey(autoGenerate = true)
     var id: Int? = null
 }
+
 
 @Entity(tableName = "organizations")
 data class Organizations(

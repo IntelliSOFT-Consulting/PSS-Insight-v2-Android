@@ -39,9 +39,11 @@ class SubmissionAdapter(
 
     override fun onClick(p0: View?) {
       val submissionId = submissionList[adapterPosition].id
+      Log.e("Adapter", "submission:::: $submissionId")
+
+      formatterClass.saveSharedPref(SubmissionQueue.INITIATED.name, "$submissionId", context)
       formatterClass.saveSharedPref(
           NavigationValues.NAVIGATION.name, NavigationValues.DATA_ENTRY.name, context)
-      formatterClass.saveSharedPref(SubmissionQueue.INITIATED.name, "$submissionId", context)
       val intent = Intent(context, MainActivity::class.java)
       context.startActivity(intent)
     }
@@ -56,7 +58,7 @@ class SubmissionAdapter(
 
     val date = submissionList[position].date
     val status = submissionList[position].status
-    val submissionId = submissionList[position].id
+    val isSynced = submissionList[position].isSynced
 
     if (status == "DRAFT") {
       holder.statusIcon.setImageResource(R.drawable.ic_draft)
@@ -67,7 +69,7 @@ class SubmissionAdapter(
     holder.tvDate.text = date
 
     val statusValue =
-        if (status == SubmissionsStatus.SUBMITTED.name) {
+        if (status == SubmissionsStatus.SUBMITTED.name && isSynced) {
           "$status & SYNCED"
         } else {
           status

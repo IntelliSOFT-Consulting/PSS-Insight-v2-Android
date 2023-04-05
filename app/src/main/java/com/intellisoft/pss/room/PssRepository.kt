@@ -41,12 +41,13 @@ class PssRepository(private val roomDao: RoomDao) {
       val userId = indicatorResponse.userId
       val indicatorId = indicatorResponse.indicatorId
       val value = indicatorResponse.value
+      val submissionId = indicatorResponse.submissionId
 
-      val isResponse = roomDao.checkUserResponse(userId, indicatorId)
+      val isResponse = roomDao.checkUserResponse(userId, indicatorId, submissionId)
       if (!isResponse) {
         roomDao.addResponse(indicatorResponse)
       } else {
-        val response = roomDao.getMyResponse(userId, indicatorId)
+        val response = roomDao.getMyResponse(userId, indicatorId, submissionId)
         if (response != null) {
           val id = response.id
           if (id != null) {
@@ -57,10 +58,10 @@ class PssRepository(private val roomDao: RoomDao) {
     }
   }
 
-  fun getMyResponse(context: Context, indicatorId: String): String? {
+  fun getMyResponse(context: Context, indicatorId: String, submissionId: String): String? {
     val userId = formatterClass.getSharedPref("username", context)
     if (userId != null) {
-      val response = roomDao.getMyResponse(userId, indicatorId)
+      val response = roomDao.getMyResponse(userId, indicatorId, submissionId)
       if (response != null) {
         val value = response.value
         return value
@@ -73,6 +74,7 @@ class PssRepository(private val roomDao: RoomDao) {
     val userId = submissions.userId
     val date = submissions.date
     val status = submissions.status
+
     val isSubmissions = roomDao.checkSubmissions(userId, date, status)
     if (!isSubmissions) {
       roomDao.addSubmissions(submissions)
@@ -86,6 +88,10 @@ class PssRepository(private val roomDao: RoomDao) {
         }
       }
     }
+  }
+
+  fun initiateSubmissions(submissions: Submissions) {
+    roomDao.addSubmissions(submissions)
   }
 
   fun addComment(comments: Comments) {
@@ -122,7 +128,7 @@ class PssRepository(private val roomDao: RoomDao) {
       responseList.forEach {
         val valueResponse = it.value
         val indicatorId = it.indicatorId
-//        val selectedPeriod=it.p
+        //        val selectedPeriod=it.p
         // Get comments
         val comment = roomDao.getComment(userId, indicatorId)
         var valueComment = ""
@@ -135,6 +141,35 @@ class PssRepository(private val roomDao: RoomDao) {
         dbResponsesList.add(dbResponses)
       }
       return DbSaveDataEntry("", "2023", "COMPLETED", userId, dbResponsesList)
+    }
+    return null
+  }
+  fun getSubmitDataSync(context: Context, submissions: Submissions): DbSaveDataEntry? {
+
+    // get the logged in user
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+
+      // Get responses
+      val dbResponsesList = ArrayList<DbResponses>()
+      val responseList = roomDao.getUserSubmissionResponses(userId, submissions.id.toString())
+      responseList.forEach {
+        val valueResponse = it.value
+        val indicatorId = it.indicatorId
+        //        val selectedPeriod=it.p
+        // Get comments
+        val comment = roomDao.getComment(userId, indicatorId)
+        var valueComment = ""
+        if (comment != null) {
+          valueComment = comment.value
+        }
+        // Get Attachment
+
+        val dbResponses = DbResponses(indicatorId, valueResponse, valueComment, "")
+        dbResponsesList.add(dbResponses)
+      }
+      return DbSaveDataEntry(
+          submissions.organization, submissions.period, "COMPLETED", userId, dbResponsesList)
     }
     return null
   }
@@ -151,11 +186,64 @@ class PssRepository(private val roomDao: RoomDao) {
     return null
   }
 
-  fun getSubmission(submissionId: String, context: Context):Submissions? {
+  fun getSubmission(submissionId: String, context: Context): Submissions? {
     val userId = formatterClass.getSharedPref("username", context)
     if (userId != null) {
-      return roomDao.getSubmission(submissionId,userId)
+      return roomDao.getSubmission(submissionId, userId)
     }
     return null
   }
+
+  fun getLatestSubmission(context: Context): Submissions? {
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+      return roomDao.getLatestSubmission()
+    }
+    return null
+  }
+
+  fun updateSubmissions(submissions: Submissions, submissionId: String) {
+    val userId = submissions.userId
+    val date = submissions.date
+    val status = submissions.status
+    val org = submissions.organization
+    val peri = submissions.period
+
+    val isSubmissions = roomDao.checkSubmissionPerId(userId, date, submissionId)
+    if (!isSubmissions) {
+      roomDao.addSubmissions(submissions)
+    } else {
+      val submissionsDetails = roomDao.getSubmissionsById(userId, submissionId)
+
+      roomDao.updateSubmissionOrg(status, submissionId, peri, org)
+    }
+  }
+
+  fun getUnsyncedSubmissions(context: Context, status: String): List<Submissions> {
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+      return roomDao.getUnsyncedSubmissions(userId, status)
+    }
+    return emptyList()
+  }
+
+  fun markSynced(context: Context, id: String): Boolean {
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+      val submissionsDetails = roomDao.getSubmissionsById(userId, id)
+      if (submissionsDetails != null) {
+        roomDao.updateSubmissionSync(true, id)
+      }
+      return true
+    }
+    return false
+  }
+
+    fun getSubmissionResponses(context: Context, submissionId: String) :Int{
+      val userId = formatterClass.getSharedPref("username", context)
+      if (userId != null) {
+        return  roomDao.getResponsesCount(userId, submissionId)
+      }
+      return 0
+    }
 }
