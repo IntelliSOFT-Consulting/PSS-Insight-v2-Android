@@ -12,7 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -136,10 +139,7 @@ public class FragmentDataEntry extends Fragment {
             saveSubmission(SubmissionsStatus.SUBMITTED.name(), period, organizationsCode);
             DbSaveDataEntry dataEntry = myViewModel.getSubmitData(requireContext());
             if (dataEntry != null) {
-//                retrofitCalls.submitData(requireContext(), dataEntry);
-                Intent intent = new Intent(requireContext(), MainActivity.class);
-                startActivity(intent);
-
+                submissionDialog();
             } else {
                 Toast.makeText(requireContext(), "Please try again.", Toast.LENGTH_SHORT).show();
             }
@@ -149,6 +149,23 @@ public class FragmentDataEntry extends Fragment {
         loadInitial();
 
         return rootView;
+    }
+
+    private void submissionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_custom, null);
+        builder.setView(dialogView);
+        TextView titleTextView = dialogView.findViewById(R.id.tv_title);
+        ImageView okButton = dialogView.findViewById(R.id.dialog_cancel_image);
+
+        okButton.setOnClickListener(v -> {
+
+            Intent intent = new Intent(requireContext(), MainActivity.class);
+            startActivity(intent);
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
     }
 
     private void loadInitial() {
@@ -290,7 +307,7 @@ public class FragmentDataEntry extends Fragment {
                 }
             }
             Log.e("Data Entry", "Submission Id" + submissionId);
-            DataEntryAdapter dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId,FragmentDataEntry.this);
+            DataEntryAdapter dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId, FragmentDataEntry.this);
             mRecyclerView.setAdapter(dataEntryAdapter);
 
             formatterClass.saveSharedPref("indicatorSize",
@@ -320,7 +337,7 @@ public class FragmentDataEntry extends Fragment {
             double percent = (answered / total) * 100;
             int percentInt = (int) percent;
             progressBar.setProgress(percentInt);
-            progressText.setText( percentInt+"% done");
+            progressText.setText(percentInt + "% done");
 
 
         } catch (Exception e) {

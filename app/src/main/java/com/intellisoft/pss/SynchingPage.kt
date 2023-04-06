@@ -38,6 +38,7 @@ class SynchingPage : AppCompatActivity() {
         CoroutineScope(Dispatchers.Main).launch {
           val intent = Intent(this@SynchingPage, MainActivity::class.java)
           startActivity(intent)
+          this@SynchingPage.finish()
         }
       }
     }
