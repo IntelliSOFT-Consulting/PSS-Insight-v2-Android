@@ -245,7 +245,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (fragment != null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
+                    .addToBackStack(null)
+                    .commit();
             mDrawerLayout.closeDrawer(GravityCompat.START);
 
         } else {
@@ -288,13 +290,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (itemId == R.id.nav_set_pin) {
             // Handle Settings click
             selectItem(2);
-        }else if (itemId == R.id.nav_logout) {
+        } else if (itemId == R.id.nav_logout) {
             // Handle Settings click
             selectItem(3);
-        }else if (itemId == R.id.nav_about) {
+        } else if (itemId == R.id.nav_about) {
             // Handle Settings click
             selectItem(5);
-        }else if (itemId == R.id.nav_help) {
+        } else if (itemId == R.id.nav_help) {
             // Handle Settings click
             selectItem(6);
         }

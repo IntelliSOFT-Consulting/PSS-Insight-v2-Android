@@ -99,17 +99,18 @@ class PssRepository(private val roomDao: RoomDao) {
     CoroutineScope(Dispatchers.IO).launch {
       val userId = comments.userId
       val indicatorId = comments.indicatorId
+      val submissionId=comments.submissionId
       val value = comments.value
 
-      val isResponse = roomDao.checkComment(userId, indicatorId)
+      val isResponse = roomDao.checkComment(userId, indicatorId,submissionId)
       if (!isResponse) {
         roomDao.addComment(comments)
       } else {
-        val response = roomDao.getComment(userId, indicatorId)
+        val response = roomDao.getComment(userId, indicatorId,submissionId)
         if (response != null) {
           val id = response.id
           if (id != null) {
-            roomDao.updateResponse(value, id)
+            roomDao.updateComment(value, id)
           }
         }
       }
@@ -130,7 +131,7 @@ class PssRepository(private val roomDao: RoomDao) {
         val indicatorId = it.indicatorId
         //        val selectedPeriod=it.p
         // Get comments
-        val comment = roomDao.getComment(userId, indicatorId)
+        val comment = roomDao.getComment(userId, indicatorId,"")
         var valueComment = ""
         if (comment != null) {
           valueComment = comment.value
@@ -158,7 +159,7 @@ class PssRepository(private val roomDao: RoomDao) {
         val indicatorId = it.indicatorId
         //        val selectedPeriod=it.p
         // Get comments
-        val comment = roomDao.getComment(userId, indicatorId)
+        val comment = roomDao.getComment(userId, indicatorId,submissions.id.toString())
         var valueComment = ""
         if (comment != null) {
           valueComment = comment.value

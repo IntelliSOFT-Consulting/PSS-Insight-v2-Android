@@ -40,6 +40,7 @@ class DataEntryFormsAdapter(
 
     val tvQuestion: TextView = itemView.findViewById(R.id.tvQuestion)
     val tvComment: TextView = itemView.findViewById(R.id.tvComment)
+    val tvAttachment: TextView = itemView.findViewById(R.id.tv_image)
     val etValue: EditText = itemView.findViewById(R.id.etValue)
     val radioGroup: RadioGroup = itemView.findViewById(R.id.rg_group)
     val radioYes: RadioButton = itemView.findViewById(R.id.rb_yes)
@@ -47,6 +48,7 @@ class DataEntryFormsAdapter(
 
     init {
       tvComment.setOnClickListener(this)
+      tvAttachment.setOnClickListener(this)
       etValue.addTextChangedListener(this)
       radioYes.setOnCheckedChangeListener { buttonView, isChecked ->
         if (isChecked) {
@@ -57,9 +59,7 @@ class DataEntryFormsAdapter(
           val name = dbDataEntryFormList[pos].name
           val indicatorResponse = IndicatorResponse(userId.toString(), submissionId, id, "Yes")
           myViewModel.addResponse(indicatorResponse)
-          Handler().postDelayed({
-            fragmentDataEntry.updateProgress()
-          }, 2000)
+          Handler().postDelayed({ fragmentDataEntry.updateProgress() }, 2000)
         }
       }
       radioNo.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -69,19 +69,22 @@ class DataEntryFormsAdapter(
           val name = dbDataEntryFormList[pos].name
           val indicatorResponse = IndicatorResponse(userId.toString(), submissionId, id, "No")
           myViewModel.addResponse(indicatorResponse)
-          Handler().postDelayed({
-            fragmentDataEntry.updateProgress()
-          }, 2000)
+          Handler().postDelayed({ fragmentDataEntry.updateProgress() }, 2000)
         }
       }
     }
 
-    override fun onClick(p0: View?) {
-
+    override fun onClick(view: View) {
       val pos = adapterPosition
       val id = dbDataEntryFormList[pos].id
-
-      onAlertDialog(myViewModel, userId.toString(), id)
+      when (view.id) {
+        R.id.tvComment -> {
+          onAlertDialog(myViewModel, userId.toString(), id)
+        }
+        R.id.tv_image -> {
+          fragmentDataEntry.uploadImage(userId.toString(), id, submissionId)
+        }
+      }
     }
 
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -96,9 +99,7 @@ class DataEntryFormsAdapter(
 
       val indicatorResponse = IndicatorResponse(userId.toString(), submissionId, id, value)
       myViewModel.addResponse(indicatorResponse)
-      Handler().postDelayed({
-        fragmentDataEntry.updateProgress()
-      }, 2000)
+      Handler().postDelayed({ fragmentDataEntry.updateProgress() }, 2000)
     }
   }
 
@@ -159,7 +160,7 @@ class DataEntryFormsAdapter(
     val btnok = dialog.findViewById(R.id.dialog_button_ok) as Button
     btnok.setOnClickListener {
       val value = editText.text.toString()
-      val comments = Comments(userId.toString(), indicatorId, value)
+      val comments = Comments(userId.toString(), indicatorId, submissionId, value)
       myViewModel.addComment(comments)
 
       dialog.dismiss()

@@ -78,10 +78,10 @@
                     app:drawableStartCompat="@drawable/ic_comment" />
 
                 <TextView
+                    android:id="@+id/tv_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-
                     android:drawablePadding="10dp"
                     android:text="Attach File"
                     android:textColor="@color/black"

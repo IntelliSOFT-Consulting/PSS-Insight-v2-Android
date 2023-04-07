@@ -27,6 +27,7 @@ data class IndicatorResponse(
 data class Comments(
     var userId: String ,
     val indicatorId: String,
+    val submissionId: String,
     val value: String,
 ){
     @PrimaryKey(autoGenerate = true)

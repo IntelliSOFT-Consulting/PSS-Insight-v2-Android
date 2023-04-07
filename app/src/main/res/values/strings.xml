@@ -39,5 +39,10 @@
     <string name="drawer_close">Close</string>
     <string name="saved_successfully">Saved Successfully</string>
     <string name="your_responses_have_been_submitted_successfully">Your responses have been submitted successfully</string>
+    <string name="address_123_main_st_pss_kenya">Address: 123 Main St, PSS Kenya</string>
+    <string name="phone_254_700_111_222">Phone: +254 700 111-222</string>
+    <string name="email_apps_intellisoftkenya_com">Email: apps@intellisoftkenya.com</string>
+    <string name="contact_us">Contact Us</string>
+    <string name="image_upload">Image Upload</string>
 
 </resources>

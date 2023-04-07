@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,6 +50,8 @@ import com.intellisoft.pss.room.Organizations;
 import com.intellisoft.pss.room.PssViewModel;
 import com.intellisoft.pss.room.Submissions;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +59,7 @@ import java.util.Map;
 
 public class FragmentDataEntry extends Fragment {
     private PssViewModel myViewModel;
-
+    int REQUEST_IMAGE_PICKER=1001;
     private FormatterClass formatterClass = new FormatterClass();
     private RecyclerView mRecyclerView;
 
@@ -381,5 +384,26 @@ public class FragmentDataEntry extends Fragment {
 
         String activeItemText = "Page " + activeItemCount + " / " + totalItemCount;
         progressLabel.setText(activeItemText);
+    }
+
+    public void uploadImage(@NotNull String toString, @NotNull String id, @NotNull String submissionId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View view = inflater.inflate(R.layout.dialog_image_upload, null);
+        builder.setView(view);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        Button btnSelectImage = view.findViewById(R.id.btn_select_image);
+        Button btnCancel = view.findViewById(R.id.btn_cancel);
+
+        btnSelectImage.setOnClickListener(view1 -> {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent.setType("image/*");
+            startActivityForResult(intent, REQUEST_IMAGE_PICKER);
+            alertDialog.dismiss();
+        });
+
+        btnCancel.setOnClickListener(view12 -> alertDialog.dismiss());
     }
 }

@@ -11,6 +11,7 @@ import com.intellisoft.pss.R;
 
 public class FragmentSettings extends Fragment {
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -18,5 +19,6 @@ public class FragmentSettings extends Fragment {
 
         return rootView;
     }
+
 
 }

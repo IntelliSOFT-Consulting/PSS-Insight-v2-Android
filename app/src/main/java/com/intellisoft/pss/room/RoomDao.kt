@@ -34,10 +34,10 @@ interface RoomDao {
   /** Comments */
   @Insert(onConflict = OnConflictStrategy.REPLACE) fun addComment(comments: Comments)
   @Query(
-      "SELECT EXISTS (SELECT 1 FROM comments WHERE userId =:userId AND indicatorId =:indicatorId)")
-  fun checkComment(userId: String, indicatorId: String): Boolean
-  @Query("SELECT * FROM comments WHERE userId =:userId AND indicatorId =:indicatorId")
-  fun getComment(userId: String, indicatorId: String): Comments?
+      "SELECT EXISTS (SELECT 1 FROM comments WHERE userId =:userId AND indicatorId =:indicatorId AND submissionId =:submissionId)")
+  fun checkComment(userId: String, indicatorId: String ,submissionId: String): Boolean
+  @Query("SELECT * FROM comments WHERE userId =:userId AND indicatorId =:indicatorId AND submissionId =:submissionId")
+  fun getComment(userId: String, indicatorId: String,submissionId: String): Comments?
   @Query("UPDATE comments SET value =:value WHERE id =:id")
   fun updateComment(value: String, id: Int)
 
