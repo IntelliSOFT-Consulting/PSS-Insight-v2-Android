@@ -39,7 +39,6 @@ class SubmissionAdapter(
 
     override fun onClick(p0: View?) {
       val submissionId = submissionList[adapterPosition].id
-      Log.e("Adapter", "submission:::: $submissionId")
 
       formatterClass.saveSharedPref(SubmissionQueue.INITIATED.name, "$submissionId", context)
       formatterClass.saveSharedPref(

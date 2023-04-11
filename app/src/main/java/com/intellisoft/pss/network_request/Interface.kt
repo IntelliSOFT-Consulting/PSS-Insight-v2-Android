@@ -12,6 +12,8 @@ interface Interface {
 
     @POST("data-entry/response/save")
     suspend fun submitData(@Body dbSaveDataEntry: DbSaveDataEntry): Response<Any>
+    @POST("data-entry/response/save")
+    suspend fun uploadImageData(@Body dbSaveDataEntry: DbSaveDataEntry): Response<Any>
 
     @GET("national-template/published-indicators")
     suspend fun getDataEntry(): Response<DbDataEntry>

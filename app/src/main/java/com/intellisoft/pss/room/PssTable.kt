@@ -7,55 +7,58 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "indicators_data")
 data class IndicatorsData(
     @ColumnInfo(name = "json_data") val jsonData: String,
-    var userId: String ,
-){
-    @PrimaryKey(autoGenerate = true)
-    var id: Int? = null
+    var userId: String,
+) {
+  @PrimaryKey(autoGenerate = true) var id: Int? = null
 }
 
 @Entity(tableName = "responses")
 data class IndicatorResponse(
-    var userId: String ,
+    var userId: String,
     val submissionId: String,
     val indicatorId: String,
     val value: String,
-){
-    @PrimaryKey(autoGenerate = true)
-    var id: Int? = null
+) {
+  @PrimaryKey(autoGenerate = true) var id: Int? = null
 }
+
 @Entity(tableName = "comments")
 data class Comments(
-    var userId: String ,
+    var userId: String,
     val indicatorId: String,
     val submissionId: String,
     val value: String,
-){
-    @PrimaryKey(autoGenerate = true)
-    var id: Int? = null
+) {
+  @PrimaryKey(autoGenerate = true) var id: Int? = null
 }
 
 @Entity(tableName = "submissions")
 data class Submissions(
-    var date: String ,
-    var organization: String ,
+    var date: String,
+    var organization: String,
     val status: String,
-    var userId: String ,
-    var period: String ,
-    @ColumnInfo(name = "is_synced")
-    var isSynced: Boolean = false
-){
-    @PrimaryKey(autoGenerate = true)
-    var id: Int? = null
+    var userId: String,
+    var period: String,
+    @ColumnInfo(name = "is_synced") var isSynced: Boolean = false
+) {
+  @PrimaryKey(autoGenerate = true) var id: Int? = null
 }
-
 
 @Entity(tableName = "organizations")
 data class Organizations(
-    var idcode: String ,
+    var idcode: String,
     val displayName: String,
-){
-    @PrimaryKey(autoGenerate = true)
-    var id: Int? = null
+) {
+  @PrimaryKey(autoGenerate = true) var id: Int? = null
 }
 
-
+@Entity(tableName = "images")
+data class Image(
+    val userId: String?,
+    var submissionId: String?,
+    var indicatorId: String?,
+    @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
+    val image: ByteArray
+) {
+    @PrimaryKey(autoGenerate = true) var id: Int? = null
+}

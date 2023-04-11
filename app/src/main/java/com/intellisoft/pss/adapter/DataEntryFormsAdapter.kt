@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.intellisoft.pss.R
 import com.intellisoft.pss.helper_class.DbIndicators
 import com.intellisoft.pss.helper_class.FormatterClass
+import com.intellisoft.pss.helper_class.NavigationValues
+import com.intellisoft.pss.helper_class.SubmissionQueue
 import com.intellisoft.pss.navigation_drawer.fragments.FragmentDataEntry
 import com.intellisoft.pss.room.Comments
 import com.intellisoft.pss.room.IndicatorResponse
@@ -35,6 +37,7 @@ class DataEntryFormsAdapter(
   inner class Pager2ViewHolder(itemView: View) :
       RecyclerView.ViewHolder(itemView), View.OnClickListener, TextWatcher {
 
+    val formatterClass = FormatterClass()
     val myViewModel = PssViewModel(context.applicationContext as Application)
     val userId = FormatterClass().getSharedPref("username", context)
 
@@ -82,6 +85,11 @@ class DataEntryFormsAdapter(
           onAlertDialog(myViewModel, userId.toString(), id)
         }
         R.id.tv_image -> {
+
+          formatterClass.saveSharedPref(SubmissionQueue.INITIATED.name, submissionId, context)
+          formatterClass.saveSharedPref(SubmissionQueue.RESPONSE.name, id, context)
+          formatterClass.saveSharedPref(
+              NavigationValues.NAVIGATION.name, NavigationValues.DATA_ENTRY.name, context)
           fragmentDataEntry.uploadImage(userId.toString(), id, submissionId)
         }
       }

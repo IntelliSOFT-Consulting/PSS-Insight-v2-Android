@@ -1,8 +1,12 @@
 package com.intellisoft.pss.navigation_drawer.fragments;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -24,6 +28,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -58,8 +63,9 @@ import java.util.List;
 import java.util.Map;
 
 public class FragmentDataEntry extends Fragment {
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 102;
     private PssViewModel myViewModel;
-    int REQUEST_IMAGE_PICKER=1001;
+    private static final int REQUEST_IMAGE_PICKER = 1001;
     private FormatterClass formatterClass = new FormatterClass();
     private RecyclerView mRecyclerView;
 
@@ -386,24 +392,40 @@ public class FragmentDataEntry extends Fragment {
         progressLabel.setText(activeItemText);
     }
 
-    public void uploadImage(@NotNull String toString, @NotNull String id, @NotNull String submissionId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        LayoutInflater inflater = LayoutInflater.from(requireContext());
-        View view = inflater.inflate(R.layout.dialog_image_upload, null);
-        builder.setView(view);
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
 
-        Button btnSelectImage = view.findViewById(R.id.btn_select_image);
-        Button btnCancel = view.findViewById(R.id.btn_cancel);
-
-        btnSelectImage.setOnClickListener(view1 -> {
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            intent.setType("image/*");
-            startActivityForResult(intent, REQUEST_IMAGE_PICKER);
-            alertDialog.dismiss();
-        });
-
-        btnCancel.setOnClickListener(view12 -> alertDialog.dismiss());
+    public void uploadImage(@NotNull String userId, @NotNull String indicatorId, @NotNull String submissionId) {
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.selectImage(userId,indicatorId,submissionId);
+//        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+//        LayoutInflater inflater = LayoutInflater.from(requireContext());
+//        View view = inflater.inflate(R.layout.dialog_image_upload, null);
+//        builder.setView(view);
+//        AlertDialog alertDialog = builder.create();
+//        alertDialog.show();
+//
+//        Button btnSelectImage = view.findViewById(R.id.btn_select_image);
+//        Button btnCancel = view.findViewById(R.id.btn_cancel);
+//
+//        btnSelectImage.setOnClickListener(view1 -> {
+//            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//            intent.setType("image/*");
+//            startActivityForResult(intent, REQUEST_IMAGE_PICKER);
+//            alertDialog.dismiss();
+//        });
+//
+//        btnCancel.setOnClickListener(view12 -> alertDialog.dismiss());
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_IMAGE_PICKER && resultCode == Activity.RESULT_OK && data != null) {
+            // Get the selected image URI
+            Uri selectedImageUri = data.getData();
+            Log.e("Selected", "Selected Image");
+
+        }
+    }
+
 }

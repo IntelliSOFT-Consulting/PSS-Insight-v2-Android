@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.intellisoft.pss.helper_class.DbFileDataEntry
 import com.intellisoft.pss.helper_class.DbSaveDataEntry
 import com.intellisoft.pss.helper_class.FormatterClass
 import com.intellisoft.pss.room.*
@@ -37,6 +38,21 @@ class RetrofitCalls {
 
       CoroutineScope(Dispatchers.IO + job)
           .launch { submitSyncDataBackground(context, dbSaveDataEntry, sm, myViewModel) }
+          .join()
+    }
+  }  fun submitFileData(
+    context: Context,
+    dbFileDataEntry: DbFileDataEntry,
+    myViewModel: PssViewModel
+  ) {
+
+    CoroutineScope(Dispatchers.Main).launch {
+      val job = Job()
+
+      CoroutineScope(Dispatchers.IO + job)
+          .launch {
+//            submitFileDataBackground(context, dbSaveDataEntry, sm, myViewModel)
+            }
           .join()
     }
   }

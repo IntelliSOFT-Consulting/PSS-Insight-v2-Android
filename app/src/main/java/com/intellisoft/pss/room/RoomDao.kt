@@ -35,9 +35,10 @@ interface RoomDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE) fun addComment(comments: Comments)
   @Query(
       "SELECT EXISTS (SELECT 1 FROM comments WHERE userId =:userId AND indicatorId =:indicatorId AND submissionId =:submissionId)")
-  fun checkComment(userId: String, indicatorId: String ,submissionId: String): Boolean
-  @Query("SELECT * FROM comments WHERE userId =:userId AND indicatorId =:indicatorId AND submissionId =:submissionId")
-  fun getComment(userId: String, indicatorId: String,submissionId: String): Comments?
+  fun checkComment(userId: String, indicatorId: String, submissionId: String): Boolean
+  @Query(
+      "SELECT * FROM comments WHERE userId =:userId AND indicatorId =:indicatorId AND submissionId =:submissionId")
+  fun getComment(userId: String, indicatorId: String, submissionId: String): Comments?
   @Query("UPDATE comments SET value =:value WHERE id =:id")
   fun updateComment(value: String, id: Int)
 
@@ -83,4 +84,7 @@ interface RoomDao {
   fun updateSubmissionSync(is_synced: Boolean, id: String)
   @Query("SELECT COUNT(*) FROM responses WHERE userId =:userId AND submissionId =:submissionId")
   fun getResponsesCount(userId: String, submissionId: String): Int
+  @Insert(onConflict = OnConflictStrategy.REPLACE) fun uploadImage(image: Image)
+  @Query("SELECT * FROM images")
+  fun getAllImages(): List<Image>
 }

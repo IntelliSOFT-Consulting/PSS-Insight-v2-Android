@@ -25,7 +25,8 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
 
   fun addSubmissions(submissions: Submissions) {
     repository.addSubmissions(submissions)
-  }  fun initiateSubmissions(submissions: Submissions) {
+  }
+  fun initiateSubmissions(submissions: Submissions) {
     repository.initiateSubmissions(submissions)
   }
   fun getAllMyData(context: Context) = runBlocking { repository.getAllMyData(context) }
@@ -58,11 +59,17 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
   fun getUnsyncedSubmissions(context: Context, status: String) = runBlocking {
     repository.getUnsyncedSubmissions(context, status)
   }
-  fun markSynced(context: Context, id: String) = runBlocking {
-    repository.markSynced(context, id)
+  fun markSynced(context: Context, id: String) = runBlocking { repository.markSynced(context, id) }
+
+  fun getSubmissionResponses(context: Context, submissionId: String) = runBlocking {
+    repository.getSubmissionResponses(context, submissionId)
   }
 
-    fun getSubmissionResponses(context: Context, submissionId: String)= runBlocking {
-      repository.getSubmissionResponses(context, submissionId)
+  fun uploadImage(context: Context, image: Image) = runBlocking {
+    repository.uploadImage(context, image)
+  }
+
+    fun getAllImages(context: Context)= runBlocking {
+      repository.getAllImages(context)
     }
 }

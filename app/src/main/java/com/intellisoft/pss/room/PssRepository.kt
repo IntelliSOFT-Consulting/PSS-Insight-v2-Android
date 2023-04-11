@@ -247,4 +247,20 @@ class PssRepository(private val roomDao: RoomDao) {
       }
       return 0
     }
+
+  fun uploadImage(context: Context, image: Image) {
+    val userId = formatterClass.getSharedPref("username", context)
+      if (userId != null) {
+           roomDao.uploadImage(image)
+      }
+  }
+
+    fun getAllImages(context: Context) : List<Image>{
+      val userId = formatterClass.getSharedPref("username", context)
+      if (userId != null) {
+        return roomDao.getAllImages()
+      }
+      return emptyList()
+    }
+
 }

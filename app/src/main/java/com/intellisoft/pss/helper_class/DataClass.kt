@@ -15,7 +15,14 @@ enum class SubmissionsStatus {
 
 enum class SubmissionQueue {
   INITIATED,
+  RESPONSE,
   COMPLETED
+}
+
+enum class FileUpload {
+  USER,
+  INDICATOR,
+  SUBMISSION
 }
 
 data class DbSubmission(val date: String, val status: String)
@@ -43,6 +50,11 @@ data class DbSaveDataEntry(
     val status: String,
     val dataEntryPersonId: String,
     val responses: List<DbResponses>,
+)
+
+data class DbFileDataEntry(
+    val file: String,
+    val userid: String,
 )
 
 data class DbResponses(
