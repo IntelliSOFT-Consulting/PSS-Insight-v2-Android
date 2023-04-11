@@ -19,6 +19,12 @@ enum class SubmissionQueue {
   COMPLETED
 }
 
+enum class SettingsQueue {
+  SYNC,
+  CONFIGURATION,
+  RESERVED
+}
+
 enum class FileUpload {
   USER,
   INDICATOR,
@@ -79,7 +85,10 @@ data class SettingItem(
     val title: String,
     val innerList: SettingItemChild,
     var expandable: Boolean = false,
-    var count: Int
+    var count: Int,
+    var icon: Int,
+    val options: List<String>?,
+    var selector: Boolean = false,
 )
 
 data class SettingItemChild(
