@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Pss</string>
+    <string name="app_name">PSS Insights V2.0</string>
     <string name="pss_title">Pharmaceutical Systems Strengthening Insights tool v2</string>
     <string name="syncing">Syncing Your Configurations</string>
     <string name="navigation">navigation</string>
@@ -12,10 +12,10 @@
     <string name="pss_insight_v2_data_entry">PSS INSIGHT V2 DATA ENTRY</string>
     <string name="quick_actions">QUICK ACTIONS</string>
     <string name="your_submissions">Your Submissions</string>
-    <string name="new_survey">New Survey</string>
+    <string name="new_survey">New Data Entry</string>
     <string name="back">Back</string>
     <string name="submit">Submit</string>
-    <string name="safe_draft">Safe Draft</string>
+    <string name="safe_draft">Save Draft</string>
     <string name="please_answer_these_questions">Please answer these questions</string>
     <string name="_20_done">20% done</string>
     <string name="select_year">Select Year*</string>
@@ -44,5 +44,11 @@
     <string name="email_apps_intellisoftkenya_com">Email: apps@intellisoftkenya.com</string>
     <string name="contact_us">Contact Us</string>
     <string name="image_upload">Image Upload</string>
+    <string name="app_in_progress">In Progress</string>
+    <string name="select_organization">Select Organization</string>
+    <string name="action_accept">Accept</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_local_data">Delete Local Data</string>
+    <string name="delete_local_data_message">Non synchronized data will be lost. Do you really want to continue?</string>
 
 </resources>

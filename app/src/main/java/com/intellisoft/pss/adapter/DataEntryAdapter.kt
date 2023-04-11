@@ -1,9 +1,11 @@
 package com.intellisoft.pss.adapter
 
+import android.app.Dialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,10 +15,10 @@ import com.intellisoft.pss.navigation_drawer.fragments.FragmentDataEntry
 import java.util.ArrayList
 
 class DataEntryAdapter(
-  private var dbDataEntryFormList: ArrayList<DbDataEntryForm>,
-  private val context: Context,
-  private val currentSession: String,
- private val fragmentDataEntry: FragmentDataEntry
+    private var dbDataEntryFormList: ArrayList<DbDataEntryForm>,
+    private val context: Context,
+    private val currentSession: String,
+    private val fragmentDataEntry: FragmentDataEntry
 ) : RecyclerView.Adapter<DataEntryAdapter.Pager2ViewHolder>() {
 
   inner class Pager2ViewHolder(itemView: View) :
@@ -25,15 +27,33 @@ class DataEntryAdapter(
     val pssCode: TextView = itemView.findViewById(R.id.pssCode)
     val indicatorName: TextView = itemView.findViewById(R.id.indicatorName)
     val recyclerView: RecyclerView = itemView.findViewById(R.id.recyclerView)
+    val infoIcon: ImageView = itemView.findViewById(R.id.info_icon)
 
     init {
       val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
       recyclerView.layoutManager = layoutManager
       recyclerView.setHasFixedSize(true)
+      infoIcon.setOnClickListener(this)
     }
-    override fun onClick(p0: View?) {
-      //            TODO("Not yet implemented")
+    override fun onClick(view: View) {
+      when (view.id) {
+        R.id.info_icon -> {
+          showDialog()
+        }
+      }
     }
+  }
+
+  private fun showDialog() {
+    val dialog = Dialog(context)
+    dialog.setCancelable(false)
+    dialog.setContentView(R.layout.definitions_dialog)
+    val width = ViewGroup.LayoutParams.MATCH_PARENT
+    val height = ViewGroup.LayoutParams.WRAP_CONTENT
+    dialog.window?.setLayout(width, height)
+    val dismissIcon = dialog.findViewById<ImageView>(R.id.cancel_button)
+    dismissIcon.setOnClickListener { dialog.dismiss() }
+    dialog.show()
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Pager2ViewHolder {
@@ -50,7 +70,8 @@ class DataEntryAdapter(
     holder.pssCode.text = indicatorCode
     holder.indicatorName.text = indicatorName
 
-    val dataEntryAdapter = DataEntryFormsAdapter(formsList, context, currentSession,fragmentDataEntry)
+    val dataEntryAdapter =
+        DataEntryFormsAdapter(formsList, context, currentSession, fragmentDataEntry)
     holder.recyclerView.adapter = dataEntryAdapter
   }
 

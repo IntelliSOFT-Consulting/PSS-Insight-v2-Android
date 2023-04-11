@@ -173,7 +173,7 @@ class RetrofitCalls {
             val body = apiInterface.body()
             if (statusCode == 200 || statusCode == 201) {
               if (body != null) {
-
+                myViewModel.clearIndicators()
                 val converters = Converters().toJson(body)
                 val indicatorsData = IndicatorsData(converters, username)
                 myViewModel.addIndicators(indicatorsData)
@@ -207,7 +207,7 @@ class RetrofitCalls {
                 try {
                   val json = Gson().fromJson(converters, JsonObject::class.java)
                   val jsonArray = json.getAsJsonArray("details")
-
+                  myViewModel.deleteAllOrganizations()
                   for (i in 0 until jsonArray.size()) {
                     val jsonObject = jsonArray.get(i).asJsonObject
                     val id = jsonObject.get("id").asString

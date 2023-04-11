@@ -22,4 +22,10 @@
     <style name="Theme.Pss.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.Pss.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="CustomDialog" parent="Base.AlertDialog.AppCompat.Light">
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:textColor">?colorPrimary</item>
+        <item name="colorAccent">?colorPrimary</item>
+    </style>
 </resources>

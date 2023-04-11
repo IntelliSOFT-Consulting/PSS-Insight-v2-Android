@@ -20,6 +20,9 @@ class PssRepository(private val roomDao: RoomDao) {
       roomDao.addIndicators(indicatorsData)
     } else {}
   }
+  fun clearIndicators() {
+    roomDao.clearIndicators()
+  }
   fun getAllMyData(context: Context): IndicatorsData? {
     val userId = formatterClass.getSharedPref("username", context)
     if (userId != null) {
@@ -99,14 +102,14 @@ class PssRepository(private val roomDao: RoomDao) {
     CoroutineScope(Dispatchers.IO).launch {
       val userId = comments.userId
       val indicatorId = comments.indicatorId
-      val submissionId=comments.submissionId
+      val submissionId = comments.submissionId
       val value = comments.value
 
-      val isResponse = roomDao.checkComment(userId, indicatorId,submissionId)
+      val isResponse = roomDao.checkComment(userId, indicatorId, submissionId)
       if (!isResponse) {
         roomDao.addComment(comments)
       } else {
-        val response = roomDao.getComment(userId, indicatorId,submissionId)
+        val response = roomDao.getComment(userId, indicatorId, submissionId)
         if (response != null) {
           val id = response.id
           if (id != null) {
@@ -131,7 +134,7 @@ class PssRepository(private val roomDao: RoomDao) {
         val indicatorId = it.indicatorId
         //        val selectedPeriod=it.p
         // Get comments
-        val comment = roomDao.getComment(userId, indicatorId,"")
+        val comment = roomDao.getComment(userId, indicatorId, "")
         var valueComment = ""
         if (comment != null) {
           valueComment = comment.value
@@ -159,7 +162,7 @@ class PssRepository(private val roomDao: RoomDao) {
         val indicatorId = it.indicatorId
         //        val selectedPeriod=it.p
         // Get comments
-        val comment = roomDao.getComment(userId, indicatorId,submissions.id.toString())
+        val comment = roomDao.getComment(userId, indicatorId, submissions.id.toString())
         var valueComment = ""
         if (comment != null) {
           valueComment = comment.value
@@ -184,7 +187,15 @@ class PssRepository(private val roomDao: RoomDao) {
     if (userId != null) {
       return roomDao.getAllOrganizations()
     }
-    return null
+    return emptyList()
+  }
+
+  fun getMatchingOrganizations(context: Context, name: String): List<Organizations>? {
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+      return roomDao.getMatchingOrganizations(name)
+    }
+    return emptyList()
   }
 
   fun getSubmission(submissionId: String, context: Context): Submissions? {
@@ -240,27 +251,34 @@ class PssRepository(private val roomDao: RoomDao) {
     return false
   }
 
-    fun getSubmissionResponses(context: Context, submissionId: String) :Int{
-      val userId = formatterClass.getSharedPref("username", context)
-      if (userId != null) {
-        return  roomDao.getResponsesCount(userId, submissionId)
-      }
-      return 0
+  fun getSubmissionResponses(context: Context, submissionId: String): Int {
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+      return roomDao.getResponsesCount(userId, submissionId)
     }
+    return 0
+  }
 
   fun uploadImage(context: Context, image: Image) {
     val userId = formatterClass.getSharedPref("username", context)
-      if (userId != null) {
-           roomDao.uploadImage(image)
-      }
+    if (userId != null) {
+      roomDao.uploadImage(image)
+    }
   }
 
-    fun getAllImages(context: Context) : List<Image>{
-      val userId = formatterClass.getSharedPref("username", context)
-      if (userId != null) {
-        return roomDao.getAllImages()
-      }
-      return emptyList()
+  fun getAllImages(context: Context): List<Image> {
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+      return roomDao.getAllImages()
     }
+    return emptyList()
+  }
 
+  fun deleteAllOrganizations() {
+    roomDao.deleteAllOrganizations()
+  }
+
+    fun clearAppData() {
+      roomDao.clearAppData()
+    }
 }

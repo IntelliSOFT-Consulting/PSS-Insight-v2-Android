@@ -1,41 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/dialog_cardview"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="16dp">
+    android:layout_height="wrap_content">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <!-- First layout -->
         <LinearLayout
             android:id="@+id/first_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:background="@color/secondary"
+            android:orientation="horizontal"
             android:padding="16dp">
 
             <TextView
-                android:layout_weight="1"
                 android:id="@+id/title_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="PS01 Definition"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <ImageButton
-                android:background="@drawable/ic_cancel"
-                android:layout_gravity="end"
                 android:id="@+id/cancel_button"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:background="@drawable/ic_cancel" />
 
         </LinearLayout>
 
@@ -48,12 +46,12 @@
             android:padding="16dp">
 
             <TextView
-                android:textColor="@color/black"
-                android:textStyle="italic"
                 android:id="@+id/info_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="This is the information field." />
+                android:text="This is the information field."
+                android:textColor="@color/black"
+                android:textStyle="italic" />
 
         </LinearLayout>
 

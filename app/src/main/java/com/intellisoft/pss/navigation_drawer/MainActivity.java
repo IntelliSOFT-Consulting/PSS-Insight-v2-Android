@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -85,11 +86,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void autoSyncSubmissions() {
 
         if (activeInternetConnection()) {
-            List<Submissions> submissionList = myViewModel.getUnsyncedSubmissions(this, SubmissionsStatus.SUBMITTED.name());
-            for (Submissions sm : submissionList) {
-                DbSaveDataEntry dataEntry = myViewModel.getSubmitSync(this, sm);
-                if (dataEntry != null) {
-                    retrofitCalls.submitSyncData(this, dataEntry, sm, myViewModel);
+            Calendar calendar = Calendar.getInstance();
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            if (hour == 0) {
+                List<Submissions> submissionList = myViewModel.getUnsyncedSubmissions(this, SubmissionsStatus.SUBMITTED.name());
+                for (Submissions sm : submissionList) {
+                    DbSaveDataEntry dataEntry = myViewModel.getSubmitSync(this, sm);
+                    if (dataEntry != null) {
+                        retrofitCalls.submitSyncData(this, dataEntry, sm, myViewModel);
+                    }
                 }
             }
         } else {

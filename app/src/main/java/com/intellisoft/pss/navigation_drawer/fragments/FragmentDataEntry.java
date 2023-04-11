@@ -10,7 +10,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,7 +83,6 @@ public class FragmentDataEntry extends Fragment {
     private List<Organizations> organizationsList;
     private List<String> stringList;
     private AutoCompleteTextView autoCompleteTextView;
-    private TextInputLayout textInputLayout;
     private ArrayAdapter adapter;
     private String submissionId = "";
     private ProgressBar progressBar;
@@ -111,7 +112,6 @@ public class FragmentDataEntry extends Fragment {
 
         etPeriod = rootView.findViewById(R.id.etPeriod);
         autoCompleteTextView = rootView.findViewById(R.id.act_organization);
-        textInputLayout = rootView.findViewById(R.id.til_organization);
 
         saveDraft.setOnClickListener(view -> {
             String period = etPeriod.getText().toString();
@@ -122,7 +122,7 @@ public class FragmentDataEntry extends Fragment {
             }
             String organizationsCode = autoCompleteTextView.getText().toString();
             if (TextUtils.isEmpty(organizationsCode)) {
-                textInputLayout.setError("Field cannot be empty..");
+                autoCompleteTextView.setError("Field cannot be empty..");
                 autoCompleteTextView.requestFocus();
                 return;
             }
@@ -141,7 +141,7 @@ public class FragmentDataEntry extends Fragment {
             }
             String organizationsCode = autoCompleteTextView.getText().toString();
             if (TextUtils.isEmpty(period)) {
-                textInputLayout.setError("Field cannot be empty..");
+                autoCompleteTextView.setError("Field cannot be empty..");
                 autoCompleteTextView.requestFocus();
                 return;
             }
@@ -210,25 +210,25 @@ public class FragmentDataEntry extends Fragment {
             }
         });
         btnCancel.setOnClickListener(v -> {
-            LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-            int currentPosition = layoutManager.findFirstVisibleItemPosition();
-            int newPosition = currentPosition - 1;
-
-            if (newPosition >= 0) {
-                // Scroll to the previous item
-                layoutManager.scrollToPosition(newPosition);
-            }
+//            LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+//            int currentPosition = layoutManager.findFirstVisibleItemPosition();
+//            int newPosition = currentPosition - 1;
+//
+//            if (newPosition >= 0) {
+//                // Scroll to the previous item
+//                layoutManager.scrollToPosition(newPosition);
+//            }
             handleButtonClicks();
         });
         btnNext.setOnClickListener(v -> {
-            LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-            int currentPosition = layoutManager.findLastVisibleItemPosition();
-            int newPosition = currentPosition + 1;
-
-            if (newPosition < mRecyclerView.getAdapter().getItemCount()) {
-                // Scroll to the next item
-                layoutManager.scrollToPosition(newPosition);
-            }
+//            LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+//            int currentPosition = layoutManager.findLastVisibleItemPosition();
+//            int newPosition = currentPosition + 1;
+//
+//            if (newPosition < mRecyclerView.getAdapter().getItemCount()) {
+//                // Scroll to the next item
+//                layoutManager.scrollToPosition(newPosition);
+//            }
             handleButtonClicks();
         });
 
@@ -236,20 +236,37 @@ public class FragmentDataEntry extends Fragment {
     }
 
     private void loadOrganizations() {
-        organizationsList = myViewModel.getOrganizations(requireContext());
-        stringMap = new HashMap<>();
-        stringList = new ArrayList<>();
-        for (Organizations organization : organizationsList) {
-            stringList.add(organization.getDisplayName());
-            stringMap.put(organization.getIdcode(), organization.getDisplayName());
-        }
-        adapter = new ArrayAdapter(requireContext(),
-                android.R.layout.simple_list_item_1, stringList);
+        autoCompleteTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
-        autoCompleteTextView.setAdapter(adapter);
-        autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
-            organizationsCode = getOrganizationsCode(autoCompleteTextView.getText().toString());
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Trigger a new query to the Room database with the user's input
+                String input = s.toString();
+
+                organizationsList = myViewModel.getMatchingOrganizations(requireContext(), input);
+                stringMap = new HashMap<>();
+                stringList = new ArrayList<>();
+                for (Organizations organization : organizationsList) {
+                    stringList.add(organization.getDisplayName());
+                    stringMap.put(organization.getIdcode(), organization.getDisplayName());
+                }
+                adapter = new ArrayAdapter(requireContext(),
+                        android.R.layout.simple_list_item_1, stringList);
+
+                autoCompleteTextView.setAdapter(adapter);
+                autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
+                    organizationsCode = getOrganizationsCode(autoCompleteTextView.getText().toString());
+                });
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
         });
+
     }
 
     private String getOrganizationsCode(String toString) {
@@ -312,28 +329,32 @@ public class FragmentDataEntry extends Fragment {
                     DbDataEntryForm dbDataEntryForm = new DbDataEntryForm(
                             categoryCode, indicatorName, categoryId, indicatorsList);
                     dbDataEntryFormList.add(dbDataEntryForm);
-
                 }
             }
-            Log.e("Data Entry", "Submission Id" + submissionId);
             DataEntryAdapter dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId, FragmentDataEntry.this);
             mRecyclerView.setAdapter(dataEntryAdapter);
 
             formatterClass.saveSharedPref("indicatorSize",
                     String.valueOf(indicatorSize), requireContext());
-            Log.e("Data Entry", "indicatorSize::::::" + indicatorSize);
             handleButtonClicks();
             controlPagination(dataEntry.getCount());
         }
     }
 
     private void controlPagination(int count) {
+        if (count == 0) {
+            btnCancel.setVisibility(View.INVISIBLE);
+            btnNext.setVisibility(View.GONE);
+        }
         if (count == 1) {
             btnCancel.setVisibility(View.INVISIBLE);
             btnNext.setVisibility(View.GONE);
             saveDraft.setVisibility(View.VISIBLE);
             submitSurvey.setVisibility(View.VISIBLE);
+        } else {
+            handleButtonClicks();
         }
+
     }
 
     public void updateProgress() {
@@ -362,7 +383,7 @@ public class FragmentDataEntry extends Fragment {
         int totalItemCount = mRecyclerView.getAdapter().getItemCount();
 
         if (firstVisibleItemPosition == 0) {
-            // The first visible item is active, disable the back button
+            // The first visible item is activhttps://docs.google.com/document/d/1aoKmQaYjD6JmXZwvkRBmmIJoXlt4usTV1qgUAcGvu_8/edit#e, disable the back button
             btnCancel.setVisibility(View.INVISIBLE);
             submitSurvey.setVisibility(View.GONE);
         } else {
@@ -395,7 +416,7 @@ public class FragmentDataEntry extends Fragment {
 
     public void uploadImage(@NotNull String userId, @NotNull String indicatorId, @NotNull String submissionId) {
         MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.selectImage(userId,indicatorId,submissionId);
+        mainActivity.selectImage(userId, indicatorId, submissionId);
 //        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
 //        LayoutInflater inflater = LayoutInflater.from(requireContext());
 //        View view = inflater.inflate(R.layout.dialog_image_upload, null);

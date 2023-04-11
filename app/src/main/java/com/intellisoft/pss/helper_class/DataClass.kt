@@ -74,3 +74,17 @@ data class DbDataEntryForm(
     val categoryId: String?,
     val forms: ArrayList<DbIndicators>
 )
+
+data class SettingItem(
+    val title: String,
+    val innerList: SettingItemChild,
+    var expandable: Boolean = false,
+    var count: Int
+)
+
+data class SettingItemChild(
+    val title: String,
+    val subTitle: String,
+    val showEdittext: Boolean,
+    val buttonName: String,
+)

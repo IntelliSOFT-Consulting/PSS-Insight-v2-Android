@@ -16,6 +16,9 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
   fun addIndicators(indicatorsData: IndicatorsData) {
     repository.addIndicators(indicatorsData)
   }
+  fun clearIndicators() {
+    repository.clearIndicators()
+  }
   fun addResponse(indicatorResponse: IndicatorResponse) {
     repository.addResponse(indicatorResponse)
   }
@@ -43,6 +46,10 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
     repository.addOrganizations(organizationData)
   }
   fun getOrganizations(context: Context) = runBlocking { repository.getAllOrganizations(context) }
+  fun getMatchingOrganizations(context: Context,name: String) = runBlocking {
+    val pattern = "%$name%"
+    repository.getMatchingOrganizations(context,pattern)
+  }
 
   fun getSubmission(submissionId: String, context: Context) = runBlocking {
     repository.getSubmission(submissionId, context)
@@ -71,5 +78,13 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getAllImages(context: Context)= runBlocking {
       repository.getAllImages(context)
+    }
+
+    fun deleteAllOrganizations() = runBlocking{
+      repository.deleteAllOrganizations()
+    }
+
+    fun clearAppData() = runBlocking{
+      repository.clearAppData()
     }
 }

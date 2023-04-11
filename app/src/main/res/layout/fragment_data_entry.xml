@@ -69,7 +69,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:text="@string/select_year"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <!-- Year Edit Text -->
@@ -83,23 +83,22 @@
                     android:inputType="number"
                     android:padding="10dp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/til_organization"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
+                <!-- Select Year Label -->
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:hint="@string/action_organization"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/select_organization"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
-                    app:boxStrokeColor="@color/purple_200">
-
-                    <AutoCompleteTextView
-                        android:id="@+id/act_organization"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="none" />
-                </com.google.android.material.textfield.TextInputLayout>
-
+                <AutoCompleteTextView
+                    android:id="@+id/act_organization"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/edittext_border"
+                    android:paddingStart="10dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

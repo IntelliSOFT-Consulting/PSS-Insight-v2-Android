@@ -2,7 +2,6 @@ package com.intellisoft.pss.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,9 +63,7 @@ class SubmissionAdapter(
     } else {
       holder.statusIcon.setImageResource(R.drawable.ic_submitted_synced)
     }
-
     holder.tvDate.text = date
-
     val statusValue =
         if (status == SubmissionsStatus.SUBMITTED.name && isSynced) {
           "$status & SYNCED"

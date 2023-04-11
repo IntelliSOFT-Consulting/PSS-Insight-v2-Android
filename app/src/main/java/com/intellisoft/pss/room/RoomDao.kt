@@ -67,6 +67,9 @@ interface RoomDao {
   fun addOrganizations(organizationData: Organizations)
 
   @Query("SELECT * FROM organizations") fun getAllOrganizations(): List<Organizations>
+
+  @Query("SELECT * FROM organizations WHERE displayName LIKE :pattern")
+  fun getMatchingOrganizations(pattern: String): List<Organizations>
   @Query("SELECT * FROM submissions WHERE userId =:userId AND id =:submissionId")
   fun getSubmission(submissionId: String, userId: String): Submissions?
 
@@ -85,6 +88,11 @@ interface RoomDao {
   @Query("SELECT COUNT(*) FROM responses WHERE userId =:userId AND submissionId =:submissionId")
   fun getResponsesCount(userId: String, submissionId: String): Int
   @Insert(onConflict = OnConflictStrategy.REPLACE) fun uploadImage(image: Image)
-  @Query("SELECT * FROM images")
-  fun getAllImages(): List<Image>
+  @Query("SELECT * FROM images") fun getAllImages(): List<Image>
+  @Query("DELETE FROM organizations")
+  fun deleteAllOrganizations()
+  @Query("DELETE FROM indicators_data")
+  fun clearIndicators()
+  @Query("DELETE FROM submissions")
+  fun clearAppData()
 }
