@@ -78,11 +78,17 @@ public class FragmentSettings extends Fragment {
 
     private String getSyncingConfPeriod() {
         String code = formatterClass.getSharedPref(SettingsQueue.CONFIGURATION.name(), requireContext());
+        if (code==null){
+            code="1 Day Default";
+        }
         return code;
     }
 
     private String getReserved() {
         String code = formatterClass.getSharedPref(SettingsQueue.RESERVED.name(), requireContext());
+        if (code==null){
+            code="0";
+        }
         return code;
     }
 
@@ -96,6 +102,9 @@ public class FragmentSettings extends Fragment {
 
     private String getSyncingPeriod() {
         String code = formatterClass.getSharedPref(SettingsQueue.SYNC.name(), requireContext());
+        if (code==null){
+            code="1 Day Default";
+        }
         return code;
     }
 

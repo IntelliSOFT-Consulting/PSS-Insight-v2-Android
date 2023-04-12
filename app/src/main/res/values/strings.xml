@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PSS Insights V2.0</string>
+    <string name="app_name">PSS Insight Survey</string>
     <string name="pss_title">Pharmaceutical Systems Strengthening Insights tool v2</string>
     <string name="syncing">Syncing Your Configurations</string>
     <string name="navigation">navigation</string>

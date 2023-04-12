@@ -13,5 +13,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Pss"
+rootProject.name = "PSS Insight Survey"
 include ':app'

@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void autoSyncSubmissions() {
 
         if (activeInternetConnection()) {
+
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
             if (hour == 0) {

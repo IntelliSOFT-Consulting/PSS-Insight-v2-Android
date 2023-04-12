@@ -56,6 +56,7 @@ import com.intellisoft.pss.room.IndicatorsData;
 import com.intellisoft.pss.room.Organizations;
 import com.intellisoft.pss.room.PssViewModel;
 import com.intellisoft.pss.room.Submissions;
+import com.intellisoft.pss.widgets.CustomRecyclerView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -200,8 +201,6 @@ public class FragmentDataEntry extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -209,26 +208,26 @@ public class FragmentDataEntry extends Fragment {
                 handleButtonClicks();
             }
         });
+
         btnCancel.setOnClickListener(v -> {
-//            LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-//            int currentPosition = layoutManager.findFirstVisibleItemPosition();
-//            int newPosition = currentPosition - 1;
-//
-//            if (newPosition >= 0) {
-//                // Scroll to the previous item
-//                layoutManager.scrollToPosition(newPosition);
-//            }
+            LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+            int lastVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+            int totalItemCount = mRecyclerView.getAdapter().getItemCount();
+            if (lastVisibleItemPosition < totalItemCount) {
+                lastVisibleItemPosition--;
+                mRecyclerView.smoothScrollToPosition(lastVisibleItemPosition);
+            }
+
             handleButtonClicks();
         });
         btnNext.setOnClickListener(v -> {
-//            LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-//            int currentPosition = layoutManager.findLastVisibleItemPosition();
-//            int newPosition = currentPosition + 1;
-//
-//            if (newPosition < mRecyclerView.getAdapter().getItemCount()) {
-//                // Scroll to the next item
-//                layoutManager.scrollToPosition(newPosition);
-//            }
+            LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+            int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+            int totalItemCount = mRecyclerView.getAdapter().getItemCount();
+            if (lastVisibleItemPosition < totalItemCount) {
+                lastVisibleItemPosition++;
+                mRecyclerView.smoothScrollToPosition(lastVisibleItemPosition);
+            }
             handleButtonClicks();
         });
 
@@ -336,7 +335,7 @@ public class FragmentDataEntry extends Fragment {
 
             formatterClass.saveSharedPref("indicatorSize",
                     String.valueOf(indicatorSize), requireContext());
-            handleButtonClicks();
+
             controlPagination(dataEntry.getCount());
         }
     }
@@ -369,10 +368,8 @@ public class FragmentDataEntry extends Fragment {
             progressBar.setProgress(percentInt);
             progressText.setText(percentInt + "% done");
 
-
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("Data Entry", "indicatorSize:::::: error" + e.getMessage());
         }
     }
 
@@ -382,59 +379,46 @@ public class FragmentDataEntry extends Fragment {
         int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
         int totalItemCount = mRecyclerView.getAdapter().getItemCount();
 
-        if (firstVisibleItemPosition == 0) {
-            // The first visible item is activhttps://docs.google.com/document/d/1aoKmQaYjD6JmXZwvkRBmmIJoXlt4usTV1qgUAcGvu_8/edit#e, disable the back button
-            btnCancel.setVisibility(View.INVISIBLE);
-            submitSurvey.setVisibility(View.GONE);
-        } else {
-            // The first visible item is not active, show the back button
-            btnCancel.setVisibility(View.VISIBLE);
-            submitSurvey.setVisibility(View.GONE);
+        int center = mRecyclerView.getWidth() / 2;
+        int closestToCenter = Integer.MAX_VALUE;
+        int activeItemPosition = -1;
+        for (int i = firstVisibleItemPosition; i <= lastVisibleItemPosition; i++) {
+            View itemView = layoutManager.findViewByPosition(i);
+            if (itemView != null) {
+                int itemCenter = (itemView.getLeft() + itemView.getRight()) / 2;
+                int distance = Math.abs(center - itemCenter);
+                if (distance < closestToCenter) {
+                    closestToCenter = distance;
+                    activeItemPosition = i + 1;
+                }
+            }
+        }
+        if (activeItemPosition == -1) {
+            activeItemPosition = 1;
         }
 
-        if (lastVisibleItemPosition == totalItemCount - 1) {
-            // The last visible item is active, remove the next button
+        String activeItemText = "Page " + activeItemPosition + " / " + totalItemCount;
+        progressLabel.setText(activeItemText);
+        if (activeItemPosition == totalItemCount) {
             btnNext.setVisibility(View.GONE);
             submitSurvey.setVisibility(View.VISIBLE);
         } else {
-            // The last visible item is not active, show the next button
             btnNext.setVisibility(View.VISIBLE);
             submitSurvey.setVisibility(View.GONE);
         }
 
-        int activeItemCount;
-        if (firstVisibleItemPosition == -1 || lastVisibleItemPosition == -1) {
-            activeItemCount = 1;
+        if (activeItemPosition > 1 && activeItemPosition <= totalItemCount) {
+            btnCancel.setVisibility(View.VISIBLE);
         } else {
-            activeItemCount = lastVisibleItemPosition - firstVisibleItemPosition + 1;
+            btnCancel.setVisibility(View.INVISIBLE);
         }
-
-        String activeItemText = "Page " + activeItemCount + " / " + totalItemCount;
-        progressLabel.setText(activeItemText);
     }
 
 
     public void uploadImage(@NotNull String userId, @NotNull String indicatorId, @NotNull String submissionId) {
         MainActivity mainActivity = (MainActivity) getActivity();
         mainActivity.selectImage(userId, indicatorId, submissionId);
-//        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-//        LayoutInflater inflater = LayoutInflater.from(requireContext());
-//        View view = inflater.inflate(R.layout.dialog_image_upload, null);
-//        builder.setView(view);
-//        AlertDialog alertDialog = builder.create();
-//        alertDialog.show();
-//
-//        Button btnSelectImage = view.findViewById(R.id.btn_select_image);
-//        Button btnCancel = view.findViewById(R.id.btn_cancel);
-//
-//        btnSelectImage.setOnClickListener(view1 -> {
-//            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//            intent.setType("image/*");
-//            startActivityForResult(intent, REQUEST_IMAGE_PICKER);
-//            alertDialog.dismiss();
-//        });
-//
-//        btnCancel.setOnClickListener(view12 -> alertDialog.dismiss());
+
     }
 
     @Override
