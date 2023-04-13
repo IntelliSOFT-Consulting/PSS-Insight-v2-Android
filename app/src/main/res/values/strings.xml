@@ -52,5 +52,7 @@
     <string name="delete_local_data_message">Non synchronized data will be lost. Do you really want to continue?</string>
     <string name="is_there_a_national_list_of_essential_medicines">Is there a national list of essential medicines?</string>
     <string name="period">Year</string>
+    <string name="user_comment">User Comment</string>
+    <string name="user_attachment">Attachment</string>
 
 </resources>

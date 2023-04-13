@@ -37,6 +37,8 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
     repository.getMyResponse(context, indicatorId, submissionId)
   }  fun getMyComment(context: Context, indicatorId: String, submissionId: String) = runBlocking {
     repository.getMyComment(context, indicatorId, submissionId)
+  } fun getMyImage(context: Context, indicatorId: String, submissionId: String) = runBlocking {
+    repository.getMyImage(context, indicatorId, submissionId)
   }
   fun getSubmissions(context: Context) = runBlocking { repository.getSubmissions(context) }
   fun getSubmitData(context: Context) = runBlocking { repository.getSubmitData(context) }
@@ -89,4 +91,9 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
     fun clearAppData() = runBlocking{
       repository.clearAppData()
     }
+
+  fun getImage(context: Context, userId: String, indicatorId: String, submissionId: String)=
+    runBlocking {
+      repository.getImage(context,userId,indicatorId,submissionId)
+  }
 }

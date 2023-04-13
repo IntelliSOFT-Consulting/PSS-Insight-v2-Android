@@ -2,20 +2,28 @@ package com.intellisoft.pss.navigation_drawer;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -31,7 +39,6 @@ import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 import com.intellisoft.pss.Login;
-import com.intellisoft.pss.helper_class.DbFileDataEntry;
 import com.intellisoft.pss.helper_class.DbSaveDataEntry;
 import com.intellisoft.pss.helper_class.FileUpload;
 import com.intellisoft.pss.helper_class.FormatterClass;
@@ -51,17 +58,22 @@ import com.intellisoft.pss.room.PssViewModel;
 import com.intellisoft.pss.room.Submissions;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_IMAGE_PICKER = 1001;
+    private static final int REQUEST_CAMERA_AND_STORAGE_PERMISSION_CODE = 1200;
+    private static final int REQUEST_IMAGE_CAPTURE = 1002;
     private String[] mNavigationDrawerItemTitles;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -72,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FormatterClass formatterClass = new FormatterClass();
     private PssViewModel myViewModel;
     private List<Image> imageList;
+    private Boolean isCamera = false;
 
 
     private BroadcastReceiver myBroadcastReceiver = new BroadcastReceiver() {
@@ -90,15 +103,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
-          /*  if (hour == 0) {*/
-                List<Submissions> submissionList = myViewModel.getUnsyncedSubmissions(this, SubmissionsStatus.SUBMITTED.name());
-                for (Submissions sm : submissionList) {
-                    DbSaveDataEntry dataEntry = myViewModel.getSubmitSync(this, sm);
-                    if (dataEntry != null) {
-                        retrofitCalls.submitSyncData(this, dataEntry, sm, myViewModel);
-                    }
+            /*  if (hour == 0) {*/
+            List<Submissions> submissionList = myViewModel.getUnsyncedSubmissions(this, SubmissionsStatus.SUBMITTED.name());
+            for (Submissions sm : submissionList) {
+                DbSaveDataEntry dataEntry = myViewModel.getSubmitSync(this, sm);
+                if (dataEntry != null) {
+                    retrofitCalls.submitSyncData(this, dataEntry, sm, myViewModel);
                 }
-           /* }*/
+            }
+            /* }*/
         } else {
             Log.e(TAG, "Sync paused.... No active connection");
         }
@@ -149,19 +162,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         // Set the listener for menu item clicks
         navigationView.setNavigationItemSelectedListener(this);
-        loadAllImages();
+//        loadAllImages();
     }
+
 
     private void loadAllImages() {
         try {
             imageList = myViewModel.getAllImages(MainActivity.this);
             for (Image img : imageList) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    String encodedImage = Base64.getEncoder().encodeToString(img.getImage());
-                    DbFileDataEntry dataEntry = new DbFileDataEntry(encodedImage, "");
-                    retrofitCalls.submitFileData(MainActivity.this, dataEntry, myViewModel);
-                }
-
+                retrofitCalls.submitFileData(MainActivity.this, img, myViewModel);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -191,23 +200,131 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void selectImage(String userId, String indicatorId, String submissionId) {
 
-//        formatterClass.saveSharedPref(FileUpload.USER.name(), userId, MainActivity.this);
-//        formatterClass.saveSharedPref(FileUpload.INDICATOR.name(), indicatorId, MainActivity.this);
-//        formatterClass.saveSharedPref(FileUpload.SUBMISSION.name(), submissionId, MainActivity.this);
+        formatterClass.saveSharedPref(FileUpload.USER.name(), userId, MainActivity.this);
+        formatterClass.saveSharedPref(FileUpload.INDICATOR.name(), indicatorId, MainActivity.this);
+        formatterClass.saveSharedPref(FileUpload.SUBMISSION.name(), submissionId, MainActivity.this);
+
+        CharSequence[] options = new CharSequence[]{"Take Photo", "Choose from Gallery", "Cancel"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Option");
+        builder.setItems(options, (dialog, item) -> {
+            switch (item) {
+                case 0:
+                    // Handle take photo option
+                    isCamera = true;
+                    launchCamera();
+                    break;
+                case 1:
+                    // Handle choose from gallery option
+                    isCamera = false;
+                    launchCamera();
+                    break;
+                case 2:
+                    dialog.dismiss();
+                    break;
+            }
+        });
+        builder.show();
 //
-//        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//        intent.setType("image/*");
-//        startActivityForResult(intent, REQUEST_IMAGE_PICKER);
-        Toast.makeText(MainActivity.this, "In Progress", Toast.LENGTH_SHORT).show();
+    }
+
+    private void launchCamera() {
+        String cameraPermission = Manifest.permission.CAMERA;
+        String storagePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        String readStoragePermission = Manifest.permission.READ_EXTERNAL_STORAGE;
+        List<String> permissionsList = new ArrayList<>();
+
+        if (ContextCompat.checkSelfPermission(this, cameraPermission) != PackageManager.PERMISSION_GRANTED) {
+            permissionsList.add(cameraPermission);
+        }
+        if (ContextCompat.checkSelfPermission(this, storagePermission) != PackageManager.PERMISSION_GRANTED) {
+            permissionsList.add(storagePermission);
+        }
+        if (ContextCompat.checkSelfPermission(this, readStoragePermission) != PackageManager.PERMISSION_GRANTED) {
+            permissionsList.add(readStoragePermission);
+        }
+        if (!permissionsList.isEmpty()) {
+            String[] permissionsArray = permissionsList.toArray(new String[permissionsList.size()]);
+            ActivityCompat.requestPermissions(this, permissionsArray, REQUEST_CAMERA_AND_STORAGE_PERMISSION_CODE);
+        } else {
+            // Permissions have already been granted
+            openLauncher(isCamera);
+        }
+
+    }
+
+    private void openLauncher(boolean isCamera) {
+        if (isCamera) {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+
+
+        } else {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent.setType("image/*");
+            startActivityForResult(intent, REQUEST_IMAGE_PICKER);
+        }
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CAMERA_AND_STORAGE_PERMISSION_CODE) {
+            Map<String, Integer> permissionResults = new HashMap<>();
+            for (int i = 0; i < permissions.length; i++) {
+                String permission = permissions[i];
+                if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                    // Add the permission to the map with a value of PERMISSION_DENIED
+                    permissionResults.put(permission, PackageManager.PERMISSION_DENIED);
+                } else {
+                    // Add the permission to the map with a value of PERMISSION_GRANTED
+                    permissionResults.put(permission, PackageManager.PERMISSION_GRANTED);
+                }
+            }
+
+            // Check if all permissions were granted
+            if (permissionResults.containsValue(PackageManager.PERMISSION_DENIED)) {
+                // At least one permission was denied
+                // Handle the denied permission(s) as appropriate
+            } else {
+                // All permissions were granted
+                // Proceed with the action that requires the permissions
+                launchCamera();
+            }
+        }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        Toast.makeText(this, "selected image", Toast.LENGTH_SHORT).show();
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+
+            try {
+                Bundle extras = data.getExtras();
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream); // specify the compression quality
+                byte[] imageBytes = byteArrayOutputStream.toByteArray();
+                uploadImage(imageBytes, "Cam" + randomNumber() + ".jpg");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e("Sample Tag", "Error Image::::" + e.getMessage());
+                Toast.makeText(this, "Error while processing image", Toast.LENGTH_LONG).show();
+            }
+
+        }
         if (requestCode == REQUEST_IMAGE_PICKER && resultCode == Activity.RESULT_OK && data != null) {
             // Get the selected image URI
             Uri selectedImageUri = data.getData();
+            String fileName = "";
 
             try {
                 ContentResolver cr = getContentResolver();
@@ -215,24 +332,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inSampleSize = 4; // specify the image compression ratio, higher the ratio smaller the image size
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream); // specify the compression quality
                 byte[] imageBytes = byteArrayOutputStream.toByteArray();
 
-                String userId = formatterClass.getSharedPref(FileUpload.USER.name(), this);
-                String indicatorId = formatterClass.getSharedPref(FileUpload.INDICATOR.name(), this);
-                String submissionId = formatterClass.getSharedPref(FileUpload.SUBMISSION.name(), this);
-                Image image = new Image(
-                        userId,
-                        submissionId,
-                        indicatorId,
-                        imageBytes);
-                myViewModel.uploadImage(MainActivity.this, image);
+                String[] projection = {MediaStore.Images.Media.DISPLAY_NAME};
+                Cursor cursor = cr.query(selectedImageUri, projection, null, null, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    fileName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME));
+                    // Use the file name as needed
+                    cursor.close();
+                }
+                Log.e(TAG, "Received image from camera" + imageBytes);
+                uploadImage(imageBytes, fileName);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
+    }
+
+    private String randomNumber() {
+        Random random = new Random();
+        int min = 10;
+        int max = 1000;
+        int randomNumber = random.nextInt(max - min + 1) + min; // generate a random number between 10 and 1000
+        return "" + randomNumber;
+    }
+
+    private void uploadImage(byte[] imageBytes, String fileName) {
+
+        String userId = formatterClass.getSharedPref(FileUpload.USER.name(), this);
+        String indicatorId = formatterClass.getSharedPref(FileUpload.INDICATOR.name(), this);
+        String submissionId = formatterClass.getSharedPref(FileUpload.SUBMISSION.name(), this);
+        Image image = new Image(
+                userId,
+                submissionId,
+                indicatorId,
+                imageBytes, fileName,"",false);
+        myViewModel.uploadImage(MainActivity.this, image);
     }
 
     private void selectItem(int position) {

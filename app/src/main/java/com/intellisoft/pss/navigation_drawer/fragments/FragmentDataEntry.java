@@ -173,17 +173,6 @@ public class FragmentDataEntry extends Fragment {
                 android.R.layout.simple_list_item_1, stringList);
         etPeriod.setAdapter(adapter);
 
-        // Create custom layout for dropdown items
-//        int layoutId = android.R.layout.simple_list_item_1;
-//        int dropdownLayoutId = android.R.layout.simple_spinner_dropdown_item;
-//        LayoutInflater inflater = LayoutInflater.from(requireContext());
-//        View customView = inflater.inflate(dropdownLayoutId, null);
-//        TextView textView = customView.findViewById(android.R.id.text1);
-//        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12); // Set font size
-//        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), layoutId, stringList);
-//        adapter.setDropDownViewResource(dropdownLayoutId);
-//        etPeriod.setAdapter(adapter);
-
     }
 
     private Collection<String> generateYears() {
@@ -199,6 +188,7 @@ public class FragmentDataEntry extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_custom, null);
         builder.setView(dialogView);
+        builder.setCancelable(false);
         TextView titleTextView = dialogView.findViewById(R.id.tv_title);
         ImageView okButton = dialogView.findViewById(R.id.dialog_cancel_image);
 

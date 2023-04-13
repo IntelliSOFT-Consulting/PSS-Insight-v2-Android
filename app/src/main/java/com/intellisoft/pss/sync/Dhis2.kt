@@ -4,6 +4,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
+import android.util.Log
 
 class Dhis2 : Service() {
 
@@ -21,7 +22,8 @@ class Dhis2 : Service() {
           override fun run() {
             val broadcastIntent = Intent("dhis2")
             sendBroadcast(broadcastIntent) // Send a broadcast message
-            handler?.postDelayed(this, 1 * 60 * 1000) // Run this runnable again in 30 seconds
+            Log.e("App","Service Started.....")
+            handler?.postDelayed(this, 30000) // Run this runnable again in 30 seconds
           }
         }
     handler?.post(runnable!!)

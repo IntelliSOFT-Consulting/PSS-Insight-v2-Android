@@ -3,19 +3,18 @@ package com.intellisoft.pss.adapter
 import android.app.Application
 import android.app.Dialog
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.os.Handler
 import android.text.Editable
+import android.text.Html
 import android.text.TextWatcher
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.RadioButton
-import android.widget.RadioGroup
-import android.widget.TextView
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.intellisoft.pss.R
 import com.intellisoft.pss.helper_class.DbIndicators
@@ -49,10 +48,14 @@ class DataEntryFormsAdapter(
     val radioYes: RadioButton = itemView.findViewById(R.id.rb_yes)
     val radioNo: RadioButton = itemView.findViewById(R.id.rb_no)
     val tvUserComment: TextView = itemView.findViewById(R.id.tv_user_comment)
+    val tvUserAttachment: TextView = itemView.findViewById(R.id.tv_user_attachment)
+    val lnComment: LinearLayout = itemView.findViewById(R.id.ln_comment)
+    val lnAttachment: LinearLayout = itemView.findViewById(R.id.ln_attachment)
 
     init {
       tvComment.setOnClickListener(this)
       tvAttachment.setOnClickListener(this)
+      tvUserAttachment.setOnClickListener(this)
       etValue.addTextChangedListener(this)
       radioYes.setOnCheckedChangeListener { buttonView, isChecked ->
         if (isChecked) {
@@ -82,6 +85,9 @@ class DataEntryFormsAdapter(
       val pos = adapterPosition
       val id = dbDataEntryFormList[pos].id
       when (view.id) {
+        R.id.tv_user_attachment -> {
+          onAttachmentDialog(myViewModel, userId.toString(), id)
+        }
         R.id.tvComment -> {
           onAlertDialog(myViewModel, userId.toString(), id)
         }
@@ -141,6 +147,7 @@ class DataEntryFormsAdapter(
     // Get saved responses
     val value = holder.myViewModel.getMyResponse(context, indicatorId, submissionId)
     val comment = holder.myViewModel.getMyComment(context, indicatorId, submissionId)
+    val image = holder.myViewModel.getMyImage(context, indicatorId, submissionId)
     if (value != null) {
       holder.etValue.setText(value)
       if (value == "Yes") {
@@ -150,11 +157,22 @@ class DataEntryFormsAdapter(
       }
     }
     if (comment != null) {
-      holder.tvUserComment.visibility = VISIBLE
+      holder.lnComment.visibility = VISIBLE
       holder.tvUserComment.text = comment
+    }
+    if (image != null) {
+      holder.lnAttachment.visibility = VISIBLE
+
+      val spanned = Html.fromHtml(generateHypeLink(image))
+      holder.tvUserAttachment.text = spanned
+      holder.tvUserAttachment.movementMethod = LinkMovementMethod.getInstance()
     }
 
     holder.tvQuestion.text = name
+  }
+
+  private fun generateHypeLink(image: String): String? {
+    return " <a href='#'> $image</a><br>"
   }
 
   override fun getItemCount(): Int {
@@ -185,6 +203,32 @@ class DataEntryFormsAdapter(
     }
 
     val btncn = dialog.findViewById(R.id.dialog_button_cancel) as Button
+    btncn.setOnClickListener { dialog.dismiss() }
+
+    dialog.show()
+  }
+  fun onAttachmentDialog(myViewModel: PssViewModel, userId: String, indicatorId: String) {
+    val dialog = Dialog(context)
+    // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    dialog.setCancelable(false)
+    dialog.setContentView(R.layout.custom_image_dialog)
+    val width = ViewGroup.LayoutParams.MATCH_PARENT
+    val height = ViewGroup.LayoutParams.WRAP_CONTENT
+    dialog.window?.setLayout(width, height)
+
+    val imgSuccess = dialog.findViewById(R.id.img_success) as ImageView
+    try {
+      val image = myViewModel.getImage(context, userId, indicatorId, submissionId)
+      if (image != null) {
+        val byteArray = image.image
+        val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+        imgSuccess.setImageBitmap(bitmap)
+      }
+    } catch (e: Exception) {
+      e.printStackTrace()
+    }
+
+    val btncn = dialog.findViewById(R.id.dialog_cancel_image) as ImageView
     btncn.setOnClickListener { dialog.dismiss() }
 
     dialog.show()

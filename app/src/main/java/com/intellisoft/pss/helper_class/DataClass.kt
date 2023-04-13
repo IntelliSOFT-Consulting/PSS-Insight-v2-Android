@@ -1,5 +1,6 @@
 package com.intellisoft.pss.helper_class
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.intellisoft.pss.R
 
 enum class NavigationValues {
@@ -34,6 +35,8 @@ enum class FileUpload {
 data class DbSubmission(val date: String, val status: String)
 
 data class DbDataEntry(val count: Int, val details: List<DbDataEntryDetails>)
+
+data class ImageResponse(@JsonProperty("id") val id: String)
 
 data class DbDataEntryDetails(val categoryName: String, val indicators: List<DbIndicatorsDetails>)
 

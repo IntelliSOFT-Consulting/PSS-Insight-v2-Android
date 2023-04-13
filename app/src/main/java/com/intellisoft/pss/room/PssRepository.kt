@@ -83,6 +83,17 @@ class PssRepository(private val roomDao: RoomDao) {
     }
     return null
   }
+  fun getMyImage(context: Context, indicatorId: String, submissionId: String): String? {
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+      val response = roomDao.getMyImage(userId, indicatorId, submissionId)
+      if (response != null) {
+        val value = response.fileName
+        return value
+      }
+    }
+    return null
+  }
 
   fun addSubmissions(submissions: Submissions) {
     val userId = submissions.userId
@@ -270,10 +281,19 @@ class PssRepository(private val roomDao: RoomDao) {
     return 0
   }
 
-  fun uploadImage(context: Context, image: Image) {
+  fun uploadImage(context: Context, file: Image) {
     val userId = formatterClass.getSharedPref("username", context)
     if (userId != null) {
-      roomDao.uploadImage(image)
+      val submissionId = file.submissionId
+      val indicatorId = file.indicatorId
+      val exists =
+          roomDao.getImageByUserIdInSubId(userId, submissionId.toString(), indicatorId.toString())
+      if (exists != null) {
+        roomDao.updateImageByte(
+            file.image, file.fileName, submissionId.toString(), indicatorId.toString())
+      } else {
+        roomDao.uploadImage(file)
+      }
     }
   }
 
@@ -289,7 +309,20 @@ class PssRepository(private val roomDao: RoomDao) {
     roomDao.deleteAllOrganizations()
   }
 
-    fun clearAppData() {
-      roomDao.clearAppData()
+  fun clearAppData() {
+    roomDao.clearAppData()
+  }
+
+  fun getImage(
+      context: Context,
+      userId: String,
+      indicatorId: String,
+      submissionId: String
+  ): Image? {
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+      return roomDao.getMyImage(userId, indicatorId, submissionId)
     }
+    return null
+  }
 }

@@ -26,6 +26,9 @@ interface RoomDao {
   @Query(
       "SELECT * FROM comments WHERE userId =:userId AND indicatorId =:indicatorId AND submissionId =:submissionId")
   fun getMyComment(userId: String, indicatorId: String, submissionId: String): Comments?
+  @Query(
+      "SELECT * FROM images WHERE userId =:userId AND indicatorId =:indicatorId AND submissionId =:submissionId")
+  fun getMyImage(userId: String, indicatorId: String, submissionId: String): Image?
 
   @Query("SELECT * FROM responses WHERE userId =:userId")
   fun getUserResponses(userId: String): List<IndicatorResponse>
@@ -81,6 +84,8 @@ interface RoomDao {
 
   @Query("SELECT * FROM submissions WHERE userId =:userId AND id =:id")
   fun getSubmissionsById(userId: String, id: String): Submissions?
+  @Query("SELECT * FROM images WHERE userId =:userId AND submissionId =:submissionId AND indicatorId =:indicatorId")
+  fun getImageByUserIdInSubId(userId: String, submissionId: String, indicatorId: String): Image?
 
   @Query(
       "SELECT * FROM submissions WHERE userId =:userId AND status =:status AND is_synced = 0 ORDER BY id DESC")
@@ -88,14 +93,19 @@ interface RoomDao {
 
   @Query("UPDATE submissions SET is_synced =:is_synced WHERE id =:id")
   fun updateSubmissionSync(is_synced: Boolean, id: String)
+//  @Query("UPDATE images SET is_synced =:is_synced WHERE id =:id")
+//  fun updateImageByte()
   @Query("SELECT COUNT(*) FROM responses WHERE userId =:userId AND submissionId =:submissionId")
   fun getResponsesCount(userId: String, submissionId: String): Int
   @Insert(onConflict = OnConflictStrategy.REPLACE) fun uploadImage(image: Image)
-  @Query("SELECT * FROM images") fun getAllImages(): List<Image>
+  @Query("SELECT * FROM images")
+  fun getAllImages(): List<Image>
   @Query("DELETE FROM organizations")
   fun deleteAllOrganizations()
   @Query("DELETE FROM indicators_data")
   fun clearIndicators()
   @Query("DELETE FROM submissions")
   fun clearAppData()
+  @Query("UPDATE images SET image =:image,fileName =:fileName WHERE submissionId =:submissionId AND indicatorId =:indicatorId")
+    fun updateImageByte(image: ByteArray, fileName: String, submissionId: String, indicatorId: String)
 }

@@ -7,14 +7,17 @@ import android.util.Log
 import android.widget.Toast
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.intellisoft.pss.helper_class.DbFileDataEntry
 import com.intellisoft.pss.helper_class.DbSaveDataEntry
 import com.intellisoft.pss.helper_class.FormatterClass
+import com.intellisoft.pss.helper_class.ImageResponse
 import com.intellisoft.pss.room.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 
 class RetrofitCalls {
 
@@ -42,7 +45,7 @@ class RetrofitCalls {
     }
   }  fun submitFileData(
     context: Context,
-    dbFileDataEntry: DbFileDataEntry,
+    image: Image,
     myViewModel: PssViewModel
   ) {
 
@@ -51,11 +54,64 @@ class RetrofitCalls {
 
       CoroutineScope(Dispatchers.IO + job)
           .launch {
-//            submitFileDataBackground(context, dbSaveDataEntry, sm, myViewModel)
+            submitFileDataBackground(context, myViewModel,image)
             }
           .join()
     }
   }
+  private suspend fun submitFileDataBackground(context: Context, myViewModel: PssViewModel,image: Image) {
+
+    val job1 = Job()
+    CoroutineScope(Dispatchers.Main + job1).launch {
+//      var progressDialog = ProgressDialog(context)
+//      progressDialog.setTitle("Please wait..")
+//      progressDialog.setMessage("Posting data in progress..")
+//      progressDialog.setCanceledOnTouchOutside(false)
+//      progressDialog.show()
+      val requestFile = RequestBody.create("image/jpeg".toMediaTypeOrNull(), image.image)
+      val file = MultipartBody.Part.createFormData("file", "image.jpg", requestFile)
+      var messageToast = ""
+      val job = Job()
+      CoroutineScope(Dispatchers.IO + job)
+          .launch {
+            val formatterClass = FormatterClass()
+            val baseUrl = formatterClass.getSharedPref("serverUrl", context)
+
+            if (baseUrl != null) {
+              val apiService = RetrofitBuilder.getRetrofit(baseUrl).create(Interface::class.java)
+              try {
+                val apiInterface = apiService.uploadImageFileData(file)
+                messageToast =
+                    if (apiInterface.isSuccessful) {
+                      val statusCode = apiInterface.code()
+                      val body = apiInterface.body()
+                      if (statusCode == 200 || statusCode == 201) {
+                       updateFileStatus( body,"Saved and synced successfully")
+                      } else {
+                        "Error: Body is null"
+                      }
+                    } else {
+                      "Error: The request was not successful"
+                    }
+              } catch (e: Exception) {
+                messageToast = "There was an issue with the server"
+              }
+            }
+          }
+          .join()
+      CoroutineScope(Dispatchers.Main).launch {
+//        progressDialog.dismiss()
+        Toast.makeText(context, messageToast, Toast.LENGTH_LONG).show()
+      }
+    }
+  }
+
+  private fun updateFileStatus(body: ImageResponse?, s: String): String {
+    Log.e("TAG","ImageResponse::::::: $body")
+    return s
+
+  }
+
   private suspend fun submitDataBackground(context: Context, dbSaveDataEntry: DbSaveDataEntry) {
 
     val job1 = Job()

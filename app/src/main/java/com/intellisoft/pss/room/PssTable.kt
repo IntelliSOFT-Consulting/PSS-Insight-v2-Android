@@ -58,7 +58,10 @@ data class Image(
     var submissionId: String?,
     var indicatorId: String?,
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
-    val image: ByteArray
+    val image: ByteArray,
+    val fileName:String,
+    var imageUrl: String?,
+    @ColumnInfo(name = "is_synced") var isSynced: Boolean = false
 ) {
     @PrimaryKey(autoGenerate = true) var id: Int? = null
 }

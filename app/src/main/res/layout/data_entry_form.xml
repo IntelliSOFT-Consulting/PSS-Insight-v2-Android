@@ -30,15 +30,6 @@
             android:inputType="number"
             android:padding="10dp" />
 
-
-        <TextView
-            android:id="@+id/tv_user_comment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:visibility="gone" />
-
-
         <RadioGroup
             android:id="@+id/rg_group"
             android:layout_width="match_parent"
@@ -63,6 +54,48 @@
                 android:text="No" />
 
         </RadioGroup>
+        <LinearLayout
+            android:id="@+id/ln_comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:textStyle="bold"
+                android:text="@string/user_comment" />
+
+            <TextView
+                android:id="@+id/tv_user_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ln_attachment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:textStyle="bold"
+                android:text="@string/user_attachment" />
+
+            <TextView
+                android:id="@+id/tv_user_attachment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp" />
+        </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
