@@ -18,5 +18,7 @@
     <color name="button_default_color">#2196F3</color>
     <color name="button_pressed_color">#1565C0</color>
     <color name="green">#4CAF50</color>
+    <color name="greyish">#aaa8a8</color>
+    <color name="mine_shaft">#303030</color>
 
 </resources>

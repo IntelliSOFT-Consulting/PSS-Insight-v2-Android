@@ -48,6 +48,7 @@ class DataEntryFormsAdapter(
     val radioGroup: RadioGroup = itemView.findViewById(R.id.rg_group)
     val radioYes: RadioButton = itemView.findViewById(R.id.rb_yes)
     val radioNo: RadioButton = itemView.findViewById(R.id.rb_no)
+    val tvUserComment: TextView = itemView.findViewById(R.id.tv_user_comment)
 
     init {
       tvComment.setOnClickListener(this)
@@ -139,6 +140,7 @@ class DataEntryFormsAdapter(
 
     // Get saved responses
     val value = holder.myViewModel.getMyResponse(context, indicatorId, submissionId)
+    val comment = holder.myViewModel.getMyComment(context, indicatorId, submissionId)
     if (value != null) {
       holder.etValue.setText(value)
       if (value == "Yes") {
@@ -146,6 +148,10 @@ class DataEntryFormsAdapter(
       } else {
         holder.radioNo.isChecked = true
       }
+    }
+    if (comment != null) {
+      holder.tvUserComment.visibility = VISIBLE
+      holder.tvUserComment.text = comment
     }
 
     holder.tvQuestion.text = name
@@ -160,6 +166,9 @@ class DataEntryFormsAdapter(
     // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
     dialog.setCancelable(false)
     dialog.setContentView(R.layout.custom_comment_dialog)
+    val width = ViewGroup.LayoutParams.MATCH_PARENT
+    val height = ViewGroup.LayoutParams.WRAP_CONTENT
+    dialog.window?.setLayout(width, height)
 
     var editText: EditText? = null
 
@@ -170,6 +179,7 @@ class DataEntryFormsAdapter(
       val value = editText.text.toString()
       val comments = Comments(userId.toString(), indicatorId, submissionId, value)
       myViewModel.addComment(comments)
+      notifyDataSetChanged()
 
       dialog.dismiss()
     }

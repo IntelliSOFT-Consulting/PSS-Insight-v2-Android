@@ -14,6 +14,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -61,6 +63,8 @@ import com.intellisoft.pss.widgets.CustomRecyclerView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +77,7 @@ public class FragmentDataEntry extends Fragment {
     private RecyclerView mRecyclerView;
 
     private MaterialButton saveDraft, submitSurvey, btnCancel, btnNext;
-    private EditText etPeriod;
+    private AutoCompleteTextView etPeriod;
     private TextView progressLabel, progressText;
     private RetrofitCalls retrofitCalls = new RetrofitCalls();
     private LinearLayoutManager linearLayoutManager;
@@ -95,6 +99,7 @@ public class FragmentDataEntry extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_data_entry, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
         mRecyclerView = rootView.findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
@@ -155,10 +160,39 @@ public class FragmentDataEntry extends Fragment {
             }
 
         });
+        loadYears();
 
         loadInitial();
 
         return rootView;
+    }
+
+    private void loadYears() {
+        ArrayList<String> stringList = new ArrayList<>(generateYears());
+        adapter = new ArrayAdapter(requireContext(),
+                android.R.layout.simple_list_item_1, stringList);
+        etPeriod.setAdapter(adapter);
+
+        // Create custom layout for dropdown items
+//        int layoutId = android.R.layout.simple_list_item_1;
+//        int dropdownLayoutId = android.R.layout.simple_spinner_dropdown_item;
+//        LayoutInflater inflater = LayoutInflater.from(requireContext());
+//        View customView = inflater.inflate(dropdownLayoutId, null);
+//        TextView textView = customView.findViewById(android.R.id.text1);
+//        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12); // Set font size
+//        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), layoutId, stringList);
+//        adapter.setDropDownViewResource(dropdownLayoutId);
+//        etPeriod.setAdapter(adapter);
+
+    }
+
+    private Collection<String> generateYears() {
+        List<String> years = new ArrayList<>();
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        for (int i = 0; i <= 20; i++) {
+            years.add(Integer.toString(currentYear - i));
+        }
+        return years;
     }
 
     private void submissionDialog() {

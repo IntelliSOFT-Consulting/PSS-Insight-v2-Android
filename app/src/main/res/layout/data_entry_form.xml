@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:text="Is there a national list of essential medicines?" />
+            android:text="@string/is_there_a_national_list_of_essential_medicines" />
 
         <EditText
             android:id="@+id/etValue"
@@ -29,6 +29,15 @@
             android:hint="Enter value"
             android:inputType="number"
             android:padding="10dp" />
+
+
+        <TextView
+            android:id="@+id/tv_user_comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:visibility="gone" />
+
 
         <RadioGroup
             android:id="@+id/rg_group"

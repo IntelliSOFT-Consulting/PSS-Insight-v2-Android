@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.intellisoft.pss.R;
@@ -31,6 +32,8 @@ public class FragmentAbout extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_about, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+
         about = getAbout();
         textView = rootView.findViewById(R.id.tv_about);
         about = getAbout();

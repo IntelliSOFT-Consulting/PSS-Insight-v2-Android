@@ -23,6 +23,9 @@ interface RoomDao {
   @Query(
       "SELECT * FROM responses WHERE userId =:userId AND indicatorId =:indicatorId AND submissionId =:submissionId")
   fun getMyResponse(userId: String, indicatorId: String, submissionId: String): IndicatorResponse?
+  @Query(
+      "SELECT * FROM comments WHERE userId =:userId AND indicatorId =:indicatorId AND submissionId =:submissionId")
+  fun getMyComment(userId: String, indicatorId: String, submissionId: String): Comments?
 
   @Query("SELECT * FROM responses WHERE userId =:userId")
   fun getUserResponses(userId: String): List<IndicatorResponse>

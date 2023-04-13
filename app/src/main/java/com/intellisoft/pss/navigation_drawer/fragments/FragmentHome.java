@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
@@ -36,6 +37,8 @@ public class FragmentHome extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 //        setHasOptionsMenu(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+
         myViewModel = new PssViewModel(((Application) requireContext().getApplicationContext()));
         cardViewSubmission = rootView.findViewById(R.id.cardViewSubmission);
         cardViewSubmission.setOnClickListener(view -> {

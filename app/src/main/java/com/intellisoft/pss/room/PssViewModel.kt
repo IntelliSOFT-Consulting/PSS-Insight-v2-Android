@@ -35,6 +35,8 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
   fun getAllMyData(context: Context) = runBlocking { repository.getAllMyData(context) }
   fun getMyResponse(context: Context, indicatorId: String, submissionId: String) = runBlocking {
     repository.getMyResponse(context, indicatorId, submissionId)
+  }  fun getMyComment(context: Context, indicatorId: String, submissionId: String) = runBlocking {
+    repository.getMyComment(context, indicatorId, submissionId)
   }
   fun getSubmissions(context: Context) = runBlocking { repository.getSubmissions(context) }
   fun getSubmitData(context: Context) = runBlocking { repository.getSubmitData(context) }

@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 import com.intellisoft.pss.Login;
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
-            if (hour == 0) {
+          /*  if (hour == 0) {*/
                 List<Submissions> submissionList = myViewModel.getUnsyncedSubmissions(this, SubmissionsStatus.SUBMITTED.name());
                 for (Submissions sm : submissionList) {
                     DbSaveDataEntry dataEntry = myViewModel.getSubmitSync(this, sm);
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         retrofitCalls.submitSyncData(this, dataEntry, sm, myViewModel);
                     }
                 }
-            }
+           /* }*/
         } else {
             Log.e(TAG, "Sync paused.... No active connection");
         }
@@ -190,13 +191,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void selectImage(String userId, String indicatorId, String submissionId) {
 
-        formatterClass.saveSharedPref(FileUpload.USER.name(), userId, MainActivity.this);
-        formatterClass.saveSharedPref(FileUpload.INDICATOR.name(), indicatorId, MainActivity.this);
-        formatterClass.saveSharedPref(FileUpload.SUBMISSION.name(), submissionId, MainActivity.this);
-
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        startActivityForResult(intent, REQUEST_IMAGE_PICKER);
+//        formatterClass.saveSharedPref(FileUpload.USER.name(), userId, MainActivity.this);
+//        formatterClass.saveSharedPref(FileUpload.INDICATOR.name(), indicatorId, MainActivity.this);
+//        formatterClass.saveSharedPref(FileUpload.SUBMISSION.name(), submissionId, MainActivity.this);
+//
+//        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//        intent.setType("image/*");
+//        startActivityForResult(intent, REQUEST_IMAGE_PICKER);
+        Toast.makeText(MainActivity.this, "In Progress", Toast.LENGTH_SHORT).show();
     }
 
     @Override

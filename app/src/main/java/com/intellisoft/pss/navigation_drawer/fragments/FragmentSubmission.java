@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,6 +41,8 @@ public class FragmentSubmission extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_submission, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+
         submissionArrayList = new ArrayList<>();
         myViewModel = new PssViewModel(((Application) requireContext().getApplicationContext()));
         mRecyclerView = rootView.findViewById(R.id.recyclerView);

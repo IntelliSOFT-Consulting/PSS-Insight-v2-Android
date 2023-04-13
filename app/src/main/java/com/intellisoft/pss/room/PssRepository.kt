@@ -72,6 +72,17 @@ class PssRepository(private val roomDao: RoomDao) {
     }
     return null
   }
+  fun getMyComment(context: Context, indicatorId: String, submissionId: String): String? {
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+      val response = roomDao.getMyComment(userId, indicatorId, submissionId)
+      if (response != null) {
+        val value = response.value
+        return value
+      }
+    }
+    return null
+  }
 
   fun addSubmissions(submissions: Submissions) {
     val userId = submissions.userId

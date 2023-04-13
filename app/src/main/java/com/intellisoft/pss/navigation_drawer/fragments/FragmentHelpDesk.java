@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.intellisoft.pss.R;
@@ -22,6 +23,7 @@ public class FragmentHelpDesk extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_help_desk, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
         tv_contact_email=  rootView.findViewById(R.id.tv_contact_email);
         tv_contact_phone=  rootView.findViewById(R.id.tv_contact_phone);

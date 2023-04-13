@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">PSS Insight Survey</string>
+    <string name="app_name">PSS Insight</string>
     <string name="pss_title">Pharmaceutical Systems Strengthening Insights tool v2</string>
     <string name="syncing">Syncing Your Configurations</string>
     <string name="navigation">navigation</string>
-    <string name="app_name_refined">PSS Insights Mobile App</string>
+    <string name="app_name_refined">PSS Insight Mobile App</string>
     <string name="base_url">navigation</string>
     <string name="password">Password</string>
     <string name="sign_in">Sign In</string>
@@ -50,5 +50,7 @@
     <string name="cancel">Cancel</string>
     <string name="delete_local_data">Delete Local Data</string>
     <string name="delete_local_data_message">Non synchronized data will be lost. Do you really want to continue?</string>
+    <string name="is_there_a_national_list_of_essential_medicines">Is there a national list of essential medicines?</string>
+    <string name="period">Year</string>
 
 </resources>

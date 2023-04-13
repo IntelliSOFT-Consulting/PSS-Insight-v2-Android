@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,6 +40,8 @@ public class FragmentSettings extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+
         settingItemArrayList = new ArrayList<>();
         settingItemChildArrayList = new ArrayList<>();
         myViewModel = new PssViewModel(((Application) requireContext().getApplicationContext()));
