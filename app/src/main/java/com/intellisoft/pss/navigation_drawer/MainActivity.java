@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void autoSyncSubmissions() {
 
         if (activeInternetConnection()) {
-
+            loadAllImages();
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
             /*  if (hour == 0) {*/
@@ -162,13 +162,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         // Set the listener for menu item clicks
         navigationView.setNavigationItemSelectedListener(this);
-//        loadAllImages();
+        loadAllImages();
     }
 
 
     private void loadAllImages() {
         try {
-            imageList = myViewModel.getAllImages(MainActivity.this);
+            imageList = myViewModel.getAllImages(MainActivity.this, false);
             for (Image img : imageList) {
                 retrofitCalls.submitFileData(MainActivity.this, img, myViewModel);
             }
@@ -369,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 userId,
                 submissionId,
                 indicatorId,
-                imageBytes, fileName,"",false);
+                imageBytes, fileName, "", false);
         myViewModel.uploadImage(MainActivity.this, image);
     }
 

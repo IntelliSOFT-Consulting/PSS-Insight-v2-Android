@@ -259,37 +259,21 @@ public class FragmentDataEntry extends Fragment {
     }
 
     private void loadOrganizations() {
-        autoCompleteTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Trigger a new query to the Room database with the user's input
-                String input = s.toString();
+        organizationsList = myViewModel.getOrganizations(requireContext());
+        stringMap = new HashMap<>();
+        stringList = new ArrayList<>();
+        for (Organizations organization : organizationsList) {
+            stringList.add(organization.getDisplayName());
+            stringMap.put(organization.getIdcode(), organization.getDisplayName());
+        }
+        adapter = new ArrayAdapter(requireContext(),
+                android.R.layout.simple_list_item_1, stringList);
 
-                organizationsList = myViewModel.getMatchingOrganizations(requireContext(), input);
-                stringMap = new HashMap<>();
-                stringList = new ArrayList<>();
-                for (Organizations organization : organizationsList) {
-                    stringList.add(organization.getDisplayName());
-                    stringMap.put(organization.getIdcode(), organization.getDisplayName());
-                }
-                adapter = new ArrayAdapter(requireContext(),
-                        android.R.layout.simple_list_item_1, stringList);
-
-                autoCompleteTextView.setAdapter(adapter);
-                autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
-                    organizationsCode = getOrganizationsCode(autoCompleteTextView.getText().toString());
-                });
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
+        autoCompleteTextView.setAdapter(adapter);
+        autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
+            organizationsCode = getOrganizationsCode(autoCompleteTextView.getText().toString());
         });
-
     }
 
     private String getOrganizationsCode(String toString) {

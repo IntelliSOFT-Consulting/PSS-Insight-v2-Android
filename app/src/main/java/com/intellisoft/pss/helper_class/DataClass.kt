@@ -14,6 +14,12 @@ enum class SubmissionsStatus {
   DRAFT
 }
 
+enum class PinLockStatus {
+  INITIAL,
+  CONFIRMED,
+  LOCK
+}
+
 enum class SubmissionQueue {
   INITIATED,
   RESPONSE,
@@ -40,9 +46,9 @@ data class ImageResponse(@JsonProperty("id") val id: String)
 
 data class DbDataEntryDetails(val categoryName: String, val indicators: List<DbIndicatorsDetails>)
 
-data class DbOrganizationEntry(val count: Int, val details: List<DbOrganizationEntryDetails>)
+data class DbOrganizationEntry(val organisationUnits: List<DbOrganizationEntryDetails>)
 
-data class DbOrganizationEntryDetails(val id: String, val displayName: String)
+data class DbOrganizationEntryDetails(val id: String, val name: String)
 
 data class DbIndicatorsDetails(
     val categoryId: String?,

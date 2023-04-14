@@ -190,8 +190,15 @@ class PssRepository(private val roomDao: RoomDao) {
           valueComment = comment.value
         }
         // Get Attachment
-
-        val dbResponses = DbResponses(indicatorId, valueResponse, valueComment, "")
+        val attached = roomDao.getIndicatorImage(userId, indicatorId, submissions.id.toString())
+        var attachmentValue = ""
+        if (attached != null) {
+          val imgURL = attached.imageUrl
+          if (imgURL != null) {
+            attachmentValue = imgURL
+          }
+        }
+        val dbResponses = DbResponses(indicatorId, valueResponse, valueComment, attachmentValue)
         dbResponsesList.add(dbResponses)
       }
       return DbSaveDataEntry(
@@ -297,10 +304,10 @@ class PssRepository(private val roomDao: RoomDao) {
     }
   }
 
-  fun getAllImages(context: Context): List<Image> {
+  fun getAllImages(context: Context, is_synced: Boolean): List<Image> {
     val userId = formatterClass.getSharedPref("username", context)
     if (userId != null) {
-      return roomDao.getAllImages()
+      return roomDao.getAllImages(is_synced, userId)
     }
     return emptyList()
   }
@@ -324,5 +331,12 @@ class PssRepository(private val roomDao: RoomDao) {
       return roomDao.getMyImage(userId, indicatorId, submissionId)
     }
     return null
+  }
+
+  fun updateImageLink(context: Context, submissionId: String?, indicatorId: String?, url: String) {
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+      roomDao.updateImageLink(userId, indicatorId.toString(), submissionId.toString(), url, true)
+    }
   }
 }

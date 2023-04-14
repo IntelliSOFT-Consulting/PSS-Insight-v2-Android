@@ -6,15 +6,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.intellisoft.pss.R;
+import com.intellisoft.pss.helper_class.FileUpload;
+import com.intellisoft.pss.helper_class.FormatterClass;
+import com.intellisoft.pss.helper_class.PinLockStatus;
+import com.intellisoft.pss.navigation_drawer.MainActivity;
 import com.intellisoft.pss.pinlockview.IndicatorDots;
 import com.intellisoft.pss.pinlockview.PinLockListener;
 import com.intellisoft.pss.pinlockview.PinLockView;
@@ -22,8 +26,10 @@ import com.intellisoft.pss.pinlockview.PinLockView;
 public class FragmentSetPin extends Fragment {
     public static final String TAG = "PinLockView";
 
+    private FormatterClass formatterClass = new FormatterClass();
     private PinLockView mPinLockView;
     private IndicatorDots mIndicatorDots;
+    private TextView profile_name;
 
     public FragmentSetPin() {
     }
@@ -32,8 +38,7 @@ public class FragmentSetPin extends Fragment {
         @Override
         public void onComplete(String pin) {
             Log.d(TAG, "Pin complete: " + pin);
-            Toast.makeText(requireContext(), "In Progress", Toast.LENGTH_SHORT).show();
-            navigateBackHome();
+            setNavigateBackHome(pin);
         }
 
         @Override
@@ -47,27 +52,26 @@ public class FragmentSetPin extends Fragment {
         }
     };
 
-    private void navigateBackHome() {
-        requireActivity().onBackPressed();
+    private void setNavigateBackHome(String pin) {
+        formatterClass.saveSharedPref(PinLockStatus.INITIAL.name(), "true", requireContext());
+        formatterClass.saveSharedPref(PinLockStatus.LOCK.name(), pin, requireContext());
+        String completed = formatterClass.getSharedPref(PinLockStatus.CONFIRMED.name(), requireContext());
+        if (completed == null) {
+            formatterClass.saveSharedPref(PinLockStatus.CONFIRMED.name(), "true", requireContext());
+            profile_name.setText("Confirm your PIN");
+            mPinLockView.resetPinLockView();
+        } else {
+            Toast.makeText(requireContext(), "Pin Set Successfully", Toast.LENGTH_SHORT).show();
+            requireActivity().onBackPressed();
+        }
     }
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        // Enable back press handling in this fragment
-  /*      requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                // Handle back press event
-                if (shouldHandleBackPress()) {
-                    // Handle back press event in this fragment
-                    handleBackPress();
-                } else {
-                    // Pass the back press event to the hosting activity
-                    requireActivity().onBackPressed();
-                }
-            }
-        });*/
+
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -76,7 +80,7 @@ public class FragmentSetPin extends Fragment {
 
         mPinLockView = rootView.findViewById(R.id.pin_lock_view);
         mIndicatorDots = rootView.findViewById(R.id.indicator_dots);
-
+        profile_name = rootView.findViewById(R.id.profile_name);
         mPinLockView.attachIndicatorDots(mIndicatorDots);
         mPinLockView.setPinLockListener(mPinLockListener);
         mPinLockView.setPinLength(4);

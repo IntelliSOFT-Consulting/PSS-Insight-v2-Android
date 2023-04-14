@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".App"
@@ -22,6 +22,10 @@
         android:theme="@style/Theme.Pss"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".navigation_drawer.PinActivity"
+            android:theme="@style/NoActionBar"
+            android:exported="false" />
         <activity
             android:name=".navigation_drawer.MainActivity"
             android:exported="false"
@@ -44,8 +48,6 @@
         <service
             android:name=".sync.Dhis2"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
-
     </application>
 
 </manifest>

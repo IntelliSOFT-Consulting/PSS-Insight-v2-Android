@@ -4,7 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.intellisoft.pss.helper_class.FormatterClass
+import com.intellisoft.pss.helper_class.PinLockStatus
 import com.intellisoft.pss.navigation_drawer.MainActivity
+import com.intellisoft.pss.navigation_drawer.PinActivity
 import com.intellisoft.pss.network_request.RetrofitCalls
 import kotlin.random.Random
 import kotlinx.coroutines.*
@@ -12,7 +15,7 @@ import kotlinx.coroutines.*
 class SynchingPage : AppCompatActivity() {
 
   private val retrofitCalls = RetrofitCalls()
-
+  private val formatterClass = FormatterClass()
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_synching_page)
@@ -36,8 +39,14 @@ class SynchingPage : AppCompatActivity() {
       launch {
         delay(1000)
         CoroutineScope(Dispatchers.Main).launch {
-          val intent = Intent(this@SynchingPage, MainActivity::class.java)
-          startActivity(intent)
+          val completed = formatterClass.getSharedPref(PinLockStatus.CONFIRMED.name, this@SynchingPage)
+          if (completed == null) {
+            val intent = Intent(this@SynchingPage, MainActivity::class.java)
+            startActivity(intent)
+          }else{
+            val intent = Intent(this@SynchingPage, PinActivity::class.java)
+            startActivity(intent)
+          }
           this@SynchingPage.finish()
         }
       }

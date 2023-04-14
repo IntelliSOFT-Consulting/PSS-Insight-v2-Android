@@ -54,5 +54,8 @@
     <string name="period">Year</string>
     <string name="user_comment">User Comment</string>
     <string name="user_attachment">Attachment</string>
+    <string name="set_new_pin">Set New Pin</string>
+    <string name="unblock">Unblock Session</string>
+    <string name="forgot">Forgot Pin? Reset</string>
 
 </resources>

@@ -35,9 +35,11 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
   fun getAllMyData(context: Context) = runBlocking { repository.getAllMyData(context) }
   fun getMyResponse(context: Context, indicatorId: String, submissionId: String) = runBlocking {
     repository.getMyResponse(context, indicatorId, submissionId)
-  }  fun getMyComment(context: Context, indicatorId: String, submissionId: String) = runBlocking {
+  }
+  fun getMyComment(context: Context, indicatorId: String, submissionId: String) = runBlocking {
     repository.getMyComment(context, indicatorId, submissionId)
-  } fun getMyImage(context: Context, indicatorId: String, submissionId: String) = runBlocking {
+  }
+  fun getMyImage(context: Context, indicatorId: String, submissionId: String) = runBlocking {
     repository.getMyImage(context, indicatorId, submissionId)
   }
   fun getSubmissions(context: Context) = runBlocking { repository.getSubmissions(context) }
@@ -50,9 +52,9 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
     repository.addOrganizations(organizationData)
   }
   fun getOrganizations(context: Context) = runBlocking { repository.getAllOrganizations(context) }
-  fun getMatchingOrganizations(context: Context,name: String) = runBlocking {
+  fun getMatchingOrganizations(context: Context, name: String) = runBlocking {
     val pattern = "%$name%"
-    repository.getMatchingOrganizations(context,pattern)
+    repository.getMatchingOrganizations(context, pattern)
   }
 
   fun getSubmission(submissionId: String, context: Context) = runBlocking {
@@ -80,20 +82,18 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
     repository.uploadImage(context, image)
   }
 
-    fun getAllImages(context: Context)= runBlocking {
-      repository.getAllImages(context)
-    }
+  fun getAllImages(context: Context,is_synced:Boolean) = runBlocking { repository.getAllImages(context,is_synced) }
 
-    fun deleteAllOrganizations() = runBlocking{
-      repository.deleteAllOrganizations()
-    }
+  fun deleteAllOrganizations() = runBlocking { repository.deleteAllOrganizations() }
 
-    fun clearAppData() = runBlocking{
-      repository.clearAppData()
-    }
+  fun clearAppData() = runBlocking { repository.clearAppData() }
 
-  fun getImage(context: Context, userId: String, indicatorId: String, submissionId: String)=
-    runBlocking {
-      repository.getImage(context,userId,indicatorId,submissionId)
+  fun getImage(context: Context, userId: String, indicatorId: String, submissionId: String) =
+      runBlocking {
+        repository.getImage(context, userId, indicatorId, submissionId)
+      }
+
+  fun updateImageLink(context: Context,image: Image, url: String) = runBlocking {
+    repository.updateImageLink(context, image.submissionId,image.indicatorId, url)
   }
 }

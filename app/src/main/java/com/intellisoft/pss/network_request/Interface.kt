@@ -15,7 +15,9 @@ interface Interface {
   suspend fun submitData(@Body dbSaveDataEntry: DbSaveDataEntry): Response<Any>
 
   @GET("national-template/published-indicators") suspend fun getDataEntry(): Response<DbDataEntry>
-  @GET("national-template/organisation-units")
+//  @GET("national-template/organisation-units")
+//  suspend fun getOrganizations(): Response<DbOrganizationEntry>
+  @GET("/api/me.json?fields=organisationUnits[name,id]")
   suspend fun getOrganizations(): Response<DbOrganizationEntry>
 
   @Multipart

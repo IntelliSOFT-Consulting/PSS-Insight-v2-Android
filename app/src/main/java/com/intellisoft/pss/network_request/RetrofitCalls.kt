@@ -63,11 +63,7 @@ class RetrofitCalls {
 
     val job1 = Job()
     CoroutineScope(Dispatchers.Main + job1).launch {
-//      var progressDialog = ProgressDialog(context)
-//      progressDialog.setTitle("Please wait..")
-//      progressDialog.setMessage("Posting data in progress..")
-//      progressDialog.setCanceledOnTouchOutside(false)
-//      progressDialog.show()
+
       val requestFile = RequestBody.create("image/jpeg".toMediaTypeOrNull(), image.image)
       val file = MultipartBody.Part.createFormData("file", "image.jpg", requestFile)
       var messageToast = ""
@@ -86,7 +82,7 @@ class RetrofitCalls {
                       val statusCode = apiInterface.code()
                       val body = apiInterface.body()
                       if (statusCode == 200 || statusCode == 201) {
-                       updateFileStatus( body,"Saved and synced successfully")
+                       updateFileStatus(context, body,myViewModel,image,"Saved and synced successfully")
                       } else {
                         "Error: Body is null"
                       }
@@ -100,17 +96,20 @@ class RetrofitCalls {
           }
           .join()
       CoroutineScope(Dispatchers.Main).launch {
-//        progressDialog.dismiss()
-        Toast.makeText(context, messageToast, Toast.LENGTH_LONG).show()
+
+//        Toast.makeText(context, messageToast, Toast.LENGTH_LONG).show()
       }
     }
   }
 
-  private fun updateFileStatus(body: ImageResponse?, s: String): String {
-    Log.e("TAG","ImageResponse::::::: $body")
+  private fun updateFileStatus(context: Context,body: ImageResponse?, myViewModel: PssViewModel, image: Image, s: String): String {
+    if (body != null) {
+      myViewModel.updateImageLink(context,image,body.id)
+    }
     return s
-
   }
+
+
 
   private suspend fun submitDataBackground(context: Context, dbSaveDataEntry: DbSaveDataEntry) {
 
@@ -247,7 +246,8 @@ class RetrofitCalls {
       val myViewModel = PssViewModel(context.applicationContext as Application)
 
       val formatterClass = FormatterClass()
-      val baseUrl = formatterClass.getSharedPref("serverUrl", context)
+      val baseUrl = formatterClass.getSharedPref("serverUrl1", context)
+      Log.e("Retrofit","Server Url $baseUrl")
       val username = formatterClass.getSharedPref("username", context)
       if (baseUrl != null && username != null) {
         val apiService = RetrofitBuilder.getRetrofit(baseUrl).create(Interface::class.java)
@@ -262,17 +262,18 @@ class RetrofitCalls {
                 val converters = Converters().toJsonOrganization(body)
                 try {
                   val json = Gson().fromJson(converters, JsonObject::class.java)
-                  val jsonArray = json.getAsJsonArray("details")
+                  val jsonArray = json.getAsJsonArray("organisationUnits")
                   myViewModel.deleteAllOrganizations()
                   for (i in 0 until jsonArray.size()) {
                     val jsonObject = jsonArray.get(i).asJsonObject
                     val id = jsonObject.get("id").asString
-                    val displayName = jsonObject.get("displayName").asString
+                    val displayName = jsonObject.get("name").asString
                     val organizationData = Organizations(idcode = id, displayName = displayName)
                     myViewModel.addOrganizations(organizationData)
                   }
                 } catch (e: Exception) {
                   e.printStackTrace()
+                  Log.e("TAG","json:::: ${e.message}")
                 }
               }
             }

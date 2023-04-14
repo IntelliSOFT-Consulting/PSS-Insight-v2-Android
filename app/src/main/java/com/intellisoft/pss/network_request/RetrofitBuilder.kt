@@ -14,10 +14,14 @@ object RetrofitBuilder {
         val interceptor = HttpLoggingInterceptor()
         interceptor.level = HttpLoggingInterceptor.Level.BODY
 
+        val basicAuthInterceptor = BasicAuthInterceptor("admin", "district")
+
         val client = OkHttpClient.Builder()
             .readTimeout(2, TimeUnit.MINUTES)
             .connectTimeout(2, TimeUnit.MINUTES)
-            .addInterceptor(interceptor).build()
+            .addInterceptor(interceptor)
+            .addInterceptor(basicAuthInterceptor)
+            .build()
 
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
