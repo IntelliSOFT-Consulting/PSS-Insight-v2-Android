@@ -36,6 +36,7 @@ data class Comments(
 data class Submissions(
     var date: String,
     var organization: String,
+    var orgCode: String,
     val status: String,
     var userId: String,
     var period: String,

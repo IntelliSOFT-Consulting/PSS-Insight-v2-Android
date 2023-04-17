@@ -57,5 +57,7 @@
     <string name="set_new_pin">Set New Pin</string>
     <string name="unblock">Unblock Session</string>
     <string name="forgot">Forgot Pin? Reset</string>
+    <string name="this_is_the_information_field">This is the information field.</string>
+    <string name="ps01_definition">PS01 Definition</string>
 
 </resources>

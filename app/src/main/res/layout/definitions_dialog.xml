@@ -23,7 +23,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="PS01 Definition"
+                android:text="@string/ps01_definition"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -49,8 +49,7 @@
                 android:id="@+id/info_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="This is the information field."
-                android:textColor="@color/black"
+                android:text="@string/this_is_the_information_field"
                 android:textStyle="italic" />
 
         </LinearLayout>

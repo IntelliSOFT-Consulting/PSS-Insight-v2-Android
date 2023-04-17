@@ -40,24 +40,33 @@ enum class FileUpload {
 
 data class DbSubmission(val date: String, val status: String)
 
-data class DbDataEntry(val count: Int, val details: List<DbDataEntryDetails>)
+data class DbDataEntry(val publishedIndicators: PublishedIndicators)
+data class PublishedIndicators(val count: Int, val details: List<DbDataEntryDetails>)
 
 data class ImageResponse(@JsonProperty("id") val id: String)
 
-data class DbDataEntryDetails(val categoryName: String, val indicators: List<DbIndicatorsDetails>)
+data class DbDataEntryDetails(
+    val categoryName: String,
+    val indicators: List<DbIndicatorsDetails>
+    )
 
 data class DbOrganizationEntry(val organisationUnits: List<DbOrganizationEntryDetails>)
 
 data class DbOrganizationEntryDetails(val id: String, val name: String)
 
 data class DbIndicatorsDetails(
+    val description:String?,
     val categoryId: String?,
     val categoryName: String?,
     val indicatorName: String?,
     val indicatorDataValue: List<DbIndicators>
 )
 
-data class DbIndicators(val code: String, val name: String, val id: String, val valueType: String)
+data class DbIndicators(
+    val code: String,
+    val name: String,
+    val id: String,
+    val valueType: String)
 
 data class DbSaveDataEntry(
     val orgUnit: String,
@@ -87,7 +96,8 @@ data class DbDataEntryForm(
     val categoryName: String?,
     val indicatorName: String?,
     val categoryId: String?,
-    val forms: ArrayList<DbIndicators>
+    val forms: ArrayList<DbIndicators>,
+    val description: String?,
 )
 
 data class SettingItem(

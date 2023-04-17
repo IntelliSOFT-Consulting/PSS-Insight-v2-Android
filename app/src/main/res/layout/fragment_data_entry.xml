@@ -207,8 +207,9 @@
                 android:text="@string/submit"
                 android:textAllCaps="false"
                 android:visibility="gone"
-                app:icon="@drawable/baseline_save_24"
+                app:icon="@drawable/submit"
                 app:iconGravity="textStart"
+                app:iconSize="24dp"
                 app:iconPadding="8dp" />
 
         </LinearLayout>

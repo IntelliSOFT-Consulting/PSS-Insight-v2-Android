@@ -13,18 +13,23 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.tabs.TabLayout;
 import com.intellisoft.pss.R;
+import com.intellisoft.pss.adapter.ViewPagerAdapter;
 import com.intellisoft.pss.helper_class.FormatterClass;
 import com.intellisoft.pss.helper_class.SettingsQueue;
+import com.intellisoft.pss.navigation_drawer.fragments.child.FragmentAboutApp;
+import com.intellisoft.pss.navigation_drawer.fragments.child.FragmentAboutPss;
 
 import org.w3c.dom.Text;
 
 public class FragmentAbout extends Fragment {
-    private TextView textView;
-    private String about = "";
-    private FormatterClass formatterClass = new FormatterClass();
 
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
+    private ViewPagerAdapter pagerAdapter;
     public FragmentAbout() {
     }
 
@@ -34,34 +39,16 @@ public class FragmentAbout extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_about, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
-        about = getAbout();
-        textView = rootView.findViewById(R.id.tv_about);
-        about = getAbout();
-        Spanned spanned = Html.fromHtml(about);
-        textView.setText(spanned);
-        textView.setMovementMethod(LinkMovementMethod.getInstance());
+        viewPager = rootView.findViewById(R.id.viewPager);
+        tabLayout = rootView.findViewById(R.id.tabLayout);
+        pagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
+        pagerAdapter.addFragment(new FragmentAboutApp(), "About App");
+        pagerAdapter.addFragment(new FragmentAboutPss(), "About PSS");
+        viewPager.setAdapter(pagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
         return rootView;
     }
 
-    private String getAbout() {
-        return "App Version: v2<br>" +
-                "SDK Version: 1.1.1<br><br>" +
-                "More about this app: read <a href='#'>what's supported</a> and what's not supported</a><br><br>" +
-                "Connected to: " + getServerUrl() + "<br>" +
-                "Current user: " + getUsername() + "<br><br>" +
-                "<a href='#'>Click here</a> to check our Privacy Policy<br><br>" +
-                "This and previous versions of this application, as well as the source code are available at <a href='#'>Github</a>.<br>" +
-                "PSS V2 Android Capture is Licensed under the terms of the <a href='https://www.gnu.org/licenses/gpl-3.0.en.html'>GNU General Public License</a> as published by the Free Software Foundation<br><br><br>" +
-                "Developed and maintained by the IntelliSOFT team.<br><br>" +
-                "For more information or questions about this application, please write to <a href='mailto:apps@intellisoftkenya.com'>apps@intellisoftkenya.com</a>";
-    }
 
-    private String getUsername() {
-        return formatterClass.getSharedPref("username", requireContext());
-    }
-
-    private String getServerUrl() {
-        return formatterClass.getSharedPref("serverUrl1", requireContext());
-    }
 
 }

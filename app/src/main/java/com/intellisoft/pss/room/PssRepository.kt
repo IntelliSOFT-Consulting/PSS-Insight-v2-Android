@@ -202,7 +202,7 @@ class PssRepository(private val roomDao: RoomDao) {
         dbResponsesList.add(dbResponses)
       }
       return DbSaveDataEntry(
-          submissions.organization, submissions.period, "COMPLETED", userId, dbResponsesList)
+          submissions.orgCode, submissions.period, "COMPLETED", userId, dbResponsesList)
     }
     return null
   }

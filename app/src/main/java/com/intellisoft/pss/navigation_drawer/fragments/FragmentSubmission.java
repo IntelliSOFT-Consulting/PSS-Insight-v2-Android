@@ -75,6 +75,7 @@ public class FragmentSubmission extends Fragment {
             Submissions submissions = new Submissions(
                     date,
                     "",
+                    "",
                     status,
                     userId,
                     year,false

@@ -91,6 +91,7 @@ public class FragmentDataEntry extends Fragment {
     private ArrayAdapter adapter;
     private String submissionId = "";
     private ProgressBar progressBar;
+    private String orgCode = "";
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -132,6 +133,12 @@ public class FragmentDataEntry extends Fragment {
                 autoCompleteTextView.requestFocus();
                 return;
             }
+            orgCode = getCodeFromHash(organizationsCode);
+            if (TextUtils.isEmpty(orgCode)) {
+                autoCompleteTextView.setError("Select organization");
+                autoCompleteTextView.requestFocus();
+                return;
+            }
             saveSubmission(SubmissionsStatus.DRAFT.name(), period, organizationsCode);
             Intent intent = new Intent(requireContext(), MainActivity.class);
             startActivity(intent);
@@ -151,6 +158,12 @@ public class FragmentDataEntry extends Fragment {
                 autoCompleteTextView.requestFocus();
                 return;
             }
+            orgCode = getCodeFromHash(organizationsCode);
+            if (TextUtils.isEmpty(orgCode)) {
+                autoCompleteTextView.setError("Select organization");
+                autoCompleteTextView.requestFocus();
+                return;
+            }
             saveSubmission(SubmissionsStatus.SUBMITTED.name(), period, organizationsCode);
             DbSaveDataEntry dataEntry = myViewModel.getSubmitData(requireContext());
             if (dataEntry != null) {
@@ -167,11 +180,27 @@ public class FragmentDataEntry extends Fragment {
         return rootView;
     }
 
+    private String getCodeFromHash(String organizationsCode) {
+        organizationsList = myViewModel.getOrganizations(requireContext());
+        stringMap = new HashMap<>();
+        for (Organizations organization : organizationsList) {
+            stringMap.put(organization.getIdcode(), organization.getDisplayName());
+            if (organization.getDisplayName().equalsIgnoreCase(organizationsCode)){
+                orgCode=organization.getIdcode();
+            }
+        }
+        return orgCode;
+    }
+
     private void loadYears() {
         ArrayList<String> stringList = new ArrayList<>(generateYears());
         adapter = new ArrayAdapter(requireContext(),
                 android.R.layout.simple_list_item_1, stringList);
         etPeriod.setAdapter(adapter);
+        if (adapter.getCount() > 0) {
+            etPeriod.setText(adapter.getItem(0).toString(), false);
+            etPeriod.setSelection(0);
+        }
 
     }
 
@@ -211,10 +240,12 @@ public class FragmentDataEntry extends Fragment {
                 autoCompleteTextView.setText(submission.getOrganization());
                 etPeriod.setText(submission.getPeriod());
                 submissionId = id;
+                orgCode = submission.getOrgCode();
             } else {
                 Submissions submission1 = myViewModel.getLatestSubmission(requireContext());
                 if (submission1 != null) {
                     submissionId = submission1.getId().toString();
+                    orgCode = submission1.getOrgCode();
                     formatterClass.saveSharedPref(SubmissionQueue.INITIATED.name(), submissionId, requireContext());
                 }
             }
@@ -271,6 +302,10 @@ public class FragmentDataEntry extends Fragment {
                 android.R.layout.simple_list_item_1, stringList);
 
         autoCompleteTextView.setAdapter(adapter);
+        if (adapter.getCount() > 0) {
+            autoCompleteTextView.setText(adapter.getItem(0).toString(), false);
+            autoCompleteTextView.setSelection(0);
+        }
         autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
             organizationsCode = getOrganizationsCode(autoCompleteTextView.getText().toString());
         });
@@ -290,6 +325,7 @@ public class FragmentDataEntry extends Fragment {
             Submissions submissions = new Submissions(
                     date,
                     organizationsCode,
+                    orgCode,
                     status,
                     userId,
                     period, false
@@ -319,7 +355,7 @@ public class FragmentDataEntry extends Fragment {
 
             Converters converters = new Converters();
             DbDataEntry dataEntry = converters.fromJson(jsonData);
-            List<DbDataEntryDetails> detailsList = dataEntry.getDetails();
+            List<DbDataEntryDetails> detailsList = dataEntry.getPublishedIndicators().getDetails();
             for (int j = 0; j < detailsList.size(); j++) {
 
                 String categoryName = detailsList.get(j).getCategoryName();
@@ -329,12 +365,13 @@ public class FragmentDataEntry extends Fragment {
                     String categoryId = indicators.get(i).getCategoryId();
                     String categoryCode = indicators.get(i).getCategoryName();
                     String indicatorName = indicators.get(i).getIndicatorName();
+                    String description = indicators.get(i).getDescription();
 
                     ArrayList<DbIndicators> indicatorsList = (ArrayList<DbIndicators>) indicators.get(i).getIndicatorDataValue();
                     indicatorSize = indicatorSize + indicatorsList.size();
 
                     DbDataEntryForm dbDataEntryForm = new DbDataEntryForm(
-                            categoryCode, indicatorName, categoryId, indicatorsList);
+                            categoryCode, indicatorName, categoryId, indicatorsList,description);
                     dbDataEntryFormList.add(dbDataEntryForm);
                 }
             }
@@ -344,7 +381,7 @@ public class FragmentDataEntry extends Fragment {
             formatterClass.saveSharedPref("indicatorSize",
                     String.valueOf(indicatorSize), requireContext());
 
-            controlPagination(dataEntry.getCount());
+            controlPagination(dataEntry.getPublishedIndicators().getCount());
         }
     }
 

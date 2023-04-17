@@ -36,23 +36,32 @@ class DataEntryAdapter(
       infoIcon.setOnClickListener(this)
     }
     override fun onClick(view: View) {
+      val pos = adapterPosition
+      val categoryName = dbDataEntryFormList[pos].categoryName
+      val indicatorName = dbDataEntryFormList[pos].indicatorName
+      val description = dbDataEntryFormList[pos].description
       when (view.id) {
         R.id.info_icon -> {
-          showDialog()
+          showDialog(categoryName.toString(), indicatorName.toString(), description.toString())
         }
       }
     }
   }
 
-  private fun showDialog() {
+  private fun showDialog(categoryName: String, indicatorName: String, description: String) {
     val dialog = Dialog(context)
     dialog.setCancelable(false)
     dialog.setContentView(R.layout.definitions_dialog)
     val width = ViewGroup.LayoutParams.MATCH_PARENT
     val height = ViewGroup.LayoutParams.WRAP_CONTENT
     dialog.window?.setLayout(width, height)
+    val titleTextview = dialog.findViewById<TextView>(R.id.title_textview)
+    val infoTextview = dialog.findViewById<TextView>(R.id.info_textview)
     val dismissIcon = dialog.findViewById<ImageView>(R.id.cancel_button)
     dismissIcon.setOnClickListener { dialog.dismiss() }
+    val title="$categoryName: $indicatorName"
+    titleTextview.text = title
+    infoTextview.text=description
     dialog.show()
   }
 
