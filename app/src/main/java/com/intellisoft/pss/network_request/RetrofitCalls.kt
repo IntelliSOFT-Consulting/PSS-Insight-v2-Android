@@ -74,7 +74,7 @@ class RetrofitCalls {
             val baseUrl = formatterClass.getSharedPref("serverUrl", context)
 
             if (baseUrl != null) {
-              val apiService = RetrofitBuilder.getRetrofit(baseUrl).create(Interface::class.java)
+              val apiService = RetrofitBuilder.getRetrofit(context,baseUrl).create(Interface::class.java)
               try {
                 val apiInterface = apiService.uploadImageFileData(file)
                 messageToast =
@@ -130,7 +130,7 @@ class RetrofitCalls {
             val baseUrl = formatterClass.getSharedPref("serverUrl", context)
 
             if (baseUrl != null) {
-              val apiService = RetrofitBuilder.getRetrofit(baseUrl).create(Interface::class.java)
+              val apiService = RetrofitBuilder.getRetrofit(context,baseUrl).create(Interface::class.java)
               try {
                 val apiInterface = apiService.submitData(dbSaveDataEntry)
                 messageToast =
@@ -174,7 +174,7 @@ class RetrofitCalls {
             val baseUrl = formatterClass.getSharedPref("serverUrl", context)
 
             if (baseUrl != null) {
-              val apiService = RetrofitBuilder.getRetrofit(baseUrl).create(Interface::class.java)
+              val apiService = RetrofitBuilder.getRetrofit(context,baseUrl).create(Interface::class.java)
               try {
                 val apiInterface = apiService.submitData(dbSaveDataEntry)
                 messageToast =
@@ -220,7 +220,7 @@ class RetrofitCalls {
       val baseUrl = formatterClass.getSharedPref("serverUrl", context)
       val username = formatterClass.getSharedPref("username", context)
       if (baseUrl != null && username != null) {
-        val apiService = RetrofitBuilder.getRetrofit(baseUrl).create(Interface::class.java)
+        val apiService = RetrofitBuilder.getRetrofit(context,baseUrl).create(Interface::class.java)
         try {
           val apiInterface = apiService.getDataEntry()
           if (apiInterface.isSuccessful) {
@@ -250,7 +250,7 @@ class RetrofitCalls {
       Log.e("Retrofit","Server Url $baseUrl")
       val username = formatterClass.getSharedPref("username", context)
       if (baseUrl != null && username != null) {
-        val apiService = RetrofitBuilder.getRetrofit(baseUrl).create(Interface::class.java)
+        val apiService = RetrofitBuilder.getRetrofit(context,baseUrl).create(Interface::class.java)
         try {
           val apiInterface = apiService.getOrganizations()
           if (apiInterface.isSuccessful) {

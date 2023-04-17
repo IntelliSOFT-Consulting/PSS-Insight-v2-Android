@@ -27,12 +27,11 @@ class DataEntryAdapter(
     val pssCode: TextView = itemView.findViewById(R.id.pssCode)
     val indicatorName: TextView = itemView.findViewById(R.id.indicatorName)
     val recyclerView: RecyclerView = itemView.findViewById(R.id.recyclerView)
-    val infoIcon: ImageView = itemView.findViewById(R.id.info_icon)
+    private val infoIcon: ImageView = itemView.findViewById(R.id.info_icon)
 
     init {
       val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
       recyclerView.layoutManager = layoutManager
-      recyclerView.setHasFixedSize(true)
       infoIcon.setOnClickListener(this)
     }
     override fun onClick(view: View) {

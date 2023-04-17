@@ -95,7 +95,7 @@ public class FragmentDataEntry extends Fragment {
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    @SuppressLint("MissingInflatedId")
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -103,7 +103,7 @@ public class FragmentDataEntry extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
         mRecyclerView = rootView.findViewById(R.id.recyclerView);
-        mRecyclerView.setHasFixedSize(true);
+//        mRecyclerView.setHasFixedSize(true);
         linearLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(linearLayoutManager);
 

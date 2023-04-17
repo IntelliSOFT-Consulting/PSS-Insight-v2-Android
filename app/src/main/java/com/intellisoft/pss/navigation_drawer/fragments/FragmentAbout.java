@@ -30,6 +30,7 @@ public class FragmentAbout extends Fragment {
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private ViewPagerAdapter pagerAdapter;
+
     public FragmentAbout() {
     }
 
@@ -42,13 +43,14 @@ public class FragmentAbout extends Fragment {
         viewPager = rootView.findViewById(R.id.viewPager);
         tabLayout = rootView.findViewById(R.id.tabLayout);
         pagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
-        pagerAdapter.addFragment(new FragmentAboutApp(), "About App");
         pagerAdapter.addFragment(new FragmentAboutPss(), "About PSS");
+        pagerAdapter.addFragment(new FragmentAboutApp(), "About App");
         viewPager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setTabTextColors(requireContext().getResources().getColor(R.color.secondaryColor),requireContext().getResources().getColor(R.color.secondaryColor));
+        tabLayout.setSelectedTabIndicatorColor(requireContext().getResources().getColor(R.color.secondaryColor));
         return rootView;
     }
-
 
 
 }

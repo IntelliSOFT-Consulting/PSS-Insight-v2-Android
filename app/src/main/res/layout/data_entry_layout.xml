@@ -1,51 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView app:cardCornerRadius="5dp"
-    android:layout_width="match_parent"
-    android:layout_margin="5dp"
-    android:layout_height="wrap_content"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    app:cardCornerRadius="5dp">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:background="@color/secondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/secondary"
             android:orientation="horizontal">
 
             <TextView
-                android:padding="15dp"
-                android:textColor="@color/white"
                 android:id="@+id/pssCode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="PSCode" />
+                android:padding="15dp"
+                android:textColor="@color/white" />
 
             <View
-                android:background="@color/white"
                 android:layout_width="1dp"
-                android:layout_height="match_parent"/>
-
-            <TextView
-                android:gravity="center|start"
-                android:layout_marginStart="10dp"
-                android:textColor="@color/white"
-                android:id="@+id/indicatorName"
-                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="Indicator Name" />
+                android:background="@color/white" />
 
             <LinearLayout
-                android:layout_marginEnd="10dp"
-                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center|start">
+
+                <TextView
+                    android:id="@+id/indicatorName"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:gravity="center|start"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_marginEnd="10dp"
+                android:gravity="center">
 
                 <ImageView
                     android:id="@+id/info_icon"
@@ -57,20 +60,19 @@
             </LinearLayout>
 
 
-
         </LinearLayout>
 
         <LinearLayout
-            android:layout_margin="10dp"
-            android:orientation="vertical"
-            android:background="@drawable/data_entry_border"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/data_entry_border"
+            android:orientation="vertical">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
