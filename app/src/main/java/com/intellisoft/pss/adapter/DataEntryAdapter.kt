@@ -26,6 +26,7 @@ class DataEntryAdapter(
 
     val pssCode: TextView = itemView.findViewById(R.id.pssCode)
     val indicatorName: TextView = itemView.findViewById(R.id.indicatorName)
+    val categoryName: TextView = itemView.findViewById(R.id.categoryName)
     val recyclerView: RecyclerView = itemView.findViewById(R.id.recyclerView)
     private val infoIcon: ImageView = itemView.findViewById(R.id.info_icon)
 
@@ -58,9 +59,9 @@ class DataEntryAdapter(
     val infoTextview = dialog.findViewById<TextView>(R.id.info_textview)
     val dismissIcon = dialog.findViewById<ImageView>(R.id.cancel_button)
     dismissIcon.setOnClickListener { dialog.dismiss() }
-    val title="$categoryName: $indicatorName"
+    val title = "$categoryName: $indicatorName"
     titleTextview.text = title
-    infoTextview.text=description
+    infoTextview.text = description
     dialog.show()
   }
 
@@ -71,12 +72,14 @@ class DataEntryAdapter(
 
   override fun onBindViewHolder(holder: Pager2ViewHolder, position: Int) {
 
-    val indicatorCode = dbDataEntryFormList[position].categoryName
+    val categoryName = dbDataEntryFormList[position].categoryName
+    val indicatorCode = dbDataEntryFormList[position].categoryCode
     val indicatorName = dbDataEntryFormList[position].indicatorName
     val formsList = dbDataEntryFormList[position].forms
 
     holder.pssCode.text = indicatorCode
     holder.indicatorName.text = indicatorName
+    holder.categoryName.text = categoryName
 
     val dataEntryAdapter =
         DataEntryFormsAdapter(formsList, context, currentSession, fragmentDataEntry)

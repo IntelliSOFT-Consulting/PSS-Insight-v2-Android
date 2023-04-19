@@ -330,8 +330,7 @@ public class FragmentDataEntry extends Fragment {
                     userId,
                     period, false
             );
-            Log.e("Data Entry", "Button Clicked...." + submissionId + "code" + organizationsCode);
-            if (submissionId == null) {
+              if (submissionId == null) {
                 myViewModel.addSubmissions(submissions);
             } else {
                 myViewModel.updateSubmissions(submissions, submissionId);
@@ -358,12 +357,13 @@ public class FragmentDataEntry extends Fragment {
             List<DbDataEntryDetails> detailsList = dataEntry.getPublishedIndicators().getDetails();
             for (int j = 0; j < detailsList.size(); j++) {
 
-                String categoryName = detailsList.get(j).getCategoryName();
+                String categoryNameHigher = detailsList.get(j).getCategoryName();
                 List<DbIndicatorsDetails> indicators = detailsList.get(j).getIndicators();
 
                 for (int i = 0; i < indicators.size(); i++) {
                     String categoryId = indicators.get(i).getCategoryId();
-                    String categoryCode = indicators.get(i).getCategoryName();
+                    String categoryCode = indicators.get(i).getCategoryCode();
+                    String categoryName = indicators.get(i).getCategoryName();
                     String indicatorName = indicators.get(i).getIndicatorName();
                     String description = indicators.get(i).getDescription();
 
@@ -371,7 +371,7 @@ public class FragmentDataEntry extends Fragment {
                     indicatorSize = indicatorSize + indicatorsList.size();
 
                     DbDataEntryForm dbDataEntryForm = new DbDataEntryForm(
-                            categoryCode, indicatorName, categoryId, indicatorsList,description);
+                            categoryCode,categoryName, indicatorName, categoryId, indicatorsList,description);
                     dbDataEntryFormList.add(dbDataEntryForm);
                 }
             }

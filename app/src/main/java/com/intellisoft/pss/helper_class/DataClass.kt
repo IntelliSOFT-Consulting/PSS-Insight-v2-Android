@@ -37,36 +37,47 @@ enum class FileUpload {
   INDICATOR,
   SUBMISSION
 }
+enum class Information{
+    ABOUT,
+    CONTACT
+}
 
 data class DbSubmission(val date: String, val status: String)
 
-data class DbDataEntry(val publishedIndicators: PublishedIndicators)
+data class DbDataEntry(
+    val publishedIndicators: PublishedIndicators,
+    val nationalInformation: List<NationalInformation>
+)
+
+data class NationalInformation(
+    val id: Int,
+    val aboutUs: String,
+    val contactUs: String,
+    val createdAt: String,
+    val updatedAt: String
+)
+
 data class PublishedIndicators(val count: Int, val details: List<DbDataEntryDetails>)
+data class PublishedNationalInformation(val nationalInformation: List<NationalInformation>)
 
 data class ImageResponse(@JsonProperty("id") val id: String)
 
-data class DbDataEntryDetails(
-    val categoryName: String,
-    val indicators: List<DbIndicatorsDetails>
-    )
+data class DbDataEntryDetails(val categoryName: String, val indicators: List<DbIndicatorsDetails>)
 
 data class DbOrganizationEntry(val organisationUnits: List<DbOrganizationEntryDetails>)
 
 data class DbOrganizationEntryDetails(val id: String, val name: String)
 
 data class DbIndicatorsDetails(
-    val description:String?,
+    val description: String?,
     val categoryId: String?,
+    val categoryCode: String?,
     val categoryName: String?,
     val indicatorName: String?,
     val indicatorDataValue: List<DbIndicators>
 )
 
-data class DbIndicators(
-    val code: String,
-    val name: String,
-    val id: String,
-    val valueType: String)
+data class DbIndicators(val code: String, val name: String, val id: String, val valueType: String)
 
 data class DbSaveDataEntry(
     val orgUnit: String,
@@ -93,6 +104,7 @@ enum class UrlData(var message: Int) {
 }
 
 data class DbDataEntryForm(
+    val categoryCode: String?,
     val categoryName: String?,
     val indicatorName: String?,
     val categoryId: String?,

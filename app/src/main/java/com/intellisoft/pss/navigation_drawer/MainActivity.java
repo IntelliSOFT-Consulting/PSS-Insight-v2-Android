@@ -395,7 +395,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 finish();
                 break;
             case 4:
-//                fragment = new OrganizationFragment();
+                autoSyncSubmissions();
                 break;
             case 5:
                 fragment = new FragmentAbout();
@@ -470,6 +470,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (itemId == R.id.nav_help) {
             // Handle Settings click
             selectItem(6);
+        } else if (itemId == R.id.nav_sync) {
+            // Handle Settings click
+            selectItem(4);
         }
 
         // Close the navigation drawer

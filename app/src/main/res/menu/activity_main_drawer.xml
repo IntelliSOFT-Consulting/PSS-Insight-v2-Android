@@ -30,5 +30,9 @@
             android:id="@+id/nav_help"
             android:icon="@drawable/help_desk"
             android:title="Help Desk" />
+        <item
+            android:id="@+id/nav_sync"
+            android:icon="@drawable/baseline_sync_24"
+            android:title="Sync" />
     </group>
 </menu>

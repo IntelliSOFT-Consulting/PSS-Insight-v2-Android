@@ -1,5 +1,6 @@
 package com.intellisoft.pss.navigation_drawer.fragments;
 
+import android.app.Application;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -13,9 +14,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.intellisoft.pss.R;
+import com.intellisoft.pss.helper_class.DbDataEntry;
+import com.intellisoft.pss.helper_class.FormatterClass;
+import com.intellisoft.pss.helper_class.Information;
+import com.intellisoft.pss.helper_class.NationalInformation;
+import com.intellisoft.pss.room.Converters;
+import com.intellisoft.pss.room.IndicatorsData;
+import com.intellisoft.pss.room.PssViewModel;
+
+import java.util.List;
 
 public class FragmentHelpDesk extends Fragment {
-    private TextView tv_contact_email,tv_contact_phone;
+    private TextView tv_contact_email;
+    private FormatterClass formatterClass;
+    private PssViewModel myViewModel;
+
     public FragmentHelpDesk() {
     }
 
@@ -25,12 +38,44 @@ public class FragmentHelpDesk extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_help_desk, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
-        tv_contact_email=  rootView.findViewById(R.id.tv_contact_email);
-        tv_contact_phone=  rootView.findViewById(R.id.tv_contact_phone);
-        updateText(tv_contact_email,"Email: <a href='mailto:apps@intellisoftkenya.com'>apps@intellisoftkenya.com</a>");
-        updateText(tv_contact_phone,"Phone: <a href='tel:+254712345678'>+254 712 345 678</a>");
+        myViewModel = new PssViewModel(((Application) requireContext().getApplicationContext()));
+        formatterClass = new FormatterClass();
+        tv_contact_email = rootView.findViewById(R.id.tv_contact_email);
+        updateText(tv_contact_email, loadData());
 
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        IndicatorsData indicatorsData = myViewModel.getAllMyData(requireContext());
+        if (indicatorsData != null) {
+            String jsonData = indicatorsData.getJsonData();
+
+            Converters converters = new Converters();
+            DbDataEntry dataEntry = converters.fromJson(jsonData);
+            List<NationalInformation> detailsList = dataEntry.getNationalInformation();
+            for (int j = 0; j < detailsList.size(); j++) {
+                String aboutUs = detailsList.get(j).getAboutUs();
+                String contactUs = detailsList.get(j).getContactUs();
+
+                formatterClass.saveSharedPref(Information.ABOUT.name(),
+                        aboutUs, requireContext());
+                formatterClass.saveSharedPref(Information.CONTACT.name(),
+                        contactUs, requireContext());
+            }
+        }
+    }
+
+    private String loadData() {
+        String data = "";
+        String about = formatterClass.getSharedPref(Information.CONTACT.name(), requireContext());
+        if (about != null) {
+            data = about;
+        }
+        return data;
     }
 
     private void updateText(TextView tv_contact_email, String s) {

@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.intellisoft.pss.R;
 import com.intellisoft.pss.helper_class.FormatterClass;
+import com.intellisoft.pss.helper_class.Information;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,14 +62,16 @@ public class FragmentAboutPss extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+
     private FormatterClass formatterClass;
     private String about;
     private TextView textView;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_about_pss, container, false);
+        View view = inflater.inflate(R.layout.fragment_about_pss, container, false);
         formatterClass = new FormatterClass();
         textView = view.findViewById(R.id.tv_about);
         about = getAbout();
@@ -79,7 +82,13 @@ public class FragmentAboutPss extends Fragment {
     }
 
     private String getAbout() {
-        return "App Version: v2<br>" +
+        String data = "";
+        String about = formatterClass.getSharedPref(Information.ABOUT.name(), requireContext());
+        if (about != null) {
+            data = about;
+        }
+        return data;
+     /*   return "App Version: v2<br>" +
                 "SDK Version: 1.1.1<br><br>" +
                 "More about this app: read <a href='#'>what's supported</a> and what's not supported</a><br><br>" +
                 "Connected to: " + getServerUrl() + "<br>" +
@@ -89,6 +98,7 @@ public class FragmentAboutPss extends Fragment {
                 "PSS V2 Android Capture is Licensed under the terms of the <a href='https://www.gnu.org/licenses/gpl-3.0.en.html'>GNU General Public License</a> as published by the Free Software Foundation<br><br><br>" +
                 "Developed and maintained by the IntelliSOFT team.<br><br>" +
                 "For more information or questions about this application, please write to <a href='mailto:apps@intellisoftkenya.com'>apps@intellisoftkenya.com</a>";
+   */
     }
 
     private String getUsername() {
