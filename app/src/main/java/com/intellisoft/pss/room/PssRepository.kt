@@ -250,7 +250,7 @@ class PssRepository(private val roomDao: RoomDao) {
     val org = submissions.organization
     val peri = submissions.period
 
-    val isSubmissions = roomDao.checkSubmissionPerId(userId, date, submissionId)
+    val isSubmissions = roomDao.checkSubmissionPerId(userId, submissionId)
     if (!isSubmissions) {
       roomDao.addSubmissions(submissions)
     } else {
@@ -338,5 +338,13 @@ class PssRepository(private val roomDao: RoomDao) {
     if (userId != null) {
       roomDao.updateImageLink(userId, indicatorId.toString(), submissionId.toString(), url, true)
     }
+  }
+
+  fun getSubmissionById(context: Context, userId: String, submissionId: String): Submissions? {
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+      return roomDao.getSubmissionsById(userId, submissionId)
+    }
+    return null
   }
 }

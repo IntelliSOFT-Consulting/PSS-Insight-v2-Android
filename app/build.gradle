@@ -82,4 +82,5 @@ dependencies {
     androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
     implementation "androidx.room:room-rxjava2:$rootProject.roomVersion"
     implementation 'com.airbnb.android:lottie:4.2.0'
+
 }

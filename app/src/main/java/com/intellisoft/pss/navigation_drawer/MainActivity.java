@@ -58,7 +58,10 @@ import com.intellisoft.pss.room.PssViewModel;
 import com.intellisoft.pss.room.Submissions;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -67,6 +70,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.zip.GZIPOutputStream;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -74,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int REQUEST_IMAGE_PICKER = 1001;
     private static final int REQUEST_CAMERA_AND_STORAGE_PERMISSION_CODE = 1200;
     private static final int REQUEST_IMAGE_CAPTURE = 1002;
+    private static final int FILE_SELECT_CODE = 1003;
     private String[] mNavigationDrawerItemTitles;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -85,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private PssViewModel myViewModel;
     private List<Image> imageList;
     private Boolean isCamera = false;
+    private Boolean isPdf = false;
 
 
     private BroadcastReceiver myBroadcastReceiver = new BroadcastReceiver() {
@@ -204,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         formatterClass.saveSharedPref(FileUpload.INDICATOR.name(), indicatorId, MainActivity.this);
         formatterClass.saveSharedPref(FileUpload.SUBMISSION.name(), submissionId, MainActivity.this);
 
-        CharSequence[] options = new CharSequence[]{"Take Photo", "Choose from Gallery", "Cancel"};
+        CharSequence[] options = new CharSequence[]{"Take Photo", "Choose from Gallery", "Choose PDF", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Select Option");
         builder.setItems(options, (dialog, item) -> {
@@ -212,14 +218,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 case 0:
                     // Handle take photo option
                     isCamera = true;
+                    isPdf = false;
                     launchCamera();
                     break;
                 case 1:
                     // Handle choose from gallery option
                     isCamera = false;
+                    isPdf = false;
                     launchCamera();
                     break;
                 case 2:
+                    isCamera = false;
+                    isPdf = true;
+                    launchCamera();
+                    break;
+                case 3:
                     dialog.dismiss();
                     break;
             }
@@ -248,23 +261,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             ActivityCompat.requestPermissions(this, permissionsArray, REQUEST_CAMERA_AND_STORAGE_PERMISSION_CODE);
         } else {
             // Permissions have already been granted
-            openLauncher(isCamera);
+            openLauncher(isCamera, isPdf);
         }
 
     }
 
-    private void openLauncher(boolean isCamera) {
-        if (isCamera) {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
+    private void openLauncher(boolean isCamera, boolean isPdf) {
+        if (isPdf) {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("application/pdf");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
 
+            // Start the file picker activity
+            startActivityForResult(Intent.createChooser(intent, "Select a PDF file"), FILE_SELECT_CODE);
 
         } else {
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            intent.setType("image/*");
-            startActivityForResult(intent, REQUEST_IMAGE_PICKER);
+            if (isCamera) {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                }
+            } else {
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+                startActivityForResult(intent, REQUEST_IMAGE_PICKER);
+            }
         }
     }
 
@@ -296,13 +317,76 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     }
+    private File getFileFromUri(Uri uri) throws IOException {
+        File file = null;
 
+        if ("content".equals(uri.getScheme())) {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            if (cursor.moveToFirst()) {
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
+                String fileName = cursor.getString(column_index);
+                InputStream inputStream = getContentResolver().openInputStream(uri);
+                file = new File(getCacheDir(), fileName);
+                FileOutputStream outputStream = new FileOutputStream(file);
+                byte[] buffer = new byte[4 * 1024];
+                int read;
+                while ((read = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, read);
+                }
+                outputStream.flush();
+                outputStream.close();
+                inputStream.close();
+            }
+            cursor.close();
+        } else if ("file".equals(uri.getScheme())) {
+            String filePath = uri.getPath();
+            file = new File(filePath);
+        }
+
+        return file;
+    }
+
+
+    private byte[] compressFile(File file) {
+        byte[] bytes = null;
+
+        try {
+            // Create a FileInputStream to read the file
+            FileInputStream inputStream = new FileInputStream(file);
+
+            // Create a ByteArrayOutputStream to hold the compressed data
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            // Create a GZIPOutputStream to compress the data
+            GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream);
+
+            // Create a buffer to hold the data read from the file
+            byte[] buffer = new byte[4096];
+            int bytesRead = -1;
+
+            // Read the file into the buffer and write it to the GZIPOutputStream
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                gzipOutputStream.write(buffer, 0, bytesRead);
+            }
+
+            // Close the streams
+            gzipOutputStream.close();
+            outputStream.close();
+            inputStream.close();
+
+            // Get the compressed data as a byte array
+            bytes = outputStream.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bytes;
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        Toast.makeText(this, "selected image", Toast.LENGTH_SHORT).show();
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
             try {
@@ -312,7 +396,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 imageBitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream); // specify the compression quality
                 byte[] imageBytes = byteArrayOutputStream.toByteArray();
-                uploadImage(imageBytes, "Cam" + randomNumber() + ".jpg");
+                uploadImage(imageBytes, "Cam" + randomNumber() + ".jpg", true);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -320,6 +404,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(this, "Error while processing image", Toast.LENGTH_LONG).show();
             }
 
+        }
+        if (requestCode == FILE_SELECT_CODE && resultCode == RESULT_OK && data != null) {
+            Log.e(TAG, "onActivityResult");
+            try {
+                Uri uri = data.getData();
+
+                File file = getFileFromUri(uri);
+                String fileName =file.getName();
+                byte[] bytes = compressFile(file);
+                uploadImage(bytes, fileName, false);
+            } catch (Exception e) {
+                Log.e(TAG, "onActivityResult::::"+ e.getMessage());
+                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+            }
         }
         if (requestCode == REQUEST_IMAGE_PICKER && resultCode == Activity.RESULT_OK && data != null) {
             // Get the selected image URI
@@ -345,7 +443,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     cursor.close();
                 }
                 Log.e(TAG, "Received image from camera" + imageBytes);
-                uploadImage(imageBytes, fileName);
+                uploadImage(imageBytes, fileName, true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -360,7 +458,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return "" + randomNumber;
     }
 
-    private void uploadImage(byte[] imageBytes, String fileName) {
+    private void uploadImage(byte[] imageBytes, String fileName, boolean isImage) {
 
         String userId = formatterClass.getSharedPref(FileUpload.USER.name(), this);
         String indicatorId = formatterClass.getSharedPref(FileUpload.INDICATOR.name(), this);
@@ -369,7 +467,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 userId,
                 submissionId,
                 indicatorId,
-                imageBytes, fileName, "", false);
+                imageBytes, fileName, "", false, isImage);
         myViewModel.uploadImage(MainActivity.this, image);
     }
 

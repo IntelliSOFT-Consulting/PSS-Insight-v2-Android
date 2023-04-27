@@ -32,7 +32,7 @@ class Login : AppCompatActivity() {
     usernameEdittext = findViewById(R.id.usernameEdittext)
     passwordEdittext = findViewById(R.id.passwordEdittext)
 
-    populateInital()
+    populateInitial()
 
     findViewById<Button>(R.id.loginButton).setOnClickListener {
       var progressDialog = ProgressDialog(this)
@@ -93,10 +93,8 @@ class Login : AppCompatActivity() {
     }
   }
 
-  private fun populateInital() {
+  private fun populateInitial() {
     serverUrlEdittext.setText("http://pssnational.intellisoftkenya.com/")
-    usernameEdittext.setText("admin")
-    passwordEdittext.setText("district")
   }
 
   override fun onStart() {

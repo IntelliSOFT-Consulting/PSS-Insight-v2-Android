@@ -96,4 +96,8 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
   fun updateImageLink(context: Context,image: Image, url: String) = runBlocking {
     repository.updateImageLink(context, image.submissionId,image.indicatorId, url)
   }
+
+    fun getSubmissionsById(context: Context,userId: String, submissionId: String)= runBlocking {
+      repository.getSubmissionById(context, userId,submissionId)
+    }
 }

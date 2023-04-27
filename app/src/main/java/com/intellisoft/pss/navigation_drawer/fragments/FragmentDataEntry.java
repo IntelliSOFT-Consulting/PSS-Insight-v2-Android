@@ -48,6 +48,7 @@ import com.intellisoft.pss.helper_class.DbSaveDataEntry;
 import com.intellisoft.pss.helper_class.NavigationValues;
 import com.intellisoft.pss.helper_class.FormatterClass;
 import com.intellisoft.pss.R;
+import com.intellisoft.pss.helper_class.PositionStatus;
 import com.intellisoft.pss.helper_class.SubmissionQueue;
 import com.intellisoft.pss.helper_class.SubmissionsStatus;
 import com.intellisoft.pss.adapter.DataEntryAdapter;
@@ -92,7 +93,7 @@ public class FragmentDataEntry extends Fragment {
     private String submissionId = "";
     private ProgressBar progressBar;
     private String orgCode = "";
-
+    private DataEntryAdapter dataEntryAdapter;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
 
@@ -180,13 +181,14 @@ public class FragmentDataEntry extends Fragment {
         return rootView;
     }
 
+
     private String getCodeFromHash(String organizationsCode) {
         organizationsList = myViewModel.getOrganizations(requireContext());
         stringMap = new HashMap<>();
         for (Organizations organization : organizationsList) {
             stringMap.put(organization.getIdcode(), organization.getDisplayName());
-            if (organization.getDisplayName().equalsIgnoreCase(organizationsCode)){
-                orgCode=organization.getIdcode();
+            if (organization.getDisplayName().equalsIgnoreCase(organizationsCode)) {
+                orgCode = organization.getIdcode();
             }
         }
         return orgCode;
@@ -263,7 +265,7 @@ public class FragmentDataEntry extends Fragment {
                 handleButtonClicks();
             }
         });
-
+        controlSubmission();
         btnCancel.setOnClickListener(v -> {
             LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
             int lastVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
@@ -287,6 +289,26 @@ public class FragmentDataEntry extends Fragment {
         });
 
         loadOrganizations();
+    }
+
+
+    private void controlSubmission() {
+
+        String userId = formatterClass.getSharedPref("username", requireContext());
+        if (userId != null) {
+            Submissions submission = myViewModel.getSubmissionsById(requireContext(), userId, submissionId);
+            if (submission != null) {
+                if (submission.isSynced()) {
+                    saveDraft.setVisibility(View.INVISIBLE);
+                    submitSurvey.setVisibility(View.GONE);
+                }
+                if (submission.getStatus().equalsIgnoreCase(SubmissionsStatus.SUBMITTED.name())) {
+                    saveDraft.setVisibility(View.INVISIBLE);
+                    submitSurvey.setVisibility(View.GONE);
+                }
+            }
+
+        }
     }
 
     private void loadOrganizations() {
@@ -330,7 +352,7 @@ public class FragmentDataEntry extends Fragment {
                     userId,
                     period, false
             );
-              if (submissionId == null) {
+            if (submissionId == null) {
                 myViewModel.addSubmissions(submissions);
             } else {
                 myViewModel.updateSubmissions(submissions, submissionId);
@@ -371,11 +393,11 @@ public class FragmentDataEntry extends Fragment {
                     indicatorSize = indicatorSize + indicatorsList.size();
 
                     DbDataEntryForm dbDataEntryForm = new DbDataEntryForm(
-                            categoryCode,categoryName, indicatorName, categoryId, indicatorsList,description);
+                            categoryCode, categoryName, indicatorName, categoryId, indicatorsList, description);
                     dbDataEntryFormList.add(dbDataEntryForm);
                 }
             }
-            DataEntryAdapter dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId, FragmentDataEntry.this);
+            dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId, FragmentDataEntry.this);
             mRecyclerView.setAdapter(dataEntryAdapter);
 
             formatterClass.saveSharedPref("indicatorSize",
@@ -396,7 +418,23 @@ public class FragmentDataEntry extends Fragment {
             saveDraft.setVisibility(View.VISIBLE);
             submitSurvey.setVisibility(View.VISIBLE);
         } else {
-            handleButtonClicks();
+            String pos = formatterClass.getSharedPref(PositionStatus.CURRENT.name(), requireContext());
+            Log.e("TAG", "Position::::" + pos);
+            if (pos != null) {
+               try {
+                   int intPos = Integer.parseInt(pos);
+                   // Navigate to positions
+                   Log.e("TAG", "Position:::: intPos" + intPos);
+                   LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+                   layoutManager.scrollToPosition(intPos);
+                   dataEntryAdapter.notifyDataSetChanged();
+               }catch (Exception e){
+                   e.printStackTrace();
+               }
+
+            }
+//            handleButtonClicks();
+
         }
 
     }
@@ -441,12 +479,19 @@ public class FragmentDataEntry extends Fragment {
         if (activeItemPosition == -1) {
             activeItemPosition = 1;
         }
-
+        String cur = String.valueOf(activeItemPosition);
         String activeItemText = "Page " + activeItemPosition + " / " + totalItemCount;
         progressLabel.setText(activeItemText);
         if (activeItemPosition == totalItemCount) {
             btnNext.setVisibility(View.GONE);
-            submitSurvey.setVisibility(View.VISIBLE);
+
+            boolean isSynced = checkIfSynced();
+            boolean isSubmitted = checkIfSubmitted();
+            if (isSynced || isSubmitted) {
+                submitSurvey.setVisibility(View.GONE);
+            } else {
+                submitSurvey.setVisibility(View.VISIBLE);
+            }
         } else {
             btnNext.setVisibility(View.VISIBLE);
             submitSurvey.setVisibility(View.GONE);
@@ -457,6 +502,34 @@ public class FragmentDataEntry extends Fragment {
         } else {
             btnCancel.setVisibility(View.INVISIBLE);
         }
+    }
+
+    private boolean checkIfSubmitted() {
+        boolean show = false;
+        String userId = formatterClass.getSharedPref("username", requireContext());
+        if (userId != null) {
+            Submissions submission = myViewModel.getSubmissionsById(requireContext(), userId, submissionId);
+            if (submission != null) {
+                if (submission.getStatus().equalsIgnoreCase(SubmissionsStatus.SUBMITTED.name())) {
+                    show = true;
+                }
+            }
+        }
+        return show;
+    }
+
+    private Boolean checkIfSynced() {
+        boolean show = false;
+        String userId = formatterClass.getSharedPref("username", requireContext());
+        if (userId != null) {
+            Submissions submission = myViewModel.getSubmissionsById(requireContext(), userId, submissionId);
+            if (submission != null) {
+                if (submission.isSynced()) {
+                    show = true;
+                }
+            }
+        }
+        return show;
     }
 
 

@@ -14,6 +14,10 @@ enum class SubmissionsStatus {
   DRAFT
 }
 
+enum class PositionStatus {
+  CURRENT
+}
+
 enum class PinLockStatus {
   INITIAL,
   CONFIRMED,
@@ -37,9 +41,10 @@ enum class FileUpload {
   INDICATOR,
   SUBMISSION
 }
-enum class Information{
-    ABOUT,
-    CONTACT
+
+enum class Information {
+  ABOUT,
+  CONTACT
 }
 
 data class DbSubmission(val date: String, val status: String)
@@ -58,6 +63,7 @@ data class NationalInformation(
 )
 
 data class PublishedIndicators(val count: Int, val details: List<DbDataEntryDetails>)
+
 data class PublishedNationalInformation(val nationalInformation: List<NationalInformation>)
 
 data class ImageResponse(@JsonProperty("id") val id: String)

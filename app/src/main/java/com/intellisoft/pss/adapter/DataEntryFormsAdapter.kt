@@ -1,5 +1,6 @@
 package com.intellisoft.pss.adapter
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.app.Dialog
 import android.content.Context
@@ -9,11 +10,13 @@ import android.text.Editable
 import android.text.Html
 import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.webkit.WebView
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.intellisoft.pss.R
@@ -207,6 +210,7 @@ class DataEntryFormsAdapter(
 
     dialog.show()
   }
+
   fun onAttachmentDialog(myViewModel: PssViewModel, userId: String, indicatorId: String) {
     val dialog = Dialog(context)
     // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -217,15 +221,28 @@ class DataEntryFormsAdapter(
     dialog.window?.setLayout(width, height)
 
     val imgSuccess = dialog.findViewById(R.id.img_success) as ImageView
+    val mWebView = dialog.findViewById(R.id.webView) as WebView
     try {
       val image = myViewModel.getImage(context, userId, indicatorId, submissionId)
       if (image != null) {
         val byteArray = image.image
-        val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-        imgSuccess.setImageBitmap(bitmap)
+        if (image.isImage) {
+          val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+          imgSuccess.setImageBitmap(bitmap)
+        } else {
+          imgSuccess.visibility = GONE
+          mWebView.visibility = VISIBLE
+          mWebView.settings.javaScriptEnabled = true
+          mWebView.settings.builtInZoomControls = true
+          mWebView.settings.displayZoomControls = false
+          val pdfBase64 = Base64.encodeToString(byteArray, Base64.NO_WRAP)
+          val dataUrl = "data:application/pdf;base64,$pdfBase64"
+          mWebView.loadUrl(dataUrl);
+        }
       }
     } catch (e: Exception) {
       e.printStackTrace()
+      Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show()
     }
 
     val btncn = dialog.findViewById(R.id.dialog_cancel_image) as ImageView

@@ -54,7 +54,7 @@ public class FragmentSettings extends Fragment {
     private void initData() {
         SettingItemChild settingItemChild = new SettingItemChild("Syncing period: " + getSyncingPeriod(), "Last Sync on: " + getLastSync(), true, "Sync Data Now");
         SettingItemChild settingItemChild1 = new SettingItemChild("Syncing period: " + getSyncingConfPeriod(), "Last Sync on: " + getLastSync(), true, "Sync Configuration Now");
-        SettingItemChild settingItemChild2 = new SettingItemChild(getReserved() + " Reserved values downloaded per TEI attribute", "", true, "Manage Reserved Values");
+//        SettingItemChild settingItemChild2 = new SettingItemChild(getReserved() + " Reserved values downloaded per TEI attribute", "", true, "Manage Reserved Values");
         SettingItemChild settingItemChild3 = new SettingItemChild("All Capture App data stored in your device will be deleted",
                 "Data which is not synced to the server will be lost", false, "Accept");
 
@@ -65,13 +65,12 @@ public class FragmentSettings extends Fragment {
                 R.drawable.baseline_sync_24, sync,true);
         SettingItem settingItem1 = new SettingItem("Sync Configuration", settingItemChild1, false, 1,
                 R.drawable.baseline_manage_history_24, conf,true);
-        SettingItem settingItem2 = new SettingItem("Reserved Values", settingItemChild2, false, 2,
-                R.drawable.baseline_menu_24, null,false);
+//        SettingItem settingItem2 = new SettingItem("Reserved Values", settingItemChild2, false, 2,                R.drawable.baseline_menu_24, null,false);
         SettingItem settingItem3 = new SettingItem("Delete Local Data", settingItemChild3, false, 3,
                 R.drawable.baseline_delete_24, null,false);
 
 
-        settingItemArrayList.addAll(Arrays.asList(settingItem, settingItem1, settingItem2, settingItem3));
+        settingItemArrayList.addAll(Arrays.asList(settingItem, settingItem1, settingItem3));
 
         expandableRecyclerAdapter = new ExpandableRecyclerAdapter(settingItemArrayList, requireContext(), myViewModel);
         recyclerView.setAdapter(expandableRecyclerAdapter);

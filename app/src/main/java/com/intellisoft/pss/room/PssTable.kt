@@ -62,7 +62,8 @@ data class Image(
     val image: ByteArray,
     val fileName:String,
     var imageUrl: String?,
-    @ColumnInfo(name = "is_synced") var isSynced: Boolean = false
+    @ColumnInfo(name = "is_synced") var isSynced: Boolean = false,
+    @ColumnInfo(name = "isImage") var isImage: Boolean = true
 ) {
     @PrimaryKey(autoGenerate = true) var id: Int? = null
 }

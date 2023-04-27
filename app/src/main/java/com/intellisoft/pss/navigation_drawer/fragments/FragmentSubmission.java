@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.intellisoft.pss.helper_class.PositionStatus;
 import com.intellisoft.pss.helper_class.SubmissionQueue;
 import com.intellisoft.pss.helper_class.SubmissionsStatus;
 import com.intellisoft.pss.adapter.SubmissionAdapter;
@@ -69,6 +70,7 @@ public class FragmentSubmission extends Fragment {
     private void saveSubmission(String status) {
         //Create a entity of the date it was pressed
         String userId = formatterClass.getSharedPref("username", requireContext());
+        formatterClass.deleteSharedPref(PositionStatus.CURRENT.name(), requireContext());
         if (userId != null) {
             String date = formatterClass.getCurrentDate();
             String year = formatterClass.getYear();

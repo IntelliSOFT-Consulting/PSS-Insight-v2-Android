@@ -2,6 +2,7 @@ package com.intellisoft.pss.adapter
 
 import android.app.Dialog
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,8 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.intellisoft.pss.R
 import com.intellisoft.pss.helper_class.DbDataEntryForm
+import com.intellisoft.pss.helper_class.FormatterClass
+import com.intellisoft.pss.helper_class.PositionStatus
 import com.intellisoft.pss.navigation_drawer.fragments.FragmentDataEntry
-import java.util.ArrayList
 
 class DataEntryAdapter(
     private var dbDataEntryFormList: ArrayList<DbDataEntryForm>,
@@ -20,7 +22,7 @@ class DataEntryAdapter(
     private val currentSession: String,
     private val fragmentDataEntry: FragmentDataEntry
 ) : RecyclerView.Adapter<DataEntryAdapter.Pager2ViewHolder>() {
-
+  private val formatterClass = FormatterClass()
   inner class Pager2ViewHolder(itemView: View) :
       RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
@@ -71,7 +73,9 @@ class DataEntryAdapter(
   }
 
   override fun onBindViewHolder(holder: Pager2ViewHolder, position: Int) {
+    Log.e("Data Entry", "Current Position $position")
 
+    formatterClass.saveSharedPref(PositionStatus.CURRENT.name, (position+1).toString(), context)
     val categoryName = dbDataEntryFormList[position].categoryName
     val indicatorCode = dbDataEntryFormList[position].categoryCode
     val indicatorName = dbDataEntryFormList[position].indicatorName

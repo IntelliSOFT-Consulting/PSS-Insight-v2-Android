@@ -55,8 +55,8 @@ interface RoomDao {
   fun checkSubmissions(userId: String, date: String, status: String): Boolean
 
   @Query(
-      "SELECT EXISTS (SELECT 1 FROM submissions WHERE userId =:userId AND date =:date AND id =:id)")
-  fun checkSubmissionPerId(userId: String, date: String, id: String): Boolean
+      "SELECT EXISTS (SELECT 1 FROM submissions WHERE userId =:userId  AND id =:id)")
+  fun checkSubmissionPerId(userId: String, id: String): Boolean
   @Query("SELECT * FROM submissions WHERE userId =:userId ORDER BY id DESC")
   fun getSubmissions(userId: String): List<Submissions>
 
