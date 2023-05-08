@@ -14,29 +14,35 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/hidden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/tvQuestion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
+            android:padding="3dp"
             android:text="@string/is_there_a_national_list_of_essential_medicines" />
 
         <EditText
             android:id="@+id/etValue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:background="@drawable/edittext_border"
             android:hint="Enter value"
             android:inputType="number"
-            android:padding="10dp" />
+            android:padding="5dp" />
 
         <RadioGroup
             android:id="@+id/rg_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:orientation="horizontal"
-            android:padding="10dp"
+            android:padding="5dp"
             android:visibility="gone">
 
             <RadioButton
@@ -44,6 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:checked="false"
                 android:text="Yes" />
 
             <RadioButton
@@ -51,9 +58,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:checked="false"
                 android:text="No" />
 
         </RadioGroup>
+
         <LinearLayout
             android:id="@+id/ln_comment"
             android:layout_width="match_parent"
@@ -65,8 +74,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:textStyle="bold"
-                android:text="@string/user_comment" />
+                android:text="@string/user_comment"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_user_comment"
@@ -86,8 +95,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:textStyle="bold"
-                android:text="@string/user_attachment" />
+                android:text="@string/user_attachment"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_user_attachment"

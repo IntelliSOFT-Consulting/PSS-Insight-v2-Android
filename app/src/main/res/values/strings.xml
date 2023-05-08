@@ -59,5 +59,7 @@
     <string name="forgot">Forgot Pin? Reset</string>
     <string name="this_is_the_information_field">This is the information field.</string>
     <string name="ps01_definition">PS01 Definition</string>
+    <string name="reference_sheet">Reference Sheet</string>
+    <string name="fill_assessment_question">Fill Assessment Question</string>
 
 </resources>

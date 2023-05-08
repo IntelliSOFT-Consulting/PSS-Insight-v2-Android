@@ -15,7 +15,9 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -33,6 +35,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GestureDetectorCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -94,6 +97,9 @@ public class FragmentDataEntry extends Fragment {
     private ProgressBar progressBar;
     private String orgCode = "";
     private DataEntryAdapter dataEntryAdapter;
+    private int mCurrentActiveItemPosition = 0;
+    private GestureDetectorCompat mGestureDetector;
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
 
@@ -102,7 +108,12 @@ public class FragmentDataEntry extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_data_entry, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
-
+        mGestureDetector = new GestureDetectorCompat(requireContext(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                return true;
+            }
+        });
         mRecyclerView = rootView.findViewById(R.id.recyclerView);
 //        mRecyclerView.setHasFixedSize(true);
         linearLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -140,6 +151,8 @@ public class FragmentDataEntry extends Fragment {
                 autoCompleteTextView.requestFocus();
                 return;
             }
+            formatterClass.saveSharedPref(PositionStatus.CURRENT.name(), "0", requireContext());
+
             saveSubmission(SubmissionsStatus.DRAFT.name(), period, organizationsCode);
             Intent intent = new Intent(requireContext(), MainActivity.class);
             startActivity(intent);
@@ -165,6 +178,7 @@ public class FragmentDataEntry extends Fragment {
                 autoCompleteTextView.requestFocus();
                 return;
             }
+            formatterClass.saveSharedPref(PositionStatus.CURRENT.name(), "0", requireContext());
             saveSubmission(SubmissionsStatus.SUBMITTED.name(), period, organizationsCode);
             DbSaveDataEntry dataEntry = myViewModel.getSubmitData(requireContext());
             if (dataEntry != null) {
@@ -265,6 +279,8 @@ public class FragmentDataEntry extends Fragment {
                 handleButtonClicks();
             }
         });
+
+
         controlSubmission();
         btnCancel.setOnClickListener(v -> {
             LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
@@ -273,6 +289,7 @@ public class FragmentDataEntry extends Fragment {
             if (lastVisibleItemPosition < totalItemCount) {
                 lastVisibleItemPosition--;
                 mRecyclerView.smoothScrollToPosition(lastVisibleItemPosition);
+                formatterClass.saveSharedPref(PositionStatus.CURRENT.name(), "" + lastVisibleItemPosition, requireContext());
             }
 
             handleButtonClicks();
@@ -284,6 +301,7 @@ public class FragmentDataEntry extends Fragment {
             if (lastVisibleItemPosition < totalItemCount) {
                 lastVisibleItemPosition++;
                 mRecyclerView.smoothScrollToPosition(lastVisibleItemPosition);
+                formatterClass.saveSharedPref(PositionStatus.CURRENT.name(), "" + lastVisibleItemPosition, requireContext());
             }
             handleButtonClicks();
         });
@@ -376,10 +394,12 @@ public class FragmentDataEntry extends Fragment {
 
             Converters converters = new Converters();
             DbDataEntry dataEntry = converters.fromJson(jsonData);
-            List<DbDataEntryDetails> detailsList = dataEntry.getPublishedIndicators().getDetails();
+            List<DbDataEntryDetails> detailsList = dataEntry.getDetails();
+            String referenceSheet = dataEntry.getReferenceSheet();
+
+            formatterClass.saveSharedPref("referenceSheet", referenceSheet, requireContext());
             for (int j = 0; j < detailsList.size(); j++) {
 
-                String categoryNameHigher = detailsList.get(j).getCategoryName();
                 List<DbIndicatorsDetails> indicators = detailsList.get(j).getIndicators();
 
                 for (int i = 0; i < indicators.size(); i++) {
@@ -397,13 +417,18 @@ public class FragmentDataEntry extends Fragment {
                     dbDataEntryFormList.add(dbDataEntryForm);
                 }
             }
-            dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId, FragmentDataEntry.this);
+            String status = SubmissionsStatus.DRAFT.name();
+            Submissions submission = myViewModel.getSubmission(submissionId, requireContext());
+            if (submission != null) {
+                status = submission.getStatus();
+            }
+            dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId, status, FragmentDataEntry.this);
             mRecyclerView.setAdapter(dataEntryAdapter);
 
             formatterClass.saveSharedPref("indicatorSize",
                     String.valueOf(indicatorSize), requireContext());
 
-            controlPagination(dataEntry.getPublishedIndicators().getCount());
+            controlPagination(indicatorSize);
         }
     }
 
@@ -419,24 +444,24 @@ public class FragmentDataEntry extends Fragment {
             submitSurvey.setVisibility(View.VISIBLE);
         } else {
             String pos = formatterClass.getSharedPref(PositionStatus.CURRENT.name(), requireContext());
-            Log.e("TAG", "Position::::" + pos);
+
             if (pos != null) {
-               try {
-                   int intPos = Integer.parseInt(pos);
-                   // Navigate to positions
-                   Log.e("TAG", "Position:::: intPos" + intPos);
-                   LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-                   layoutManager.scrollToPosition(intPos);
-                   dataEntryAdapter.notifyDataSetChanged();
-               }catch (Exception e){
-                   e.printStackTrace();
-               }
-
+                try {
+                    int intPos = Integer.parseInt(pos);
+                    // Navigate to positions
+                    LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+                    layoutManager.scrollToPosition(intPos);
+                    dataEntryAdapter.notifyDataSetChanged();
+                    String activeItemText = "Page " + intPos+1 + " / " + count;
+                    progressLabel.setText(activeItemText);
+                    btnCancel.setVisibility(View.VISIBLE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    handleButtonClicks();
+                }
             }
-//            handleButtonClicks();
-
+            handleButtonClicks();
         }
-
     }
 
     public void updateProgress() {
@@ -448,6 +473,9 @@ public class FragmentDataEntry extends Fragment {
 
             double percent = (answered / total) * 100;
             int percentInt = (int) percent;
+            if (percentInt > 100) {
+                percentInt = 100;
+            }
             progressBar.setProgress(percentInt);
             progressText.setText(percentInt + "% done");
 
@@ -455,6 +483,7 @@ public class FragmentDataEntry extends Fragment {
             e.printStackTrace();
         }
     }
+
 
     private void handleButtonClicks() {
         LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
@@ -479,7 +508,6 @@ public class FragmentDataEntry extends Fragment {
         if (activeItemPosition == -1) {
             activeItemPosition = 1;
         }
-        String cur = String.valueOf(activeItemPosition);
         String activeItemText = "Page " + activeItemPosition + " / " + totalItemCount;
         progressLabel.setText(activeItemText);
         if (activeItemPosition == totalItemCount) {
@@ -539,16 +567,5 @@ public class FragmentDataEntry extends Fragment {
 
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == REQUEST_IMAGE_PICKER && resultCode == Activity.RESULT_OK && data != null) {
-            // Get the selected image URI
-            Uri selectedImageUri = data.getData();
-            Log.e("Selected", "Selected Image");
-
-        }
-    }
 
 }

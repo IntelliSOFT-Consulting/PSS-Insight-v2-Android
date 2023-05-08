@@ -10,6 +10,8 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.intellisoft.pss.helper_class.FormatterClass
+import com.intellisoft.pss.models.Constants.REFERENCE_URL
+import com.intellisoft.pss.models.Constants.SERVER_URL
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -64,8 +66,8 @@ class Login : AppCompatActivity() {
                 startActivity(intent)
 
                 formatterClass.saveSharedPref("serverUrl1", serverUrl, this@Login)
-                formatterClass.saveSharedPref(
-                    "serverUrl", "http://172.104.91.99:7001/api/v1/", this@Login)
+                formatterClass.saveSharedPref("serverUrl", SERVER_URL, this@Login)
+                formatterClass.saveSharedPref("referenceSheetUrl", REFERENCE_URL, this@Login)
                 formatterClass.saveSharedPref("username", username, this@Login)
                 formatterClass.saveSharedPref("password", password, this@Login)
                 formatterClass.saveSharedPref("isLoggedIn", "true", this@Login)

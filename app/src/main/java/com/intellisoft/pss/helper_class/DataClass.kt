@@ -49,9 +49,14 @@ enum class Information {
 
 data class DbSubmission(val date: String, val status: String)
 
+//data class DbDataEntry(
+//    val publishedIndicators: PublishedIndicators,
+//    val nationalInformation: List<NationalInformation>
+//)
 data class DbDataEntry(
-    val publishedIndicators: PublishedIndicators,
-    val nationalInformation: List<NationalInformation>
+    val referenceSheet: String,
+    val count: Int,
+    val details: List<DbDataEntryDetails>
 )
 
 data class NationalInformation(

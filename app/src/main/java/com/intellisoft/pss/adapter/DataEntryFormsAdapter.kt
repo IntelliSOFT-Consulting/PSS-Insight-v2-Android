@@ -1,6 +1,5 @@
 package com.intellisoft.pss.adapter
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.app.Dialog
 import android.content.Context
@@ -20,10 +19,8 @@ import android.webkit.WebView
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.intellisoft.pss.R
-import com.intellisoft.pss.helper_class.DbIndicators
-import com.intellisoft.pss.helper_class.FormatterClass
-import com.intellisoft.pss.helper_class.NavigationValues
-import com.intellisoft.pss.helper_class.SubmissionQueue
+import com.intellisoft.pss.helper_class.*
+import com.intellisoft.pss.models.Utils
 import com.intellisoft.pss.navigation_drawer.fragments.FragmentDataEntry
 import com.intellisoft.pss.room.Comments
 import com.intellisoft.pss.room.IndicatorResponse
@@ -33,7 +30,8 @@ class DataEntryFormsAdapter(
     private var dbDataEntryFormList: ArrayList<DbIndicators>,
     private val context: Context,
     private val submissionId: String,
-    private val fragmentDataEntry: FragmentDataEntry
+    private val fragmentDataEntry: FragmentDataEntry,
+    private val status: String
 ) : RecyclerView.Adapter<DataEntryFormsAdapter.Pager2ViewHolder>() {
 
   inner class Pager2ViewHolder(itemView: View) :
@@ -60,24 +58,12 @@ class DataEntryFormsAdapter(
       tvAttachment.setOnClickListener(this)
       tvUserAttachment.setOnClickListener(this)
       etValue.addTextChangedListener(this)
-      radioYes.setOnCheckedChangeListener { buttonView, isChecked ->
+      radioYes.setOnCheckedChangeListener { _, isChecked ->
         if (isChecked) {
-          // The RadioButton is now checked
-          // Do something here
           val pos = adapterPosition
           val id = dbDataEntryFormList[pos].id
           val name = dbDataEntryFormList[pos].name
           val indicatorResponse = IndicatorResponse(userId.toString(), submissionId, id, "Yes")
-          myViewModel.addResponse(indicatorResponse)
-          Handler().postDelayed({ fragmentDataEntry.updateProgress() }, 2000)
-        }
-      }
-      radioNo.setOnCheckedChangeListener { buttonView, isChecked ->
-        if (isChecked) {
-          val pos = adapterPosition
-          val id = dbDataEntryFormList[pos].id
-          val name = dbDataEntryFormList[pos].name
-          val indicatorResponse = IndicatorResponse(userId.toString(), submissionId, id, "No")
           myViewModel.addResponse(indicatorResponse)
           Handler().postDelayed({ fragmentDataEntry.updateProgress() }, 2000)
         }
@@ -89,7 +75,7 @@ class DataEntryFormsAdapter(
       val id = dbDataEntryFormList[pos].id
       when (view.id) {
         R.id.tv_user_attachment -> {
-          onAttachmentDialog(myViewModel, userId.toString(), id)
+          Utils().onAttachmentDialog(context,submissionId,myViewModel, userId.toString(), id)
         }
         R.id.tvComment -> {
           onAlertDialog(myViewModel, userId.toString(), id)
@@ -127,8 +113,8 @@ class DataEntryFormsAdapter(
   }
 
   override fun onBindViewHolder(holder: Pager2ViewHolder, position: Int) {
-
-    val code = dbDataEntryFormList[position].code
+    val myViewModel = PssViewModel(context.applicationContext as Application)
+    val userId = FormatterClass().getSharedPref("username", context)
     val name = dbDataEntryFormList[position].name
     val indicatorId = dbDataEntryFormList[position].id
 
@@ -166,16 +152,27 @@ class DataEntryFormsAdapter(
     if (image != null) {
       holder.lnAttachment.visibility = VISIBLE
 
-      val spanned = Html.fromHtml(generateHypeLink(image))
+      val spanned = Html.fromHtml(Utils().generateHypeLink(image))
       holder.tvUserAttachment.text = spanned
       holder.tvUserAttachment.movementMethod = LinkMovementMethod.getInstance()
     }
-
     holder.tvQuestion.text = name
-  }
+    if (status == SubmissionsStatus.SUBMITTED.name) {
 
-  private fun generateHypeLink(image: String): String? {
-    return " <a href='#'> $image</a><br>"
+      holder.radioNo.isEnabled = false
+      holder.radioYes.isEnabled = false
+      holder.etValue.isEnabled = false
+      holder.tvAttachment.isEnabled = false
+      holder.tvComment.isEnabled = false
+    }
+    holder.radioNo.setOnCheckedChangeListener { _, isChecked ->
+      if (isChecked) {
+        val id = dbDataEntryFormList[position].id
+        val indicatorResponse = IndicatorResponse(userId.toString(), submissionId, id, "No")
+        myViewModel.addResponse(indicatorResponse)
+        Handler().postDelayed({ fragmentDataEntry.updateProgress() }, 2000)
+      }
+    }
   }
 
   override fun getItemCount(): Int {
@@ -201,6 +198,7 @@ class DataEntryFormsAdapter(
       val comments = Comments(userId.toString(), indicatorId, submissionId, value)
       myViewModel.addComment(comments)
       notifyDataSetChanged()
+      Toast.makeText(context, "posting comments...", Toast.LENGTH_SHORT).show()
 
       dialog.dismiss()
     }
@@ -210,44 +208,45 @@ class DataEntryFormsAdapter(
 
     dialog.show()
   }
-
-  fun onAttachmentDialog(myViewModel: PssViewModel, userId: String, indicatorId: String) {
-    val dialog = Dialog(context)
-    // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-    dialog.setCancelable(false)
-    dialog.setContentView(R.layout.custom_image_dialog)
-    val width = ViewGroup.LayoutParams.MATCH_PARENT
-    val height = ViewGroup.LayoutParams.WRAP_CONTENT
-    dialog.window?.setLayout(width, height)
-
-    val imgSuccess = dialog.findViewById(R.id.img_success) as ImageView
-    val mWebView = dialog.findViewById(R.id.webView) as WebView
-    try {
-      val image = myViewModel.getImage(context, userId, indicatorId, submissionId)
-      if (image != null) {
-        val byteArray = image.image
-        if (image.isImage) {
-          val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-          imgSuccess.setImageBitmap(bitmap)
-        } else {
-          imgSuccess.visibility = GONE
-          mWebView.visibility = VISIBLE
-          mWebView.settings.javaScriptEnabled = true
-          mWebView.settings.builtInZoomControls = true
-          mWebView.settings.displayZoomControls = false
-          val pdfBase64 = Base64.encodeToString(byteArray, Base64.NO_WRAP)
-          val dataUrl = "data:application/pdf;base64,$pdfBase64"
-          mWebView.loadUrl(dataUrl);
-        }
-      }
-    } catch (e: Exception) {
-      e.printStackTrace()
-      Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show()
-    }
-
-    val btncn = dialog.findViewById(R.id.dialog_cancel_image) as ImageView
-    btncn.setOnClickListener { dialog.dismiss() }
-
-    dialog.show()
-  }
+//
+//  fun onAttachmentDialog(myViewModel: PssViewModel, userId: String, indicatorId: String) {
+//
+//    val dialog = Dialog(context)
+//    // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//    dialog.setCancelable(false)
+//    dialog.setContentView(R.layout.custom_image_dialog)
+//    val width = ViewGroup.LayoutParams.MATCH_PARENT
+//    val height = ViewGroup.LayoutParams.WRAP_CONTENT
+//    dialog.window?.setLayout(width, height)
+//
+//    val imgSuccess = dialog.findViewById(R.id.img_success) as ImageView
+//    val mWebView = dialog.findViewById(R.id.webView) as WebView
+//    try {
+//      val image = myViewModel.getImage(context, userId, indicatorId, submissionId)
+//      if (image != null) {
+//        val byteArray = image.image
+//        if (image.isImage) {
+//          val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+//          imgSuccess.setImageBitmap(bitmap)
+//        } else {
+//          imgSuccess.visibility = GONE
+//          mWebView.visibility = VISIBLE
+//          mWebView.settings.javaScriptEnabled = true
+//          mWebView.settings.builtInZoomControls = true
+//          mWebView.settings.displayZoomControls = false
+//          val pdfBase64 = Base64.encodeToString(byteArray, Base64.NO_WRAP)
+//          val dataUrl = "data:application/pdf;base64,$pdfBase64"
+//          mWebView.loadUrl(dataUrl)
+//        }
+//      }
+//    } catch (e: Exception) {
+//      e.printStackTrace()
+//      Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+//    }
+//
+//    val btncn = dialog.findViewById(R.id.dialog_cancel_image) as ImageView
+//    btncn.setOnClickListener { dialog.dismiss() }
+//
+//    dialog.show()
+//  }
 }

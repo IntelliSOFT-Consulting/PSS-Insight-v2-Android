@@ -56,16 +56,16 @@ public class FragmentHelpDesk extends Fragment {
 
             Converters converters = new Converters();
             DbDataEntry dataEntry = converters.fromJson(jsonData);
-            List<NationalInformation> detailsList = dataEntry.getNationalInformation();
-            for (int j = 0; j < detailsList.size(); j++) {
-                String aboutUs = detailsList.get(j).getAboutUs();
-                String contactUs = detailsList.get(j).getContactUs();
-
-                formatterClass.saveSharedPref(Information.ABOUT.name(),
-                        aboutUs, requireContext());
-                formatterClass.saveSharedPref(Information.CONTACT.name(),
-                        contactUs, requireContext());
-            }
+//            List<NationalInformation> detailsList = dataEntry.getNationalInformation();
+//            for (int j = 0; j < detailsList.size(); j++) {
+//                String aboutUs = detailsList.get(j).getAboutUs();
+//                String contactUs = detailsList.get(j).getContactUs();
+//
+//                formatterClass.saveSharedPref(Information.ABOUT.name(),
+//                        aboutUs, requireContext());
+//                formatterClass.saveSharedPref(Information.CONTACT.name(),
+//                        contactUs, requireContext());
+//            }
         }
     }
 

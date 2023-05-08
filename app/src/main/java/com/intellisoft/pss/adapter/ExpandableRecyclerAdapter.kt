@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Outline
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -79,30 +80,31 @@ class ExpandableRecyclerAdapter(
     }else{
 //      holder.settingLayout.boxBackgroundMode= TextInputLayout.BoxBackgroundMode.OUTLINE
     }
-
     holder.btnAction.setOnClickListener {
-      val text = holder.settingAutocomplete.text
-      if (TextUtils.isEmpty(text)) {
-        holder.settingLayout.error = "Enter value"
-        holder.settingAutocomplete.requestFocus()
-        return@setOnClickListener
-      }
 
       when (model.count) {
         3 -> {
           confirmDelete()
         }
-        2 -> {
-
-          formatterClass.saveSharedPref(SettingsQueue.RESERVED.name, text.toString(), context)
-        }
         1 -> {
-
+          val text = holder.settingAutocomplete.text
+          if (TextUtils.isEmpty(text)) {
+            holder.settingLayout.error = "Enter value"
+            holder.settingAutocomplete.requestFocus()
+            return@setOnClickListener
+          }
           formatterClass.saveSharedPref(SettingsQueue.CONFIGURATION.name, text.toString(), context)
+          Toast.makeText(context,"Configurations updated",Toast.LENGTH_SHORT).show()
         }
         0 -> {
-
+          val text = holder.settingAutocomplete.text
+          if (TextUtils.isEmpty(text)) {
+            holder.settingLayout.error = "Enter value"
+            holder.settingAutocomplete.requestFocus()
+            return@setOnClickListener
+          }
           formatterClass.saveSharedPref(SettingsQueue.SYNC.name, text.toString(), context)
+          Toast.makeText(context,"Sync settings updated",Toast.LENGTH_SHORT).show()
         }
       }
     }
@@ -115,7 +117,7 @@ class ExpandableRecyclerAdapter(
         .setView(R.layout.warning_layout)
         .setPositiveButton(
             context.getString(R.string.action_accept),
-            DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
+            DialogInterface.OnClickListener { _: DialogInterface?, _: Int ->
               myViewModel.clearAppData()
               val intent = Intent(context, MainActivity::class.java)
               context.startActivity(intent)

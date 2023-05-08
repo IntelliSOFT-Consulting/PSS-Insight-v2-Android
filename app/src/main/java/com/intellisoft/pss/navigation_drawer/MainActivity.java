@@ -44,6 +44,7 @@ import com.intellisoft.pss.helper_class.FileUpload;
 import com.intellisoft.pss.helper_class.FormatterClass;
 import com.intellisoft.pss.helper_class.NavigationValues;
 import com.intellisoft.pss.R;
+import com.intellisoft.pss.helper_class.SettingsQueue;
 import com.intellisoft.pss.helper_class.SubmissionsStatus;
 import com.intellisoft.pss.navigation_drawer.fragments.FragmentAbout;
 import com.intellisoft.pss.navigation_drawer.fragments.FragmentDataEntry;
@@ -98,26 +99,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("dhis2")) {
                 // Call your function here
-                autoSyncSubmissions();
+                autoSyncSubmissions(true);
             }
         }
     };
 
-    private void autoSyncSubmissions() {
+    private void autoSyncSubmissions(Boolean confirm) {
 
         if (activeInternetConnection()) {
             loadAllImages();
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
-            /*  if (hour == 0) {*/
-            List<Submissions> submissionList = myViewModel.getUnsyncedSubmissions(this, SubmissionsStatus.SUBMITTED.name());
-            for (Submissions sm : submissionList) {
-                DbSaveDataEntry dataEntry = myViewModel.getSubmitSync(this, sm);
-                if (dataEntry != null) {
-                    retrofitCalls.submitSyncData(this, dataEntry, sm, myViewModel);
+
+            if (confirm) {
+                String code = formatterClass.getSharedPref(SettingsQueue.SYNC.name(), MainActivity.this);
+                if (code.equalsIgnoreCase("Manual")) {
+                    Log.e("TAG", "Setting updated to manual.....");
+                } else {
+                    List<Submissions> submissionList = myViewModel.getUnsyncedSubmissions(this, SubmissionsStatus.SUBMITTED.name());
+                    for (Submissions sm : submissionList) {
+                        DbSaveDataEntry dataEntry = myViewModel.getSubmitSync(this, sm);
+                        if (dataEntry != null) {
+                            retrofitCalls.submitSyncData(this, dataEntry, sm, myViewModel);
+                        }
+                    }
+                }
+            } else {
+                List<Submissions> submissionList = myViewModel.getUnsyncedSubmissions(this, SubmissionsStatus.SUBMITTED.name());
+                for (Submissions sm : submissionList) {
+                    DbSaveDataEntry dataEntry = myViewModel.getSubmitSync(this, sm);
+                    if (dataEntry != null) {
+                        retrofitCalls.submitSyncData(this, dataEntry, sm, myViewModel);
+                    }
                 }
             }
-            /* }*/
         } else {
             Log.e(TAG, "Sync paused.... No active connection");
         }
@@ -317,6 +332,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     }
+
     private File getFileFromUri(Uri uri) throws IOException {
         File file = null;
 
@@ -411,11 +427,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Uri uri = data.getData();
 
                 File file = getFileFromUri(uri);
-                String fileName =file.getName();
+                String fileName = file.getName();
                 byte[] bytes = compressFile(file);
                 uploadImage(bytes, fileName, false);
             } catch (Exception e) {
-                Log.e(TAG, "onActivityResult::::"+ e.getMessage());
+                Log.e(TAG, "onActivityResult::::" + e.getMessage());
                 Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
@@ -493,7 +509,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 finish();
                 break;
             case 4:
-                autoSyncSubmissions();
+                autoSyncSubmissions(false);
                 break;
             case 5:
                 fragment = new FragmentAbout();

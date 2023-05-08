@@ -347,4 +347,12 @@ class PssRepository(private val roomDao: RoomDao) {
     }
     return null
   }
+
+    fun deleteAllSubmitted(context: Context, id: String, submissionId: String) {
+      val userId = formatterClass.getSharedPref("username", context)
+      if (userId != null) {
+         roomDao.deleteAllSubmitted(userId,id, submissionId)
+      }
+
+    }
 }

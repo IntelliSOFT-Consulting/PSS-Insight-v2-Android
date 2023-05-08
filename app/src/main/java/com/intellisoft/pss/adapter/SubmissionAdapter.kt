@@ -2,12 +2,16 @@ package com.intellisoft.pss.adapter
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.intellisoft.pss.R
 import com.intellisoft.pss.helper_class.FormatterClass
@@ -31,6 +35,7 @@ class SubmissionAdapter(
     val tvSubmitted: TextView = itemView.findViewById(R.id.tvSubmitted)
     val statusIcon: ImageView = itemView.findViewById(R.id.statusIcon)
     val linearView: LinearLayout = itemView.findViewById(R.id.linearView)
+    val icStatusIcon: ImageView = itemView.findViewById(R.id.ic_status_icon)
 
     init {
       linearView.setOnClickListener(this)
@@ -60,6 +65,8 @@ class SubmissionAdapter(
 
     if (status == "DRAFT") {
       holder.statusIcon.setImageResource(R.drawable.ic_draft)
+      holder.icStatusIcon.setImageResource(R.drawable.edit)
+      holder.icStatusIcon.setColorFilter(ContextCompat.getColor(context, R.color.primary), PorterDuff.Mode.SRC_IN);
     } else {
       holder.statusIcon.setImageResource(R.drawable.ic_submitted_synced)
     }

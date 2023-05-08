@@ -100,4 +100,8 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
     fun getSubmissionsById(context: Context,userId: String, submissionId: String)= runBlocking {
       repository.getSubmissionById(context, userId,submissionId)
     }
+
+    fun deleteAllSubmitted(context: Context,id: String,submissionId: String)= runBlocking {
+      repository.deleteAllSubmitted(context, id,submissionId)
+    }
 }

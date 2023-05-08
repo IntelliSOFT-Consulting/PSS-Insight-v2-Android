@@ -54,6 +54,26 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/ln_reference_sheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <ImageButton
+                android:id="@+id/reference_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:background="@drawable/baseline_attachment_24" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/reference_sheet"
+                android:textStyle="normal" />
+        </LinearLayout>
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

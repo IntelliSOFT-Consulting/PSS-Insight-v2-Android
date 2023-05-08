@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
@@ -22,12 +23,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="15dp"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:visibility="gone" />
 
             <View
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
-                android:background="@color/white" />
+                android:background="@color/white"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -36,13 +39,15 @@
                 android:gravity="center|start"
                 android:orientation="vertical">
 
+
                 <TextView
                     android:id="@+id/categoryName"
                     style="@style/TextAppearance.Material3.BodySmall"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginStart="10dp"
-                    android:gravity="center|start"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
                     android:textColor="@color/white" />
 
                 <TextView
@@ -74,6 +79,25 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/ln_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/inc_parent"
+                layout="@layout/data_entry_form" />
+
+            <CheckBox
+                android:id="@+id/cb_assessment_question"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/fill_assessment_question" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
@@ -83,7 +107,8 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                tools:listitem="@layout/data_entry_form" />
 
         </LinearLayout>
 
