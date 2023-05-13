@@ -53,7 +53,14 @@ data class DbSubmission(val date: String, val status: String)
 //    val publishedIndicators: PublishedIndicators,
 //    val nationalInformation: List<NationalInformation>
 //)
+
+data class PositionValue(
+    val status: Boolean,
+    val count: Int,
+)
 data class DbDataEntry(
+    val aboutUs: String,
+    val contactUs: String,
     val referenceSheet: String,
     val count: Int,
     val details: List<DbDataEntryDetails>

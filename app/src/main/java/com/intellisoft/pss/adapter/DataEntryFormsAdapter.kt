@@ -3,19 +3,16 @@ package com.intellisoft.pss.adapter
 import android.app.Application
 import android.app.Dialog
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.os.Handler
 import android.text.Editable
 import android.text.Html
 import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
-import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.webkit.WebView
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.intellisoft.pss.R
@@ -31,7 +28,8 @@ class DataEntryFormsAdapter(
     private val context: Context,
     private val submissionId: String,
     private val fragmentDataEntry: FragmentDataEntry,
-    private val status: String
+    private val status: String,
+    private val canProvideAnswers: Boolean
 ) : RecyclerView.Adapter<DataEntryFormsAdapter.Pager2ViewHolder>() {
 
   inner class Pager2ViewHolder(itemView: View) :
@@ -54,6 +52,7 @@ class DataEntryFormsAdapter(
     val lnAttachment: LinearLayout = itemView.findViewById(R.id.ln_attachment)
 
     init {
+
       tvComment.setOnClickListener(this)
       tvAttachment.setOnClickListener(this)
       tvUserAttachment.setOnClickListener(this)
@@ -75,7 +74,7 @@ class DataEntryFormsAdapter(
       val id = dbDataEntryFormList[pos].id
       when (view.id) {
         R.id.tv_user_attachment -> {
-          Utils().onAttachmentDialog(context,submissionId,myViewModel, userId.toString(), id)
+          Utils().onAttachmentDialog(context, submissionId, myViewModel, userId.toString(), id)
         }
         R.id.tvComment -> {
           onAlertDialog(myViewModel, userId.toString(), id)
@@ -117,6 +116,21 @@ class DataEntryFormsAdapter(
     val userId = FormatterClass().getSharedPref("username", context)
     val name = dbDataEntryFormList[position].name
     val indicatorId = dbDataEntryFormList[position].id
+//    if (canProvideAnswers) {
+//      holder.etValue.isEnabled = true
+//      holder.radioYes.isEnabled = true
+//      holder.radioNo.isEnabled = true
+//      holder.radioYes.isChecked = true
+//      holder.radioNo.isChecked = true
+//
+//    } else {
+//
+//      holder.etValue.isEnabled = false
+//      holder.radioYes.isEnabled = false
+//      holder.radioNo.isEnabled = false
+//      holder.radioYes.isChecked = false
+//      holder.radioNo.isChecked = false
+//    }
 
     when (dbDataEntryFormList[position].valueType) {
       "BOOLEAN" -> {
@@ -208,45 +222,45 @@ class DataEntryFormsAdapter(
 
     dialog.show()
   }
-//
-//  fun onAttachmentDialog(myViewModel: PssViewModel, userId: String, indicatorId: String) {
-//
-//    val dialog = Dialog(context)
-//    // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//    dialog.setCancelable(false)
-//    dialog.setContentView(R.layout.custom_image_dialog)
-//    val width = ViewGroup.LayoutParams.MATCH_PARENT
-//    val height = ViewGroup.LayoutParams.WRAP_CONTENT
-//    dialog.window?.setLayout(width, height)
-//
-//    val imgSuccess = dialog.findViewById(R.id.img_success) as ImageView
-//    val mWebView = dialog.findViewById(R.id.webView) as WebView
-//    try {
-//      val image = myViewModel.getImage(context, userId, indicatorId, submissionId)
-//      if (image != null) {
-//        val byteArray = image.image
-//        if (image.isImage) {
-//          val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-//          imgSuccess.setImageBitmap(bitmap)
-//        } else {
-//          imgSuccess.visibility = GONE
-//          mWebView.visibility = VISIBLE
-//          mWebView.settings.javaScriptEnabled = true
-//          mWebView.settings.builtInZoomControls = true
-//          mWebView.settings.displayZoomControls = false
-//          val pdfBase64 = Base64.encodeToString(byteArray, Base64.NO_WRAP)
-//          val dataUrl = "data:application/pdf;base64,$pdfBase64"
-//          mWebView.loadUrl(dataUrl)
-//        }
-//      }
-//    } catch (e: Exception) {
-//      e.printStackTrace()
-//      Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
-//    }
-//
-//    val btncn = dialog.findViewById(R.id.dialog_cancel_image) as ImageView
-//    btncn.setOnClickListener { dialog.dismiss() }
-//
-//    dialog.show()
-//  }
+  //
+  //  fun onAttachmentDialog(myViewModel: PssViewModel, userId: String, indicatorId: String) {
+  //
+  //    val dialog = Dialog(context)
+  //    // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+  //    dialog.setCancelable(false)
+  //    dialog.setContentView(R.layout.custom_image_dialog)
+  //    val width = ViewGroup.LayoutParams.MATCH_PARENT
+  //    val height = ViewGroup.LayoutParams.WRAP_CONTENT
+  //    dialog.window?.setLayout(width, height)
+  //
+  //    val imgSuccess = dialog.findViewById(R.id.img_success) as ImageView
+  //    val mWebView = dialog.findViewById(R.id.webView) as WebView
+  //    try {
+  //      val image = myViewModel.getImage(context, userId, indicatorId, submissionId)
+  //      if (image != null) {
+  //        val byteArray = image.image
+  //        if (image.isImage) {
+  //          val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+  //          imgSuccess.setImageBitmap(bitmap)
+  //        } else {
+  //          imgSuccess.visibility = GONE
+  //          mWebView.visibility = VISIBLE
+  //          mWebView.settings.javaScriptEnabled = true
+  //          mWebView.settings.builtInZoomControls = true
+  //          mWebView.settings.displayZoomControls = false
+  //          val pdfBase64 = Base64.encodeToString(byteArray, Base64.NO_WRAP)
+  //          val dataUrl = "data:application/pdf;base64,$pdfBase64"
+  //          mWebView.loadUrl(dataUrl)
+  //        }
+  //      }
+  //    } catch (e: Exception) {
+  //      e.printStackTrace()
+  //      Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+  //    }
+  //
+  //    val btncn = dialog.findViewById(R.id.dialog_cancel_image) as ImageView
+  //    btncn.setOnClickListener { dialog.dismiss() }
+  //
+  //    dialog.show()
+  //  }
 }

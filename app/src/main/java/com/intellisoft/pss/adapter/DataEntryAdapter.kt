@@ -10,7 +10,6 @@ import android.text.Editable
 import android.text.Html
 import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,17 +24,20 @@ import com.intellisoft.pss.navigation_drawer.fragments.FragmentDataEntry
 import com.intellisoft.pss.room.Comments
 import com.intellisoft.pss.room.IndicatorResponse
 import com.intellisoft.pss.room.PssViewModel
+import com.intellisoft.pss.viewmodels.StatusViewModel
 
 class DataEntryAdapter(
     private var dbDataEntryFormList: ArrayList<DbDataEntryForm>,
     private val context: Context,
     private val currentSession: String,
     private val status: String,
-    private val fragmentDataEntry: FragmentDataEntry
+    private val fragmentDataEntry: FragmentDataEntry,
+    private val statusViewModel: StatusViewModel
 ) : RecyclerView.Adapter<DataEntryAdapter.Pager2ViewHolder>() {
   private val formatterClass = FormatterClass()
   var defaultCode: String = ""
   var defaultName: String = ""
+  private var canProvideAnswers = true
 
   inner class Pager2ViewHolder(itemView: View) :
       RecyclerView.ViewHolder(itemView), View.OnClickListener, TextWatcher {
@@ -69,14 +71,29 @@ class DataEntryAdapter(
       val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
       recyclerView.layoutManager = layoutManager
       infoIcon.setOnClickListener(this)
+      etValue.isEnabled = false
+      radioYes.isEnabled = false
+      radioNo.isEnabled = false
+      etValue.setText("")
+      radioYes.isChecked = false
+      radioNo.isChecked = false
       cbAssessmentQuestion.setOnCheckedChangeListener { _, checked ->
         val pos = adapterPosition
         val current = hidden.text
-        Log.e("TAG", "Current $current")
-        if (checked) {
-          //          deleteAllSubmitted(it, myViewModel, recyclerView)
 
+        if (checked) {
+//          canProvideAnswers = true
+          myViewModel.deleteAllSubmitted(context, current.toString(), currentSession)
+          etValue.isEnabled = false
+          radioYes.isEnabled = false
+          radioNo.isEnabled = false
+          radioYes.isChecked = false
+          radioNo.isChecked = false
         } else {
+//          canProvideAnswers = false
+          etValue.isEnabled = true
+          radioYes.isEnabled = true
+          radioNo.isEnabled = true
           val forms = dbDataEntryFormList[pos].forms
           forms.forEach {
             if (it.code != dbDataEntryFormList[pos].categoryCode) {
@@ -84,6 +101,7 @@ class DataEntryAdapter(
             }
           }
         }
+        notifyDataSetChanged()
       }
 
       tvComment.setOnClickListener(this)
@@ -265,7 +283,8 @@ class DataEntryAdapter(
     }
 
     val dataEntryAdapter =
-        DataEntryFormsAdapter(forms, context, currentSession, fragmentDataEntry, status)
+        DataEntryFormsAdapter(
+            forms, context, currentSession, fragmentDataEntry, status, canProvideAnswers)
     holder.recyclerView.adapter = dataEntryAdapter
   }
 

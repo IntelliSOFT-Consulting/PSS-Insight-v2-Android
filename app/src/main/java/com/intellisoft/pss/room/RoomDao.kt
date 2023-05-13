@@ -120,4 +120,8 @@ interface RoomDao {
   fun getIndicatorImage(userId: String, indicatorId: String, submissionId: String): Image?
   @Query("DELETE FROM responses WHERE userId =:userId AND submissionId =:submissionId AND indicatorId =:id")
   fun deleteAllSubmitted(userId: String, id: String, submissionId: String)
+
+
+  @Query("DELETE FROM comments") fun clearComments()
+  @Query("DELETE FROM responses") fun clearResponses()
 }

@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -74,20 +75,21 @@ public class FragmentAbout extends Fragment {
     private void loadData() {
         IndicatorsData indicatorsData = myViewModel.getAllMyData(requireContext());
         if (indicatorsData != null) {
-            String jsonData = indicatorsData.getJsonData();
+            try {
+                String jsonData = indicatorsData.getJsonData();
 
-            Converters converters = new Converters();
-            DbDataEntry dataEntry = converters.fromJson(jsonData);
-//            List<NationalInformation> detailsList = dataEntry.getNationalInformation();
-//            for (int j = 0; j < detailsList.size(); j++) {
-//                String aboutUs = detailsList.get(j).getAboutUs();
-//                String contactUs = detailsList.get(j).getContactUs();
-//
-//                formatterClass.saveSharedPref(Information.ABOUT.name(),
-//                        aboutUs, requireContext());
-//                formatterClass.saveSharedPref(Information.CONTACT.name(),
-//                        contactUs, requireContext());
-//            }
+                Converters converters = new Converters();
+                DbDataEntry dataEntry = converters.fromJson(jsonData);
+                String aboutUs = dataEntry.getAboutUs();
+                String contactUs = dataEntry.getContactUs();
+                formatterClass.saveSharedPref(Information.ABOUT.name(),
+                        aboutUs, requireContext());
+                formatterClass.saveSharedPref(Information.CONTACT.name(),
+                        contactUs, requireContext());
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(requireContext(), "Experience problems, please try again", Toast.LENGTH_SHORT).show();
+            }
 
         }
     }

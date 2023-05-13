@@ -318,6 +318,8 @@ class PssRepository(private val roomDao: RoomDao) {
 
   fun clearAppData() {
     roomDao.clearAppData()
+    roomDao.clearResponses()
+    roomDao.clearComments()
   }
 
   fun getImage(

@@ -37,6 +37,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -62,6 +63,7 @@ import com.intellisoft.pss.room.IndicatorsData;
 import com.intellisoft.pss.room.Organizations;
 import com.intellisoft.pss.room.PssViewModel;
 import com.intellisoft.pss.room.Submissions;
+import com.intellisoft.pss.viewmodels.StatusViewModel;
 import com.intellisoft.pss.widgets.CustomRecyclerView;
 
 import org.jetbrains.annotations.NotNull;
@@ -100,6 +102,7 @@ public class FragmentDataEntry extends Fragment {
     private int mCurrentActiveItemPosition = 0;
     private GestureDetectorCompat mGestureDetector;
 
+    private StatusViewModel statusViewModel;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
 
@@ -114,6 +117,8 @@ public class FragmentDataEntry extends Fragment {
                 return true;
             }
         });
+        statusViewModel = new ViewModelProvider(requireActivity()).get(StatusViewModel.class);
+
         mRecyclerView = rootView.findViewById(R.id.recyclerView);
 //        mRecyclerView.setHasFixedSize(true);
         linearLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -396,39 +401,45 @@ public class FragmentDataEntry extends Fragment {
             DbDataEntry dataEntry = converters.fromJson(jsonData);
             List<DbDataEntryDetails> detailsList = dataEntry.getDetails();
             String referenceSheet = dataEntry.getReferenceSheet();
-
             formatterClass.saveSharedPref("referenceSheet", referenceSheet, requireContext());
-            for (int j = 0; j < detailsList.size(); j++) {
+            if (!detailsList.isEmpty()) {
+                for (int j = 0; j < detailsList.size(); j++) {
 
-                List<DbIndicatorsDetails> indicators = detailsList.get(j).getIndicators();
+                    List<DbIndicatorsDetails> indicators = detailsList.get(j).getIndicators();
 
-                for (int i = 0; i < indicators.size(); i++) {
-                    String categoryId = indicators.get(i).getCategoryId();
-                    String categoryCode = indicators.get(i).getCategoryCode();
-                    String categoryName = indicators.get(i).getCategoryName();
-                    String indicatorName = indicators.get(i).getIndicatorName();
-                    String description = indicators.get(i).getDescription();
+                    for (int i = 0; i < indicators.size(); i++) {
+                        String categoryId = indicators.get(i).getCategoryId();
+                        String categoryCode = indicators.get(i).getCategoryCode();
+                        String categoryName = indicators.get(i).getCategoryName();
+                        String indicatorName = indicators.get(i).getIndicatorName();
+                        String description = indicators.get(i).getDescription();
 
-                    ArrayList<DbIndicators> indicatorsList = (ArrayList<DbIndicators>) indicators.get(i).getIndicatorDataValue();
-                    indicatorSize = indicatorSize + indicatorsList.size();
+                        ArrayList<DbIndicators> indicatorsList = (ArrayList<DbIndicators>) indicators.get(i).getIndicatorDataValue();
+                        indicatorSize = indicatorSize + indicatorsList.size();
 
-                    DbDataEntryForm dbDataEntryForm = new DbDataEntryForm(
-                            categoryCode, categoryName, indicatorName, categoryId, indicatorsList, description);
-                    dbDataEntryFormList.add(dbDataEntryForm);
+                        DbDataEntryForm dbDataEntryForm = new DbDataEntryForm(
+                                categoryCode, categoryName, indicatorName, categoryId, indicatorsList, description);
+                        dbDataEntryFormList.add(dbDataEntryForm);
+                    }
                 }
-            }
-            String status = SubmissionsStatus.DRAFT.name();
-            Submissions submission = myViewModel.getSubmission(submissionId, requireContext());
-            if (submission != null) {
-                status = submission.getStatus();
-            }
-            dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId, status, FragmentDataEntry.this);
-            mRecyclerView.setAdapter(dataEntryAdapter);
+                String status = SubmissionsStatus.DRAFT.name();
+                Submissions submission = myViewModel.getSubmission(submissionId, requireContext());
+                if (submission != null) {
+                    status = submission.getStatus();
+                }
+                dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId, status, FragmentDataEntry.this,statusViewModel);
+                mRecyclerView.setAdapter(dataEntryAdapter);
 
-            formatterClass.saveSharedPref("indicatorSize",
-                    String.valueOf(indicatorSize), requireContext());
+                formatterClass.saveSharedPref("indicatorSize",
+                        String.valueOf(indicatorSize), requireContext());
 
-            controlPagination(indicatorSize);
+                controlPagination(indicatorSize);
+            } else {
+                Toast.makeText(requireContext(), "There are no published indicators. Please try again later!!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(requireContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            }
         }
     }
 
@@ -452,7 +463,7 @@ public class FragmentDataEntry extends Fragment {
                     LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
                     layoutManager.scrollToPosition(intPos);
                     dataEntryAdapter.notifyDataSetChanged();
-                    String activeItemText = "Page " + intPos+1 + " / " + count;
+                    String activeItemText = "Page " + intPos + 1 + " / " + count;
                     progressLabel.setText(activeItemText);
                     btnCancel.setVisibility(View.VISIBLE);
                 } catch (Exception e) {
@@ -561,7 +572,8 @@ public class FragmentDataEntry extends Fragment {
     }
 
 
-    public void uploadImage(@NotNull String userId, @NotNull String indicatorId, @NotNull String submissionId) {
+    public void uploadImage(@NotNull String userId, @NotNull String
+            indicatorId, @NotNull String submissionId) {
         MainActivity mainActivity = (MainActivity) getActivity();
         mainActivity.selectImage(userId, indicatorId, submissionId);
 
