@@ -19,6 +19,7 @@ class SynchingPage : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_synching_page)
+//    throw RuntimeException("Test Crash")
     val score = Random.nextInt(10, 100)
     // Declare a variable for the TextView
     val textView: TextView = findViewById(R.id.loaderTextView)
