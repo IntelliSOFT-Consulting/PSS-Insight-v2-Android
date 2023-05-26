@@ -158,7 +158,7 @@ public class FragmentDataEntry extends Fragment {
             }
             formatterClass.saveSharedPref(PositionStatus.CURRENT.name(), "0", requireContext());
 
-            saveSubmission(SubmissionsStatus.DRAFT.name(), period, organizationsCode);
+            saveSubmission(SubmissionsStatus.DRAFT.name(), period, organizationsCode,orgCode);
             Intent intent = new Intent(requireContext(), MainActivity.class);
             startActivity(intent);
 
@@ -184,7 +184,7 @@ public class FragmentDataEntry extends Fragment {
                 return;
             }
             formatterClass.saveSharedPref(PositionStatus.CURRENT.name(), "0", requireContext());
-            saveSubmission(SubmissionsStatus.SUBMITTED.name(), period, organizationsCode);
+            saveSubmission(SubmissionsStatus.SUBMITTED.name(), period, organizationsCode,orgCode);
             DbSaveDataEntry dataEntry = myViewModel.getSubmitData(requireContext());
             if (dataEntry != null) {
                 submissionDialog();
@@ -330,7 +330,6 @@ public class FragmentDataEntry extends Fragment {
                     submitSurvey.setVisibility(View.GONE);
                 }
             }
-
         }
     }
 
@@ -361,7 +360,7 @@ public class FragmentDataEntry extends Fragment {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void saveSubmission(String status, String period, String organizationsCode) {
+    private void saveSubmission(String status, String period, String organizationsCode, String orgCode) {
 
         //Create a entity of the date it was pressed
         String userId = formatterClass.getSharedPref("username", requireContext());
@@ -373,7 +372,7 @@ public class FragmentDataEntry extends Fragment {
                     orgCode,
                     status,
                     userId,
-                    period, false
+                    period, "", "", false
             );
             if (submissionId == null) {
                 myViewModel.addSubmissions(submissions);
@@ -389,7 +388,22 @@ public class FragmentDataEntry extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        Log.e("Submission ID ", "Submission ID::::" + submissionId);
+        if (submissionId == null) {
 
+        } else {
+            Submissions submission = myViewModel.getSubmission(submissionId, requireContext());
+            if (submission != null) {
+                if (submission.getServerId().isEmpty()) {
+                    loadPublishedIndicators();
+                } else {
+                    loadRetrievedIndicators();
+                }
+            }
+        }
+    }
+
+    private void loadRetrievedIndicators() {
         IndicatorsData indicatorsData = myViewModel.getAllMyData(requireContext());
         if (indicatorsData != null) {
 
@@ -423,11 +437,65 @@ public class FragmentDataEntry extends Fragment {
                     }
                 }
                 String status = SubmissionsStatus.DRAFT.name();
-                Submissions submission = myViewModel.getSubmission(submissionId, requireContext());
-                if (submission != null) {
-                    status = submission.getStatus();
+                Submissions submission1 = myViewModel.getSubmission(submissionId, requireContext());
+                if (submission1 != null) {
+                    status = submission1.getStatus();
                 }
-                dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId, status, FragmentDataEntry.this,statusViewModel);
+                dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId, status, FragmentDataEntry.this, statusViewModel);
+                mRecyclerView.setAdapter(dataEntryAdapter);
+
+                formatterClass.saveSharedPref("indicatorSize",
+                        String.valueOf(indicatorSize), requireContext());
+
+                controlPagination(indicatorSize);
+            } else {
+                Toast.makeText(requireContext(), "There are no published indicators. Please try again later!!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(requireContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            }
+        }
+    }
+
+    private void loadPublishedIndicators() {
+        IndicatorsData indicatorsData = myViewModel.getAllMyData(requireContext());
+        if (indicatorsData != null) {
+
+            int indicatorSize = 0;
+            ArrayList<DbDataEntryForm> dbDataEntryFormList = new ArrayList<>();
+            String jsonData = indicatorsData.getJsonData();
+
+            Converters converters = new Converters();
+            DbDataEntry dataEntry = converters.fromJson(jsonData);
+            List<DbDataEntryDetails> detailsList = dataEntry.getDetails();
+            String referenceSheet = dataEntry.getReferenceSheet();
+            formatterClass.saveSharedPref("referenceSheet", referenceSheet, requireContext());
+            if (!detailsList.isEmpty()) {
+                for (int j = 0; j < detailsList.size(); j++) {
+
+                    List<DbIndicatorsDetails> indicators = detailsList.get(j).getIndicators();
+
+                    for (int i = 0; i < indicators.size(); i++) {
+                        String categoryId = indicators.get(i).getCategoryId();
+                        String categoryCode = indicators.get(i).getCategoryCode();
+                        String categoryName = indicators.get(i).getCategoryName();
+                        String indicatorName = indicators.get(i).getIndicatorName();
+                        String description = indicators.get(i).getDescription();
+
+                        ArrayList<DbIndicators> indicatorsList = (ArrayList<DbIndicators>) indicators.get(i).getIndicatorDataValue();
+                        indicatorSize = indicatorSize + indicatorsList.size();
+
+                        DbDataEntryForm dbDataEntryForm = new DbDataEntryForm(
+                                categoryCode, categoryName, indicatorName, categoryId, indicatorsList, description);
+                        dbDataEntryFormList.add(dbDataEntryForm);
+                    }
+                }
+                String status = SubmissionsStatus.DRAFT.name();
+                Submissions submission1 = myViewModel.getSubmission(submissionId, requireContext());
+                if (submission1 != null) {
+                    status = submission1.getStatus();
+                }
+                dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId, status, FragmentDataEntry.this, statusViewModel);
                 mRecyclerView.setAdapter(dataEntryAdapter);
 
                 formatterClass.saveSharedPref("indicatorSize",

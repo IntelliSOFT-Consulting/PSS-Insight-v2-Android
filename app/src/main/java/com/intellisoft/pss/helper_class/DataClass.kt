@@ -11,7 +11,9 @@ enum class NavigationValues {
 
 enum class SubmissionsStatus {
   SUBMITTED,
-  DRAFT
+  DRAFT,
+  REJECTED,
+  PUBLISHED
 }
 
 enum class PositionStatus {
@@ -49,15 +51,16 @@ enum class Information {
 
 data class DbSubmission(val date: String, val status: String)
 
-//data class DbDataEntry(
+// data class DbDataEntry(
 //    val publishedIndicators: PublishedIndicators,
 //    val nationalInformation: List<NationalInformation>
-//)
+// )
 
 data class PositionValue(
     val status: Boolean,
     val count: Int,
 )
+
 data class DbDataEntry(
     val aboutUs: String,
     val contactUs: String,
@@ -65,6 +68,15 @@ data class DbDataEntry(
     val count: Int,
     val details: List<DbDataEntryDetails>
 )
+
+data class DbReportDetailsEntry(
+    val id: Int,
+    val selectedPeriod: String,
+    val status: String,
+    val indicators: IndicatorData
+)
+
+data class IndicatorData(val count: Int, val details: List<DbDataEntryDetails>)
 
 data class NationalInformation(
     val id: Int,
@@ -82,7 +94,27 @@ data class ImageResponse(@JsonProperty("id") val id: String)
 
 data class DbDataEntryDetails(val categoryName: String, val indicators: List<DbIndicatorsDetails>)
 
+data class DbSubmissionEntryDetails(
+    val id: Int,
+    val selectedPeriod: String,
+    val status: String,
+    val dataEntryPersonId: String,
+    val dataEntryDate: String,
+    val createdAt: String,
+    val dataEntryPerson: List<DbPersonDetails>
+)
+
+data class DbPersonDetails(
+    val username: String,
+    val id: String,
+    val surname: String,
+    val firstName: String,
+    val email: String?,
+)
+
 data class DbOrganizationEntry(val organisationUnits: List<DbOrganizationEntryDetails>)
+
+data class DbSubmissionEntry(val count: Int, val details: List<DbSubmissionEntryDetails>)
 
 data class DbOrganizationEntryDetails(val id: String, val name: String)
 

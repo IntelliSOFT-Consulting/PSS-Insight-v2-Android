@@ -11,6 +11,8 @@ import com.intellisoft.pss.helper_class.DbSaveDataEntry
 import com.intellisoft.pss.helper_class.FormatterClass
 import com.intellisoft.pss.helper_class.ImageResponse
 import com.intellisoft.pss.room.*
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -43,27 +45,25 @@ class RetrofitCalls {
           .launch { submitSyncDataBackground(context, dbSaveDataEntry, sm, myViewModel) }
           .join()
     }
-  }  fun submitFileData(
-    context: Context,
-    image: Image,
-    myViewModel: PssViewModel
-  ) {
+  }
+  fun submitFileData(context: Context, image: Image, myViewModel: PssViewModel) {
 
     CoroutineScope(Dispatchers.Main).launch {
       val job = Job()
 
       CoroutineScope(Dispatchers.IO + job)
-          .launch {
-            submitFileDataBackground(context, myViewModel,image)
-            }
+          .launch { submitFileDataBackground(context, myViewModel, image) }
           .join()
     }
   }
-  private suspend fun submitFileDataBackground(context: Context, myViewModel: PssViewModel,image: Image) {
+  private suspend fun submitFileDataBackground(
+      context: Context,
+      myViewModel: PssViewModel,
+      image: Image
+  ) {
 
     val job1 = Job()
     CoroutineScope(Dispatchers.Main + job1).launch {
-
       val requestFile = RequestBody.create("image/jpeg".toMediaTypeOrNull(), image.image)
       val file = MultipartBody.Part.createFormData("file", "image.jpg", requestFile)
       var messageToast = ""
@@ -74,7 +74,8 @@ class RetrofitCalls {
             val baseUrl = formatterClass.getSharedPref("serverUrl", context)
 
             if (baseUrl != null) {
-              val apiService = RetrofitBuilder.getRetrofit(context,baseUrl).create(Interface::class.java)
+              val apiService =
+                  RetrofitBuilder.getRetrofit(context, baseUrl).create(Interface::class.java)
               try {
                 val apiInterface = apiService.uploadImageFileData(file)
                 messageToast =
@@ -82,7 +83,8 @@ class RetrofitCalls {
                       val statusCode = apiInterface.code()
                       val body = apiInterface.body()
                       if (statusCode == 200 || statusCode == 201) {
-                       updateFileStatus(context, body,myViewModel,image,"Saved and synced successfully")
+                        updateFileStatus(
+                            context, body, myViewModel, image, "Saved and synced successfully")
                       } else {
                         "Error: Body is null"
                       }
@@ -97,19 +99,23 @@ class RetrofitCalls {
           .join()
       CoroutineScope(Dispatchers.Main).launch {
 
-//        Toast.makeText(context, messageToast, Toast.LENGTH_LONG).show()
+        //        Toast.makeText(context, messageToast, Toast.LENGTH_LONG).show()
       }
     }
   }
 
-  private fun updateFileStatus(context: Context,body: ImageResponse?, myViewModel: PssViewModel, image: Image, s: String): String {
+  private fun updateFileStatus(
+      context: Context,
+      body: ImageResponse?,
+      myViewModel: PssViewModel,
+      image: Image,
+      s: String
+  ): String {
     if (body != null) {
-      myViewModel.updateImageLink(context,image,body.id)
+      myViewModel.updateImageLink(context, image, body.id)
     }
     return s
   }
-
-
 
   private suspend fun submitDataBackground(context: Context, dbSaveDataEntry: DbSaveDataEntry) {
 
@@ -130,7 +136,8 @@ class RetrofitCalls {
             val baseUrl = formatterClass.getSharedPref("serverUrl", context)
 
             if (baseUrl != null) {
-              val apiService = RetrofitBuilder.getRetrofit(context,baseUrl).create(Interface::class.java)
+              val apiService =
+                  RetrofitBuilder.getRetrofit(context, baseUrl).create(Interface::class.java)
               try {
                 val apiInterface = apiService.submitData(dbSaveDataEntry)
                 messageToast =
@@ -174,7 +181,8 @@ class RetrofitCalls {
             val baseUrl = formatterClass.getSharedPref("serverUrl", context)
 
             if (baseUrl != null) {
-              val apiService = RetrofitBuilder.getRetrofit(context,baseUrl).create(Interface::class.java)
+              val apiService =
+                  RetrofitBuilder.getRetrofit(context, baseUrl).create(Interface::class.java)
               try {
                 val apiInterface = apiService.submitData(dbSaveDataEntry)
                 messageToast =
@@ -220,7 +228,7 @@ class RetrofitCalls {
       val baseUrl = formatterClass.getSharedPref("serverUrl", context)
       val username = formatterClass.getSharedPref("username", context)
       if (baseUrl != null && username != null) {
-        val apiService = RetrofitBuilder.getRetrofit(context,baseUrl).create(Interface::class.java)
+        val apiService = RetrofitBuilder.getRetrofit(context, baseUrl).create(Interface::class.java)
         try {
           val apiInterface = apiService.getDataEntry()
           if (apiInterface.isSuccessful) {
@@ -247,10 +255,10 @@ class RetrofitCalls {
 
       val formatterClass = FormatterClass()
       val baseUrl = formatterClass.getSharedPref("serverUrl1", context)
-      Log.e("Retrofit","Server Url $baseUrl")
+
       val username = formatterClass.getSharedPref("username", context)
       if (baseUrl != null && username != null) {
-        val apiService = RetrofitBuilder.getRetrofit(context,baseUrl).create(Interface::class.java)
+        val apiService = RetrofitBuilder.getRetrofit(context, baseUrl).create(Interface::class.java)
         try {
           val apiInterface = apiService.getOrganizations()
           if (apiInterface.isSuccessful) {
@@ -273,7 +281,131 @@ class RetrofitCalls {
                   }
                 } catch (e: Exception) {
                   e.printStackTrace()
-                  Log.e("TAG","json:::: ${e.message}")
+                  Log.e("TAG", "json:::: ${e.message}")
+                }
+              }
+            }
+          }
+        } catch (e: Exception) {
+          print(e)
+        }
+      }
+    }
+  }
+  private fun loadSpecificResponses(context: Context, id: String) {
+    CoroutineScope(Dispatchers.IO).launch {
+      val myViewModel = PssViewModel(context.applicationContext as Application)
+
+      val formatterClass = FormatterClass()
+      val baseUrl = formatterClass.getSharedPref("serverUrl", context)
+
+      val username = formatterClass.getSharedPref("username", context)
+      if (baseUrl != null && username != null) {
+        val apiService = RetrofitBuilder.getRetrofit(context, baseUrl).create(Interface::class.java)
+        try {
+          val apiInterface = apiService.getResponseDetails(id)
+          if (apiInterface.isSuccessful) {
+            val statusCode = apiInterface.code()
+            val body = apiInterface.body()
+            if (statusCode == 200 || statusCode == 201) {
+              if (body != null) {
+
+                val converters = Converters().toJsonResponseDetails(body)
+                try {
+                  val json = Gson().fromJson(converters, JsonObject::class.java)
+                  Log.e("TAG", "json data:::: $json")
+                  val indicatorsObject = json.getAsJsonObject("indicators")
+                  myViewModel.updateOriginalResponses(context, id, indicatorsObject.toString())
+                } catch (e: Exception) {
+                  e.printStackTrace()
+                  Log.e("TAG", "json:::: ${e.message}")
+                }
+              }
+            }
+          }
+        } catch (e: Exception) {
+          print(e)
+        }
+      }
+    }
+  }
+
+  private fun formatDateInput(inputDate: String?): String {
+    val inputFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+    val outputFormat = "yyyy-MM-dd"
+    var date = ""
+    val dateFormat = SimpleDateFormat(inputFormat, Locale.ENGLISH)
+    dateFormat.timeZone = TimeZone.getTimeZone("UTC") // Assuming the input date is in UTC timezone
+
+    try {
+      val parsedDate = dateFormat.parse(inputDate)
+      val outputDateFormat = SimpleDateFormat(outputFormat, Locale.US)
+      val formattedDate = outputDateFormat.format(parsedDate)
+
+      println(formattedDate) // Output: "2023-5-25"
+      date = formattedDate
+    } catch (e: Exception) {
+      println("Error occurred while parsing or formatting the date")
+    }
+    return date
+  }
+
+  fun getSubmissions(context: Context) {
+    CoroutineScope(Dispatchers.IO).launch {
+      val myViewModel = PssViewModel(context.applicationContext as Application)
+
+      val formatterClass = FormatterClass()
+      val baseUrl = formatterClass.getSharedPref("serverUrl", context)
+
+      val username = formatterClass.getSharedPref("username", context)
+      if (baseUrl != null && username != null) {
+        val apiService = RetrofitBuilder.getRetrofit(context, baseUrl).create(Interface::class.java)
+        try {
+          val apiInterface = apiService.getResponses(username)
+          if (apiInterface.isSuccessful) {
+            val statusCode = apiInterface.code()
+            val body = apiInterface.body()
+            if (statusCode == 200 || statusCode == 201) {
+              if (body != null) {
+
+                val converters = Converters().toJsonResponses(body)
+                try {
+                  val json = Gson().fromJson(converters, JsonObject::class.java)
+
+                  val jsonArray = json.getAsJsonArray("details")
+                  //                  myViewModel.deleteAllOrganizations()
+                  for (i in 0 until jsonArray.size()) {
+                    val jsonObject = jsonArray.get(i).asJsonObject
+                    val id = jsonObject.get("id").asString
+                    val status = jsonObject.get("status").asString
+                    val dataEntryDate = jsonObject.get("dataEntryDate").asString
+                    val selectedPeriod = jsonObject.get("selectedPeriod").asString
+                    if (status.isNotEmpty()) {
+                      if (status != "DRAFT") {
+                        var sync = true
+                        if (status == "REJECTED") {
+                          sync = false
+                        }
+                        val submissions =
+                            Submissions(
+                                formatDateInput(dataEntryDate),
+                                "organizationsName",
+                                "orgCode",
+                                status,
+                                username,
+                                selectedPeriod,
+                                "",
+                                id,
+                                sync)
+
+                        myViewModel.checkAddSubmissions(submissions)
+                        loadSpecificResponses(context, id)
+                      }
+                    }
+                  }
+                } catch (e: Exception) {
+                  e.printStackTrace()
+                  Log.e("TAG", "json:::: ${e.message}")
                 }
               }
             }

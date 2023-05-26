@@ -3,6 +3,7 @@ package com.intellisoft.pss.room
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
+import com.google.gson.JsonObject
 import kotlinx.coroutines.runBlocking
 
 class PssViewModel(application: Application) : AndroidViewModel(application) {
@@ -104,4 +105,15 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteAllSubmitted(context: Context,id: String,submissionId: String)= runBlocking {
       repository.deleteAllSubmitted(context, id,submissionId)
     }
+
+  fun updateOriginalResponses(context: Context, id: String, response: String) =
+    runBlocking{
+      repository.updateOriginalResponses(context, id,response)
+  }
+
+
+
+  fun checkAddSubmissions(submissions: Submissions) = runBlocking{
+    repository.checkAddSubmissions(submissions)
+  }
 }

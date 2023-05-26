@@ -2,8 +2,7 @@ package com.intellisoft.pss.room
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson
-import com.intellisoft.pss.helper_class.DbDataEntry
-import com.intellisoft.pss.helper_class.DbOrganizationEntry
+import com.intellisoft.pss.helper_class.*
 
 class Converters {
     private val gson = Gson()
@@ -28,6 +27,17 @@ class Converters {
 
     @TypeConverter
     fun toJsonOrganization(data: DbOrganizationEntry): String {
+        // convert MyJsonData object to json
+        return gson.toJson(data)
+
+    }
+    @TypeConverter
+    fun toJsonResponses(data: DbSubmissionEntry): String {
+        // convert MyJsonData object to json
+        return gson.toJson(data)
+
+    }   @TypeConverter
+    fun toJsonResponseDetails(data: DbReportDetailsEntry): String {
         // convert MyJsonData object to json
         return gson.toJson(data)
 

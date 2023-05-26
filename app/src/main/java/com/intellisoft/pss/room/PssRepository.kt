@@ -114,6 +114,17 @@ class PssRepository(private val roomDao: RoomDao) {
       }
     }
   }
+  fun checkAddSubmissions(submissions: Submissions) {
+    val userId = submissions.userId
+    val date = submissions.date
+    val status = submissions.status
+
+    val isSubmissions = roomDao.checkSubmissions(userId, date, status)
+    if (!isSubmissions) {
+
+      roomDao.addSubmissions(submissions)
+    }
+  }
 
   fun initiateSubmissions(submissions: Submissions) {
     roomDao.addSubmissions(submissions)
@@ -249,6 +260,7 @@ class PssRepository(private val roomDao: RoomDao) {
     val status = submissions.status
     val org = submissions.organization
     val peri = submissions.period
+    val orgCode = submissions.orgCode
 
     val isSubmissions = roomDao.checkSubmissionPerId(userId, submissionId)
     if (!isSubmissions) {
@@ -256,7 +268,7 @@ class PssRepository(private val roomDao: RoomDao) {
     } else {
       val submissionsDetails = roomDao.getSubmissionsById(userId, submissionId)
 
-      roomDao.updateSubmissionOrg(status, submissionId, peri, org)
+      roomDao.updateSubmissionOrg(status, submissionId, peri, org,orgCode)
     }
   }
 
@@ -350,11 +362,18 @@ class PssRepository(private val roomDao: RoomDao) {
     return null
   }
 
-    fun deleteAllSubmitted(context: Context, id: String, submissionId: String) {
-      val userId = formatterClass.getSharedPref("username", context)
-      if (userId != null) {
-         roomDao.deleteAllSubmitted(userId,id, submissionId)
-      }
-
+  fun deleteAllSubmitted(context: Context, id: String, submissionId: String) {
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+      roomDao.deleteAllSubmitted(userId, id, submissionId)
     }
+  }
+
+  fun updateOriginalResponses(context: Context, id: String, response: String) {
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+      roomDao.updateOriginalResponses(userId, id, response)
+    }
+  }
+
 }

@@ -67,8 +67,8 @@ interface RoomDao {
   fun updateSubmissions(status: String, id: Int, period: String)
 
   @Query(
-      "UPDATE submissions SET status =:status, period =:period, organization =:organization WHERE id =:id")
-  fun updateSubmissionOrg(status: String, id: String, period: String, organization: String)
+      "UPDATE submissions SET status =:status, period =:period, organization =:organization,orgCode=:orgCode WHERE id =:id")
+  fun updateSubmissionOrg(status: String, id: String, period: String, organization: String, orgCode: String)
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun addOrganizations(organizationData: Organizations)
 
@@ -124,4 +124,7 @@ interface RoomDao {
 
   @Query("DELETE FROM comments") fun clearComments()
   @Query("DELETE FROM responses") fun clearResponses()
+  @Query(
+    "UPDATE submissions SET json_data =:json_data WHERE serverId =:serverId AND userId =:userId")
+    fun updateOriginalResponses(userId: String, serverId: String, json_data: String)
 }

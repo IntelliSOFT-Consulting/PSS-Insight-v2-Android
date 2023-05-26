@@ -2,8 +2,6 @@ package com.intellisoft.pss.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.ColorFilter
 import android.graphics.PorterDuff
 import android.view.LayoutInflater
 import android.view.View
@@ -62,11 +60,14 @@ class SubmissionAdapter(
     val date = submissionList[position].date
     val status = submissionList[position].status
     val isSynced = submissionList[position].isSynced
-
-    if (status == "DRAFT") {
+    if (status == "REJECTED") {
+      holder.tvSubmitted.setTextColor(ContextCompat.getColor(context, R.color.accent))
+    }
+    if (status == "DRAFT" || status == "REJECTED") {
       holder.statusIcon.setImageResource(R.drawable.ic_draft)
       holder.icStatusIcon.setImageResource(R.drawable.edit)
-      holder.icStatusIcon.setColorFilter(ContextCompat.getColor(context, R.color.primary), PorterDuff.Mode.SRC_IN);
+      holder.icStatusIcon.setColorFilter(
+          ContextCompat.getColor(context, R.color.primary), PorterDuff.Mode.SRC_IN)
     } else {
       holder.statusIcon.setImageResource(R.drawable.ic_submitted_synced)
     }

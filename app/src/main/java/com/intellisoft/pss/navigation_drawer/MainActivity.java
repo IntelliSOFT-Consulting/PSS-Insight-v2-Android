@@ -113,16 +113,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             if (confirm) {
                 String code = formatterClass.getSharedPref(SettingsQueue.SYNC.name(), MainActivity.this);
-                if (code.equalsIgnoreCase("Manual")) {
-                    Log.e("TAG", "Setting updated to manual.....");
-                } else {
-                    List<Submissions> submissionList = myViewModel.getUnsyncedSubmissions(this, SubmissionsStatus.SUBMITTED.name());
-                    for (Submissions sm : submissionList) {
-                        DbSaveDataEntry dataEntry = myViewModel.getSubmitSync(this, sm);
-                        if (dataEntry != null) {
-                            retrofitCalls.submitSyncData(this, dataEntry, sm, myViewModel);
+                try {
+                    if (code != null && code.equalsIgnoreCase("Manual")) {
+                        Log.e("TAG", "Setting updated to manual.....");
+                    } else {
+                        List<Submissions> submissionList = myViewModel.getUnsyncedSubmissions(this, SubmissionsStatus.SUBMITTED.name());
+                        for (Submissions sm : submissionList) {
+                            DbSaveDataEntry dataEntry = myViewModel.getSubmitSync(this, sm);
+                            if (dataEntry != null) {
+                                retrofitCalls.submitSyncData(this, dataEntry, sm, myViewModel);
+                            }
                         }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             } else {
                 List<Submissions> submissionList = myViewModel.getUnsyncedSubmissions(this, SubmissionsStatus.SUBMITTED.name());

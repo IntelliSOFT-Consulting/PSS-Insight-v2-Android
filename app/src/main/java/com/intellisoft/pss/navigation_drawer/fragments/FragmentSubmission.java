@@ -80,7 +80,7 @@ public class FragmentSubmission extends Fragment {
                     "",
                     status,
                     userId,
-                    year,false
+                    year,"","",false
             );
             myViewModel.initiateSubmissions(submissions);
             formatterClass.saveSharedPref(SubmissionQueue.INITIATED.name(), "", requireContext());

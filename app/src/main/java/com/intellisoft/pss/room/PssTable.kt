@@ -40,6 +40,8 @@ data class Submissions(
     val status: String,
     var userId: String,
     var period: String,
+    @ColumnInfo(name = "json_data") val jsonData: String,
+    var serverId: String,
     @ColumnInfo(name = "is_synced") var isSynced: Boolean = false
 ) {
   @PrimaryKey(autoGenerate = true) var id: Int? = null
