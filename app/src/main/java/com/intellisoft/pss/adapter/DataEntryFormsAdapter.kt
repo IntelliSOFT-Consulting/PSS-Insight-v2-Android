@@ -171,7 +171,7 @@ class DataEntryFormsAdapter(
       holder.tvUserAttachment.movementMethod = LinkMovementMethod.getInstance()
     }
     holder.tvQuestion.text = name
-    if (status == SubmissionsStatus.SUBMITTED.name) {
+    if (status == SubmissionsStatus.SUBMITTED.name||status == SubmissionsStatus.PUBLISHED.name) {
 
       holder.radioNo.isEnabled = false
       holder.radioYes.isEnabled = false

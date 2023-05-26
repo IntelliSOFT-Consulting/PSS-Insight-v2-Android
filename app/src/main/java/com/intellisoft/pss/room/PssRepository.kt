@@ -115,13 +115,9 @@ class PssRepository(private val roomDao: RoomDao) {
     }
   }
   fun checkAddSubmissions(submissions: Submissions) {
-    val userId = submissions.userId
-    val date = submissions.date
-    val status = submissions.status
-
-    val isSubmissions = roomDao.checkSubmissions(userId, date, status)
+    val serverId = submissions.serverId
+    val isSubmissions = roomDao.checkServerSubmissions(serverId)
     if (!isSubmissions) {
-
       roomDao.addSubmissions(submissions)
     }
   }
@@ -177,7 +173,7 @@ class PssRepository(private val roomDao: RoomDao) {
         val dbResponses = DbResponses(indicatorId, valueResponse, valueComment, "")
         dbResponsesList.add(dbResponses)
       }
-      return DbSaveDataEntry("", "2023", "COMPLETED", userId, dbResponsesList)
+      return DbSaveDataEntry("", "2023", "COMPLETED", userId,"", dbResponsesList)
     }
     return null
   }
@@ -213,7 +209,7 @@ class PssRepository(private val roomDao: RoomDao) {
         dbResponsesList.add(dbResponses)
       }
       return DbSaveDataEntry(
-          submissions.orgCode, submissions.period, "COMPLETED", userId, dbResponsesList)
+          submissions.orgCode, submissions.period, "COMPLETED", userId,submissions.date, dbResponsesList)
     }
     return null
   }
@@ -268,7 +264,7 @@ class PssRepository(private val roomDao: RoomDao) {
     } else {
       val submissionsDetails = roomDao.getSubmissionsById(userId, submissionId)
 
-      roomDao.updateSubmissionOrg(status, submissionId, peri, org,orgCode)
+      roomDao.updateSubmissionOrg(status, submissionId, peri, org, orgCode)
     }
   }
 
@@ -375,5 +371,4 @@ class PssRepository(private val roomDao: RoomDao) {
       roomDao.updateOriginalResponses(userId, id, response)
     }
   }
-
 }

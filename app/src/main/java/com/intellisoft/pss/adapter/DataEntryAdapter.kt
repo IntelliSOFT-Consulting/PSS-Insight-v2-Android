@@ -82,7 +82,7 @@ class DataEntryAdapter(
         val current = hidden.text
 
         if (checked) {
-//          canProvideAnswers = true
+          //          canProvideAnswers = true
           myViewModel.deleteAllSubmitted(context, current.toString(), currentSession)
           etValue.isEnabled = false
           radioYes.isEnabled = false
@@ -90,7 +90,7 @@ class DataEntryAdapter(
           radioYes.isChecked = false
           radioNo.isChecked = false
         } else {
-//          canProvideAnswers = false
+          //          canProvideAnswers = false
           etValue.isEnabled = true
           radioYes.isEnabled = true
           radioNo.isEnabled = true
@@ -318,7 +318,7 @@ class DataEntryAdapter(
       holder.tvUserAttachment.movementMethod = LinkMovementMethod.getInstance()
     }
     holder.tvQuestion.text = it.name
-    if (status == SubmissionsStatus.SUBMITTED.name) {
+    if (status == SubmissionsStatus.SUBMITTED.name || status == SubmissionsStatus.PUBLISHED.name) {
 
       holder.radioNo.isEnabled = false
       holder.radioYes.isEnabled = false

@@ -53,9 +53,10 @@ interface RoomDao {
   @Query(
       "SELECT EXISTS (SELECT 1 FROM submissions WHERE userId =:userId AND date =:date AND status =:status)")
   fun checkSubmissions(userId: String, date: String, status: String): Boolean
+  @Query("SELECT EXISTS (SELECT 1 FROM submissions WHERE serverId =:serverId)")
+  fun checkServerSubmissions(serverId: String): Boolean
 
-  @Query(
-      "SELECT EXISTS (SELECT 1 FROM submissions WHERE userId =:userId  AND id =:id)")
+  @Query("SELECT EXISTS (SELECT 1 FROM submissions WHERE userId =:userId  AND id =:id)")
   fun checkSubmissionPerId(userId: String, id: String): Boolean
   @Query("SELECT * FROM submissions WHERE userId =:userId ORDER BY id DESC")
   fun getSubmissions(userId: String): List<Submissions>
@@ -68,7 +69,13 @@ interface RoomDao {
 
   @Query(
       "UPDATE submissions SET status =:status, period =:period, organization =:organization,orgCode=:orgCode WHERE id =:id")
-  fun updateSubmissionOrg(status: String, id: String, period: String, organization: String, orgCode: String)
+  fun updateSubmissionOrg(
+      status: String,
+      id: String,
+      period: String,
+      organization: String,
+      orgCode: String
+  )
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun addOrganizations(organizationData: Organizations)
 
@@ -116,15 +123,16 @@ interface RoomDao {
       imageUrl: String,
       is_synced: Boolean
   )
-  @Query("SELECT * FROM images WHERE userId =:userId AND indicatorId =:indicatorId AND submissionId =:submissionId")
+  @Query(
+      "SELECT * FROM images WHERE userId =:userId AND indicatorId =:indicatorId AND submissionId =:submissionId")
   fun getIndicatorImage(userId: String, indicatorId: String, submissionId: String): Image?
-  @Query("DELETE FROM responses WHERE userId =:userId AND submissionId =:submissionId AND indicatorId =:id")
+  @Query(
+      "DELETE FROM responses WHERE userId =:userId AND submissionId =:submissionId AND indicatorId =:id")
   fun deleteAllSubmitted(userId: String, id: String, submissionId: String)
-
 
   @Query("DELETE FROM comments") fun clearComments()
   @Query("DELETE FROM responses") fun clearResponses()
   @Query(
-    "UPDATE submissions SET json_data =:json_data WHERE serverId =:serverId AND userId =:userId")
-    fun updateOriginalResponses(userId: String, serverId: String, json_data: String)
+      "UPDATE submissions SET json_data =:json_data WHERE serverId =:serverId AND userId =:userId")
+  fun updateOriginalResponses(userId: String, serverId: String, json_data: String)
 }

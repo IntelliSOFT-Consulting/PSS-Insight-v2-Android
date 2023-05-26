@@ -1,20 +1,11 @@
 package com.intellisoft.pss.navigation_drawer.fragments;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -22,8 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -34,7 +23,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -42,10 +30,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputLayout;
 import com.intellisoft.pss.helper_class.DbDataEntry;
 import com.intellisoft.pss.helper_class.DbDataEntryDetails;
 import com.intellisoft.pss.helper_class.DbDataEntryForm;
+import com.intellisoft.pss.helper_class.DbDataEntrySubmit;
 import com.intellisoft.pss.helper_class.DbIndicators;
 import com.intellisoft.pss.helper_class.DbIndicatorsDetails;
 import com.intellisoft.pss.helper_class.DbSaveDataEntry;
@@ -64,7 +52,6 @@ import com.intellisoft.pss.room.Organizations;
 import com.intellisoft.pss.room.PssViewModel;
 import com.intellisoft.pss.room.Submissions;
 import com.intellisoft.pss.viewmodels.StatusViewModel;
-import com.intellisoft.pss.widgets.CustomRecyclerView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -397,25 +384,20 @@ public class FragmentDataEntry extends Fragment {
                 if (submission.getServerId().isEmpty()) {
                     loadPublishedIndicators();
                 } else {
-                    loadRetrievedIndicators();
+                    loadRetrievedIndicators(submission.getJsonData());
                 }
             }
         }
     }
 
-    private void loadRetrievedIndicators() {
-        IndicatorsData indicatorsData = myViewModel.getAllMyData(requireContext());
-        if (indicatorsData != null) {
-
+    private void loadRetrievedIndicators(String data) {
+        Log.e("TAG","Json Data"+data);
+        if (data != null) {
             int indicatorSize = 0;
             ArrayList<DbDataEntryForm> dbDataEntryFormList = new ArrayList<>();
-            String jsonData = indicatorsData.getJsonData();
-
             Converters converters = new Converters();
-            DbDataEntry dataEntry = converters.fromJson(jsonData);
+            DbDataEntrySubmit dataEntry = converters.fromResubmitJson(data);
             List<DbDataEntryDetails> detailsList = dataEntry.getDetails();
-            String referenceSheet = dataEntry.getReferenceSheet();
-            formatterClass.saveSharedPref("referenceSheet", referenceSheet, requireContext());
             if (!detailsList.isEmpty()) {
                 for (int j = 0; j < detailsList.size(); j++) {
 

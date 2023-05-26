@@ -10,6 +10,7 @@ import com.google.gson.JsonObject
 import com.intellisoft.pss.helper_class.DbSaveDataEntry
 import com.intellisoft.pss.helper_class.FormatterClass
 import com.intellisoft.pss.helper_class.ImageResponse
+import com.intellisoft.pss.helper_class.SubmissionsStatus
 import com.intellisoft.pss.room.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -184,7 +185,13 @@ class RetrofitCalls {
               val apiService =
                   RetrofitBuilder.getRetrofit(context, baseUrl).create(Interface::class.java)
               try {
-                val apiInterface = apiService.submitData(dbSaveDataEntry)
+                val apiInterface =
+                    if (sm.serverId.isNotEmpty()) {
+                      apiService.reSubmitData(sm.serverId, dbSaveDataEntry)
+                    } else {
+                      apiService.submitData(dbSaveDataEntry)
+                    }
+
                 messageToast =
                     if (apiInterface.isSuccessful) {
                       val statusCode = apiInterface.code()
@@ -381,17 +388,25 @@ class RetrofitCalls {
                     val dataEntryDate = jsonObject.get("dataEntryDate").asString
                     val selectedPeriod = jsonObject.get("selectedPeriod").asString
                     if (status.isNotEmpty()) {
+                      var stat = SubmissionsStatus.PUBLISHED.name
                       if (status != "DRAFT") {
                         var sync = true
+                        if (status == "PUBLISHED") {
+                          stat = SubmissionsStatus.PUBLISHED.name
+                        }
+                        if (status == "SUBMITTED") {
+                          stat = SubmissionsStatus.SUBMITTED.name
+                        }
                         if (status == "REJECTED") {
                           sync = false
+                          stat = SubmissionsStatus.REJECTED.name
                         }
                         val submissions =
                             Submissions(
                                 formatDateInput(dataEntryDate),
                                 "organizationsName",
                                 "orgCode",
-                                status,
+                                stat,
                                 username,
                                 selectedPeriod,
                                 "",

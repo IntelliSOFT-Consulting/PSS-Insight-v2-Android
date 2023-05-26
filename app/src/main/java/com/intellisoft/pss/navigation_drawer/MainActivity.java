@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             DbSaveDataEntry dataEntry = myViewModel.getSubmitSync(this, sm);
                             if (dataEntry != null) {
                                 retrofitCalls.submitSyncData(this, dataEntry, sm, myViewModel);
+
                             }
                         }
                     }

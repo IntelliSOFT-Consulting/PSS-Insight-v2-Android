@@ -12,6 +12,12 @@ class Converters {
         return gson.fromJson(json, DbDataEntry::class.java)
 
     }
+  @TypeConverter
+    fun fromResubmitJson(json: String): DbDataEntrySubmit {
+        // convert json to MyJsonData object
+        return gson.fromJson(json, DbDataEntrySubmit::class.java)
+
+    }
 
     @TypeConverter
     fun toJson(data: DbDataEntry): String {

@@ -9,8 +9,12 @@ interface Interface {
 
   @POST("data-entry/response/save")
   suspend fun submitData(@Body dbSaveDataEntry: DbSaveDataEntry): Response<Any>
+  @PUT("data-entry/response/{id}")
+  suspend fun reSubmitData(
+    @Path("id") id: String,
+    @Body dbSaveDataEntry: DbSaveDataEntry
+  ): Response<Any>
 
-  //  @GET("national-template/details")
   @GET("national-template/published-indicators") suspend fun getDataEntry(): Response<DbDataEntry>
   @GET("data-entry/response")
   suspend fun getResponses(

@@ -68,6 +68,10 @@ data class DbDataEntry(
     val count: Int,
     val details: List<DbDataEntryDetails>
 )
+data class DbDataEntrySubmit(
+    val count: Int,
+    val details: List<DbDataEntryDetails>
+)
 
 data class DbReportDetailsEntry(
     val id: Int,
@@ -134,6 +138,7 @@ data class DbSaveDataEntry(
     val selectedPeriod: String,
     val status: String,
     val dataEntryPersonId: String,
+    val dataEntryDate: String,
     val responses: List<DbResponses>,
 )
 
