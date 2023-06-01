@@ -98,6 +98,8 @@ class DataEntryAdapter(
           forms.forEach {
             if (it.code != dbDataEntryFormList[pos].categoryCode) {
               deleteAllSubmitted(it, myViewModel, recyclerView)
+              //disable all items on the child fragments at this positions
+
             }
           }
         }
@@ -146,6 +148,7 @@ class DataEntryAdapter(
       }
     }
 
+
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -163,11 +166,12 @@ class DataEntryAdapter(
   }
 
   private fun deleteAllSubmitted(
-      it: DbIndicators,
-      myViewModel: PssViewModel,
-      recyclerView: RecyclerView
+    it: DbIndicators,
+    myViewModel: PssViewModel,
+    recyclerView: RecyclerView
   ) {
     myViewModel.deleteAllSubmitted(context, it.id, currentSession)
+
     notifyDataSetChanged()
   }
   fun onAlertDialog(myViewModel: PssViewModel, userId: String, indicatorId: String) {
@@ -339,3 +343,4 @@ class DataEntryAdapter(
     return dbDataEntryFormList.size
   }
 }
+

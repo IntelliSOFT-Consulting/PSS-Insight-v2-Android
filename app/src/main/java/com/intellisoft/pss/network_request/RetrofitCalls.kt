@@ -262,7 +262,6 @@ class RetrofitCalls {
 
       val formatterClass = FormatterClass()
       val baseUrl = formatterClass.getSharedPref("serverUrl1", context)
-
       val username = formatterClass.getSharedPref("username", context)
       if (baseUrl != null && username != null) {
         val apiService = RetrofitBuilder.getRetrofit(context, baseUrl).create(Interface::class.java)
@@ -278,6 +277,15 @@ class RetrofitCalls {
                 try {
                   val json = Gson().fromJson(converters, JsonObject::class.java)
                   val jsonArray = json.getAsJsonArray("organisationUnits")
+                  val surname = json.get("surname").asString
+                  val username1 = json.get("username").asString
+                  val id = json.get("id").asString
+                  val firstName = json.get("firstName").asString
+
+                  formatterClass.saveSharedPref("userId", id, context)
+                  formatterClass.saveSharedPref("userSurname", surname, context)
+                  formatterClass.saveSharedPref("userUsername", username1, context)
+                  formatterClass.saveSharedPref("userFirstName", firstName, context)
                   myViewModel.deleteAllOrganizations()
                   for (i in 0 until jsonArray.size()) {
                     val jsonObject = jsonArray.get(i).asJsonObject
@@ -320,7 +328,6 @@ class RetrofitCalls {
                 val converters = Converters().toJsonResponseDetails(body)
                 try {
                   val json = Gson().fromJson(converters, JsonObject::class.java)
-                  Log.e("TAG", "json data:::: $json")
                   val indicatorsObject = json.getAsJsonObject("indicators")
                   myViewModel.updateOriginalResponses(context, id, indicatorsObject.toString())
                 } catch (e: Exception) {
@@ -352,6 +359,7 @@ class RetrofitCalls {
       println(formattedDate) // Output: "2023-5-25"
       date = formattedDate
     } catch (e: Exception) {
+      date = "$inputDate"
       println("Error occurred while parsing or formatting the date")
     }
     return date

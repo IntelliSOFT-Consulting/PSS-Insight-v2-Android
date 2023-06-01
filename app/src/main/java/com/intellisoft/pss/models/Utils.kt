@@ -61,7 +61,6 @@ class Utils {
     dialog.window?.setLayout(width, height)
 
     val imgSuccess = dialog.findViewById(R.id.img_success) as ImageView
-    val mWebView = dialog.findViewById(R.id.webView) as WebView
     try {
       val image = myViewModel.getImage(context, userId, indicatorId, submissionId)
       if (image != null) {
@@ -69,16 +68,9 @@ class Utils {
         if (image.isImage) {
           val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
           imgSuccess.setImageBitmap(bitmap)
-        } else {
-          imgSuccess.visibility = View.GONE
-          mWebView.visibility = View.VISIBLE
-          mWebView.settings.javaScriptEnabled = true
-          mWebView.settings.builtInZoomControls = true
-          mWebView.settings.displayZoomControls = false
-          val pdfBase64 = Base64.encodeToString(byteArray, Base64.NO_WRAP)
-          val dataUrl = "data:application/pdf;base64,$pdfBase64"
-          mWebView.loadUrl(dataUrl)
+          imgSuccess.scaleType = ImageView.ScaleType.FIT_CENTER
         }
+
       }
     } catch (e: Exception) {
       e.printStackTrace()

@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Log.e(TAG, "Error.... Exception" + e.getMessage());
                 }
             } else {
                 List<Submissions> submissionList = myViewModel.getUnsyncedSubmissions(this, SubmissionsStatus.SUBMITTED.name());
@@ -230,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         formatterClass.saveSharedPref(FileUpload.INDICATOR.name(), indicatorId, MainActivity.this);
         formatterClass.saveSharedPref(FileUpload.SUBMISSION.name(), submissionId, MainActivity.this);
 
-        CharSequence[] options = new CharSequence[]{"Take Photo", "Choose from Gallery", "Choose PDF", "Cancel"};
+        CharSequence[] options = new CharSequence[]{"Take Photo", "Choose from Gallery", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Select Option");
         builder.setItems(options, (dialog, item) -> {
@@ -247,12 +248,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     isPdf = false;
                     launchCamera();
                     break;
+//                case 2:
+//                    isCamera = false;
+//                    isPdf = true;
+//                    launchCamera();
+//                    break;
                 case 2:
-                    isCamera = false;
-                    isPdf = true;
-                    launchCamera();
-                    break;
-                case 3:
                     dialog.dismiss();
                     break;
             }

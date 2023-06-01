@@ -68,10 +68,8 @@ data class DbDataEntry(
     val count: Int,
     val details: List<DbDataEntryDetails>
 )
-data class DbDataEntrySubmit(
-    val count: Int,
-    val details: List<DbDataEntryDetails>
-)
+
+data class DbDataEntrySubmit(val count: Int, val details: List<DbDataEntryDetails>)
 
 data class DbReportDetailsEntry(
     val id: Int,
@@ -116,7 +114,12 @@ data class DbPersonDetails(
     val email: String?,
 )
 
-data class DbOrganizationEntry(val organisationUnits: List<DbOrganizationEntryDetails>)
+data class DbOrganizationEntry(
+    val id: String,
+    val username: String,
+    val surname: String,
+    val firstName: String,
+    val organisationUnits: List<DbOrganizationEntryDetails>)
 
 data class DbSubmissionEntry(val count: Int, val details: List<DbSubmissionEntryDetails>)
 
@@ -140,6 +143,14 @@ data class DbSaveDataEntry(
     val dataEntryPersonId: String,
     val dataEntryDate: String,
     val responses: List<DbResponses>,
+    val dataEntryPerson: DataEntryPerson
+)
+
+data class DataEntryPerson(
+    val id: String,
+    val username: String,
+    val firstName: String,
+    val surname: String
 )
 
 data class DbFileDataEntry(

@@ -5,6 +5,7 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -62,8 +63,7 @@ class Login : AppCompatActivity() {
             CoroutineScope(Dispatchers.Main).launch {
               progressDialog.dismiss()
               if (isLoggedIn) {
-                val intent = Intent(this@Login, SynchingPage::class.java)
-                startActivity(intent)
+
 
                 formatterClass.saveSharedPref("serverUrl1", serverUrl, this@Login)
                 formatterClass.saveSharedPref("serverUrl", SERVER_URL, this@Login)
@@ -71,6 +71,9 @@ class Login : AppCompatActivity() {
                 formatterClass.saveSharedPref("username", username, this@Login)
                 formatterClass.saveSharedPref("password", password, this@Login)
                 formatterClass.saveSharedPref("isLoggedIn", "true", this@Login)
+
+                val intent = Intent(this@Login, SynchingPage::class.java)
+                startActivity(intent)
               } else {
                 Toast.makeText(this@Login, "Login Failed", Toast.LENGTH_SHORT).show()
               }

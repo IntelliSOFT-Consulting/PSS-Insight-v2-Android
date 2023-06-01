@@ -1,6 +1,7 @@
 package com.intellisoft.pss.room
 
 import android.content.Context
+import com.intellisoft.pss.helper_class.DataEntryPerson
 import com.intellisoft.pss.helper_class.DbResponses
 import com.intellisoft.pss.helper_class.DbSaveDataEntry
 import com.intellisoft.pss.helper_class.FormatterClass
@@ -173,7 +174,12 @@ class PssRepository(private val roomDao: RoomDao) {
         val dbResponses = DbResponses(indicatorId, valueResponse, valueComment, "")
         dbResponsesList.add(dbResponses)
       }
-      return DbSaveDataEntry("", "2023", "COMPLETED", userId,"", dbResponsesList)
+
+      val id = formatterClass.getSharedPref("userId", context)
+      val firstName = formatterClass.getSharedPref("firstName", context)
+      val userSurname = formatterClass.getSharedPref("userSurname", context)
+      val dataEntryPerson = DataEntryPerson("$id", username = userId, firstName = "$firstName", surname = "$userSurname")
+      return DbSaveDataEntry("", "2023", "COMPLETED", userId, "", dbResponsesList, dataEntryPerson)
     }
     return null
   }
@@ -208,8 +214,18 @@ class PssRepository(private val roomDao: RoomDao) {
         val dbResponses = DbResponses(indicatorId, valueResponse, valueComment, attachmentValue)
         dbResponsesList.add(dbResponses)
       }
+      val id = formatterClass.getSharedPref("userId", context)
+      val firstName = formatterClass.getSharedPref("firstName", context)
+      val userSurname = formatterClass.getSharedPref("userSurname", context)
+      val dataEntryPerson = DataEntryPerson("$id", username = userId, firstName = "$firstName", surname = "$userSurname")
       return DbSaveDataEntry(
-          submissions.orgCode, submissions.period, "COMPLETED", userId,submissions.date, dbResponsesList)
+          submissions.orgCode,
+          submissions.period,
+          "COMPLETED",
+          userId,
+          submissions.date,
+          dbResponsesList,
+          dataEntryPerson)
     }
     return null
   }

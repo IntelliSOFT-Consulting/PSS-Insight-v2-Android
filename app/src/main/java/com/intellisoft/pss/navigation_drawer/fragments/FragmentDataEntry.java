@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -222,6 +223,8 @@ public class FragmentDataEntry extends Fragment {
     }
 
     private void submissionDialog() {
+
+        //show this dialog 3 seconds then dismiss plus have the button as weel
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_custom, null);
         builder.setView(dialogView);
@@ -231,12 +234,28 @@ public class FragmentDataEntry extends Fragment {
 
         okButton.setOnClickListener(v -> {
 
-            Intent intent = new Intent(requireContext(), MainActivity.class);
-            startActivity(intent);
+            navigateToSubmissions();
         });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
 
+// Dismiss the dialog after 3 seconds
+        new Handler().postDelayed(() -> {
+            if (alertDialog.isShowing()) {
+                alertDialog.dismiss();
+            }
+            navigateToSubmissions();
+        }, 2000);
+
+    }
+
+    private void navigateToSubmissions() {
+
+        formatterClass.saveSharedPref(NavigationValues.NAVIGATION.name(),
+                NavigationValues.SUBMISSION.name(), requireContext());
+        Intent intent = new Intent(requireContext(), MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     private void loadInitial() {

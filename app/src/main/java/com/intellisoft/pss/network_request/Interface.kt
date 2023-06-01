@@ -23,7 +23,7 @@ interface Interface {
   @GET("data-entry/response/{id}")
   suspend fun getResponseDetails(@Path("id") id: String): Response<DbReportDetailsEntry>
 
-  @GET("/api/me.json?fields=organisationUnits[name,id]")
+  @GET("/api/me.json?fields=id,username,surname,firstName,organisationUnits[name,id]")
   suspend fun getOrganizations(): Response<DbOrganizationEntry>
 
   @Multipart
