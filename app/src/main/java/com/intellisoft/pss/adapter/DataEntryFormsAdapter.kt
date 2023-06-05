@@ -28,8 +28,7 @@ class DataEntryFormsAdapter(
     private val context: Context,
     private val submissionId: String,
     private val fragmentDataEntry: FragmentDataEntry,
-    private val status: String,
-    private val canProvideAnswers: Boolean
+    private val status: String
 ) : RecyclerView.Adapter<DataEntryFormsAdapter.Pager2ViewHolder>() {
 
   inner class Pager2ViewHolder(itemView: View) :
@@ -116,21 +115,7 @@ class DataEntryFormsAdapter(
     val userId = FormatterClass().getSharedPref("username", context)
     val name = dbDataEntryFormList[position].name
     val indicatorId = dbDataEntryFormList[position].id
-//    if (canProvideAnswers) {
-//      holder.etValue.isEnabled = true
-//      holder.radioYes.isEnabled = true
-//      holder.radioNo.isEnabled = true
-//      holder.radioYes.isChecked = true
-//      holder.radioNo.isChecked = true
-//
-//    } else {
-//
-//      holder.etValue.isEnabled = false
-//      holder.radioYes.isEnabled = false
-//      holder.radioNo.isEnabled = false
-//      holder.radioYes.isChecked = false
-//      holder.radioNo.isChecked = false
-//    }
+    val canAnswer = dbDataEntryFormList[position].canAnswer
 
     when (dbDataEntryFormList[position].valueType) {
       "BOOLEAN" -> {
@@ -171,13 +156,26 @@ class DataEntryFormsAdapter(
       holder.tvUserAttachment.movementMethod = LinkMovementMethod.getInstance()
     }
     holder.tvQuestion.text = name
-    if (status == SubmissionsStatus.SUBMITTED.name||status == SubmissionsStatus.PUBLISHED.name) {
-
+    if (status == SubmissionsStatus.SUBMITTED.name || status == SubmissionsStatus.PUBLISHED.name) {
       holder.radioNo.isEnabled = false
       holder.radioYes.isEnabled = false
       holder.etValue.isEnabled = false
       holder.tvAttachment.isEnabled = false
       holder.tvComment.isEnabled = false
+    } else {
+      if (canAnswer) {
+        holder.radioNo.isEnabled = true
+        holder.radioYes.isEnabled = true
+        holder.etValue.isEnabled = true
+        holder.tvAttachment.isEnabled = true
+        holder.tvComment.isEnabled = true
+      }else{
+        holder.radioNo.isEnabled = false
+        holder.radioYes.isEnabled = false
+        holder.etValue.isEnabled = false
+        holder.tvAttachment.isEnabled = false
+        holder.tvComment.isEnabled = false
+      }
     }
     holder.radioNo.setOnCheckedChangeListener { _, isChecked ->
       if (isChecked) {

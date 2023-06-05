@@ -44,6 +44,8 @@ data class Submissions(
     var serverId: String,
     @ColumnInfo(name = "is_synced") var isSynced: Boolean = false
 ) {
+
+
   @PrimaryKey(autoGenerate = true) var id: Int? = null
 }
 
@@ -60,12 +62,11 @@ data class Image(
     val userId: String?,
     var submissionId: String?,
     var indicatorId: String?,
-    @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
-    val image: ByteArray,
-    val fileName:String,
+    @ColumnInfo(typeAffinity = ColumnInfo.BLOB) val image: ByteArray,
+    val fileName: String,
     var imageUrl: String?,
     @ColumnInfo(name = "is_synced") var isSynced: Boolean = false,
     @ColumnInfo(name = "isImage") var isImage: Boolean = true
 ) {
-    @PrimaryKey(autoGenerate = true) var id: Int? = null
+  @PrimaryKey(autoGenerate = true) var id: Int? = null
 }

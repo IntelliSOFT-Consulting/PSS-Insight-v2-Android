@@ -57,7 +57,7 @@ class Utils {
     dialog.setCancelable(false)
     dialog.setContentView(R.layout.custom_image_dialog)
     val width = ViewGroup.LayoutParams.MATCH_PARENT
-    val height = ViewGroup.LayoutParams.WRAP_CONTENT
+    val height = ViewGroup.LayoutParams.MATCH_PARENT
     dialog.window?.setLayout(width, height)
 
     val imgSuccess = dialog.findViewById(R.id.img_success) as ImageView
@@ -68,7 +68,7 @@ class Utils {
         if (image.isImage) {
           val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
           imgSuccess.setImageBitmap(bitmap)
-          imgSuccess.scaleType = ImageView.ScaleType.FIT_CENTER
+          imgSuccess.scaleType = ImageView.ScaleType.FIT_XY
         }
 
       }

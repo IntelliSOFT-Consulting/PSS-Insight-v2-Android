@@ -146,7 +146,7 @@ public class FragmentDataEntry extends Fragment {
             }
             formatterClass.saveSharedPref(PositionStatus.CURRENT.name(), "0", requireContext());
 
-            saveSubmission(SubmissionsStatus.DRAFT.name(), period, organizationsCode,orgCode);
+            saveSubmission(SubmissionsStatus.DRAFT.name(), period, organizationsCode, orgCode);
             Intent intent = new Intent(requireContext(), MainActivity.class);
             startActivity(intent);
 
@@ -172,7 +172,7 @@ public class FragmentDataEntry extends Fragment {
                 return;
             }
             formatterClass.saveSharedPref(PositionStatus.CURRENT.name(), "0", requireContext());
-            saveSubmission(SubmissionsStatus.SUBMITTED.name(), period, organizationsCode,orgCode);
+            saveSubmission(SubmissionsStatus.SUBMITTED.name(), period, organizationsCode, orgCode);
             DbSaveDataEntry dataEntry = myViewModel.getSubmitData(requireContext());
             if (dataEntry != null) {
                 submissionDialog();
@@ -378,10 +378,11 @@ public class FragmentDataEntry extends Fragment {
                     orgCode,
                     status,
                     userId,
-                    period, "", "", false
+                    period,
+                    retrieveInitialData(), confirmServerId(), false
             );
             if (submissionId == null) {
-                myViewModel.addSubmissions(submissions);
+                Toast.makeText(requireContext(), "Please try again", Toast.LENGTH_SHORT).show();
             } else {
                 myViewModel.updateSubmissions(submissions, submissionId);
             }
@@ -389,6 +390,56 @@ public class FragmentDataEntry extends Fragment {
         formatterClass.saveSharedPref(NavigationValues.NAVIGATION.name(),
                 NavigationValues.SUBMISSION.name(), requireContext());
 
+    }
+
+    private String retrieveInitialData() {
+        Submissions submission = myViewModel.getSubmission(submissionId, requireContext());
+        if (submission != null) {
+            if (submission.getJsonData().isEmpty()) {
+
+                return updateAndRefresh(submission);
+            } else {
+                return submission.getJsonData();
+            }
+        }
+        return "";
+    }
+
+    private String updateAndRefresh(Submissions ab) {
+        Submissions sub = new Submissions(
+                ab.getDate(),
+                ab.getOrganization(),
+                ab.getOrgCode(),
+                ab.getStatus(),
+                ab.getUserId(),
+                ab.getPeriod(),
+                quickData(),
+                ab.getServerId(), ab.isSynced()
+        );
+        myViewModel.updateSubmissions(sub, submissionId);
+        return sub.getJsonData();
+
+    }
+
+    private String quickData() {
+        IndicatorsData indicatorsData = myViewModel.getAllMyData(requireContext());
+        if (indicatorsData != null) {
+            String jsonData = indicatorsData.getJsonData();
+            Converters converters = new Converters();
+            DbDataEntry dataEntry = converters.fromJson(jsonData);
+            String referenceSheet = dataEntry.getReferenceSheet();
+            formatterClass.saveSharedPref("referenceSheet", referenceSheet, requireContext());
+            return jsonData;
+        }
+        return "";
+    }
+
+    private String confirmServerId() {
+        Submissions submission = myViewModel.getSubmission(submissionId, requireContext());
+        if (submission != null) {
+            return submission.getServerId();
+        }
+        return null;
     }
 
     @Override
@@ -400,60 +451,64 @@ public class FragmentDataEntry extends Fragment {
         } else {
             Submissions submission = myViewModel.getSubmission(submissionId, requireContext());
             if (submission != null) {
-                if (submission.getServerId().isEmpty()) {
-                    loadPublishedIndicators();
-                } else {
-                    loadRetrievedIndicators(submission.getJsonData());
-                }
+//                if (submission.getServerId().isEmpty()) {
+//                    loadPublishedIndicators();
+//                } else {
+                loadRetrievedIndicators(submission);
+//                }
             }
         }
     }
 
-    private void loadRetrievedIndicators(String data) {
-        Log.e("TAG","Json Data"+data);
+    private void loadRetrievedIndicators(Submissions data) {
         if (data != null) {
-            int indicatorSize = 0;
-            ArrayList<DbDataEntryForm> dbDataEntryFormList = new ArrayList<>();
-            Converters converters = new Converters();
-            DbDataEntrySubmit dataEntry = converters.fromResubmitJson(data);
-            List<DbDataEntryDetails> detailsList = dataEntry.getDetails();
-            if (!detailsList.isEmpty()) {
-                for (int j = 0; j < detailsList.size(); j++) {
+            try {
+                int indicatorSize = 0;
+                ArrayList<DbDataEntryForm> dbDataEntryFormList = new ArrayList<>();
+                Converters converters = new Converters();
+                DbDataEntrySubmit dataEntry = converters.fromResubmitJson(data.getJsonData());
+                List<DbDataEntryDetails> detailsList = dataEntry.getDetails();
+                if (!detailsList.isEmpty()) {
+                    for (int j = 0; j < detailsList.size(); j++) {
 
-                    List<DbIndicatorsDetails> indicators = detailsList.get(j).getIndicators();
+                        List<DbIndicatorsDetails> indicators = detailsList.get(j).getIndicators();
 
-                    for (int i = 0; i < indicators.size(); i++) {
-                        String categoryId = indicators.get(i).getCategoryId();
-                        String categoryCode = indicators.get(i).getCategoryCode();
-                        String categoryName = indicators.get(i).getCategoryName();
-                        String indicatorName = indicators.get(i).getIndicatorName();
-                        String description = indicators.get(i).getDescription();
+                        for (int i = 0; i < indicators.size(); i++) {
+                            String categoryId = indicators.get(i).getCategoryId();
+                            String categoryCode = indicators.get(i).getCategoryCode();
+                            String categoryName = indicators.get(i).getCategoryName();
+                            String indicatorName = indicators.get(i).getIndicatorName();
+                            String description = indicators.get(i).getDescription();
 
-                        ArrayList<DbIndicators> indicatorsList = (ArrayList<DbIndicators>) indicators.get(i).getIndicatorDataValue();
-                        indicatorSize = indicatorSize + indicatorsList.size();
+                            ArrayList<DbIndicators> indicatorsList = (ArrayList<DbIndicators>) indicators.get(i).getIndicatorDataValue();
+                            indicatorSize = indicatorSize + indicatorsList.size();
 
-                        DbDataEntryForm dbDataEntryForm = new DbDataEntryForm(
-                                categoryCode, categoryName, indicatorName, categoryId, indicatorsList, description);
-                        dbDataEntryFormList.add(dbDataEntryForm);
+                            DbDataEntryForm dbDataEntryForm = new DbDataEntryForm(
+                                    categoryCode, categoryName, indicatorName, categoryId, indicatorsList, description);
+                            dbDataEntryFormList.add(dbDataEntryForm);
+                        }
                     }
-                }
-                String status = SubmissionsStatus.DRAFT.name();
-                Submissions submission1 = myViewModel.getSubmission(submissionId, requireContext());
-                if (submission1 != null) {
-                    status = submission1.getStatus();
-                }
-                dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId, status, FragmentDataEntry.this, statusViewModel);
-                mRecyclerView.setAdapter(dataEntryAdapter);
+                    String status = SubmissionsStatus.DRAFT.name();
+                    Submissions submission1 = myViewModel.getSubmission(submissionId, requireContext());
+                    if (submission1 != null) {
+                        status = submission1.getStatus();
+                    }
+                    dataEntryAdapter = new DataEntryAdapter(dbDataEntryFormList, requireContext(), submissionId, status, FragmentDataEntry.this, statusViewModel);
+                    mRecyclerView.setAdapter(dataEntryAdapter);
 
-                formatterClass.saveSharedPref("indicatorSize",
-                        String.valueOf(indicatorSize), requireContext());
+                    formatterClass.saveSharedPref("indicatorSize",
+                            String.valueOf(indicatorSize), requireContext());
 
-                controlPagination(indicatorSize);
-            } else {
-                Toast.makeText(requireContext(), "There are no published indicators. Please try again later!!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(requireContext(), MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
+                    controlPagination(indicatorSize);
+                } else {
+                    Toast.makeText(requireContext(), "There are no published indicators. Please try again later!!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(requireContext(), MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                loadPublishedIndicators();
             }
         }
     }

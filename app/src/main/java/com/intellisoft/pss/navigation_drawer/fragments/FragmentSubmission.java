@@ -15,6 +15,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.intellisoft.pss.helper_class.DbDataEntry;
+import com.intellisoft.pss.helper_class.DbDataEntryDetails;
+import com.intellisoft.pss.helper_class.DbDataEntryForm;
 import com.intellisoft.pss.helper_class.PositionStatus;
 import com.intellisoft.pss.helper_class.SubmissionQueue;
 import com.intellisoft.pss.helper_class.SubmissionsStatus;
@@ -23,6 +26,8 @@ import com.intellisoft.pss.helper_class.FormatterClass;
 import com.intellisoft.pss.helper_class.NavigationValues;
 import com.intellisoft.pss.R;
 import com.intellisoft.pss.navigation_drawer.MainActivity;
+import com.intellisoft.pss.room.Converters;
+import com.intellisoft.pss.room.IndicatorsData;
 import com.intellisoft.pss.room.PssViewModel;
 import com.intellisoft.pss.room.Submissions;
 
@@ -80,11 +85,24 @@ public class FragmentSubmission extends Fragment {
                     "",
                     status,
                     userId,
-                    year,"","",false
+                    year,loadInitialData(),"",false
             );
             myViewModel.initiateSubmissions(submissions);
             formatterClass.saveSharedPref(SubmissionQueue.INITIATED.name(), "", requireContext());
         }
+    }
+
+    private String loadInitialData() {
+        IndicatorsData indicatorsData = myViewModel.getAllMyData(requireContext());
+        if (indicatorsData != null) {
+            String jsonData = indicatorsData.getJsonData();
+            Converters converters = new Converters();
+            DbDataEntry dataEntry = converters.fromJson(jsonData);
+            String referenceSheet = dataEntry.getReferenceSheet();
+            formatterClass.saveSharedPref("referenceSheet", referenceSheet, requireContext());
+            return jsonData;
+        }
+        return null;
     }
 
     @Override

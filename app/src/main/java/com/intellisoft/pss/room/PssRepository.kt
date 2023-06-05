@@ -1,6 +1,7 @@
 package com.intellisoft.pss.room
 
 import android.content.Context
+import android.util.Log
 import com.intellisoft.pss.helper_class.DataEntryPerson
 import com.intellisoft.pss.helper_class.DbResponses
 import com.intellisoft.pss.helper_class.DbSaveDataEntry
@@ -117,7 +118,7 @@ class PssRepository(private val roomDao: RoomDao) {
   }
   fun checkAddSubmissions(submissions: Submissions) {
     val serverId = submissions.serverId
-    val isSubmissions = roomDao.checkServerSubmissions(serverId)
+    val isSubmissions = roomDao.checkServerSubmissions(serverId.toString())
     if (!isSubmissions) {
       roomDao.addSubmissions(submissions)
     }
@@ -178,7 +179,9 @@ class PssRepository(private val roomDao: RoomDao) {
       val id = formatterClass.getSharedPref("userId", context)
       val firstName = formatterClass.getSharedPref("firstName", context)
       val userSurname = formatterClass.getSharedPref("userSurname", context)
-      val dataEntryPerson = DataEntryPerson("$id", username = userId, firstName = "$firstName", surname = "$userSurname")
+      val dataEntryPerson =
+          DataEntryPerson(
+              "$id", username = userId, firstName = "$firstName", surname = "$userSurname")
       return DbSaveDataEntry("", "2023", "COMPLETED", userId, "", dbResponsesList, dataEntryPerson)
     }
     return null
@@ -215,17 +218,24 @@ class PssRepository(private val roomDao: RoomDao) {
         dbResponsesList.add(dbResponses)
       }
       val id = formatterClass.getSharedPref("userId", context)
-      val firstName = formatterClass.getSharedPref("firstName", context)
+      val firstName = formatterClass.getSharedPref("userFirstName", context)
       val userSurname = formatterClass.getSharedPref("userSurname", context)
-      val dataEntryPerson = DataEntryPerson("$id", username = userId, firstName = "$firstName", surname = "$userSurname")
-      return DbSaveDataEntry(
-          submissions.orgCode,
-          submissions.period,
-          "COMPLETED",
-          userId,
-          submissions.date,
-          dbResponsesList,
-          dataEntryPerson)
+      val dataEntryPerson =
+          DataEntryPerson(
+              "$id", username = userId, firstName = "$firstName", surname = "$userSurname")
+
+      //      Payload is here
+      val data =
+          DbSaveDataEntry(
+              submissions.orgCode,
+              submissions.period,
+              "COMPLETED",
+              "$id",
+              submissions.date,
+              dbResponsesList,
+              dataEntryPerson)
+      Log.e("TAG", "Responses $data")
+      return data
     }
     return null
   }

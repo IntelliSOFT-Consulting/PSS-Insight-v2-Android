@@ -77,35 +77,59 @@ class DataEntryAdapter(
       etValue.setText("")
       radioYes.isChecked = false
       radioNo.isChecked = false
+      tvAttachment.isEnabled = false
+      tvComment.isEnabled = false
+
+      if (adapterPosition != RecyclerView.NO_POSITION &&
+          adapterPosition < dbDataEntryFormList.size) {
+        val pos = adapterPosition
+        val forms = dbDataEntryFormList[pos].forms
+        // Rest of the initialization logic
+        forms.forEach {
+          if (it.code != dbDataEntryFormList[pos].categoryCode) {
+            it.canAnswer = true
+          }
+        }
+      }
+
       cbAssessmentQuestion.setOnCheckedChangeListener { _, checked ->
         val pos = adapterPosition
         val current = hidden.text
+        val forms = dbDataEntryFormList[pos].forms
 
         if (checked) {
-          //          canProvideAnswers = true
           myViewModel.deleteAllSubmitted(context, current.toString(), currentSession)
           etValue.isEnabled = false
           radioYes.isEnabled = false
           radioNo.isEnabled = false
           radioYes.isChecked = false
           radioNo.isChecked = false
+          tvAttachment.isEnabled = false
+          tvComment.isEnabled = false
+          forms.forEach {
+            if (it.code != dbDataEntryFormList[pos].categoryCode) {
+              it.canAnswer = true
+              recyclerView.adapter?.notifyDataSetChanged()
+            }
+          }
         } else {
-          //          canProvideAnswers = false
           etValue.isEnabled = true
           radioYes.isEnabled = true
           radioNo.isEnabled = true
-          val forms = dbDataEntryFormList[pos].forms
+          tvAttachment.isEnabled = true
+          tvComment.isEnabled = true
           forms.forEach {
             if (it.code != dbDataEntryFormList[pos].categoryCode) {
               deleteAllSubmitted(it, myViewModel, recyclerView)
-              //disable all items on the child fragments at this positions
-
+              // disable all items on the child fragments at this positions
+              it.canAnswer = false
+              recyclerView.adapter?.notifyDataSetChanged()
             }
           }
         }
-        notifyDataSetChanged()
-      }
 
+        recyclerView.adapter?.notifyDataSetChanged()
+      }
       tvComment.setOnClickListener(this)
       tvAttachment.setOnClickListener(this)
       tvUserAttachment.setOnClickListener(this)
@@ -148,7 +172,6 @@ class DataEntryAdapter(
       }
     }
 
-
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -166,9 +189,9 @@ class DataEntryAdapter(
   }
 
   private fun deleteAllSubmitted(
-    it: DbIndicators,
-    myViewModel: PssViewModel,
-    recyclerView: RecyclerView
+      it: DbIndicators,
+      myViewModel: PssViewModel,
+      recyclerView: RecyclerView
   ) {
     myViewModel.deleteAllSubmitted(context, it.id, currentSession)
 
@@ -252,7 +275,7 @@ class DataEntryAdapter(
 
     formsList.forEach {
       if (it.code == indicatorCode) {
-
+        //
         defaultCode = it.id
         defaultName = it.name
         holder.hidden.text = it.id
@@ -285,10 +308,15 @@ class DataEntryAdapter(
         Handler().postDelayed({ fragmentDataEntry.updateProgress() }, 2000)
       }
     }
+    if (holder.cbAssessmentQuestion.isChecked) {
+      forms.forEach {
+        // disable all items on the child fragments at this positions
+        it.canAnswer = true
+      }
+    }
 
     val dataEntryAdapter =
-        DataEntryFormsAdapter(
-            forms, context, currentSession, fragmentDataEntry, status, canProvideAnswers)
+        DataEntryFormsAdapter(forms, context, currentSession, fragmentDataEntry, status)
     holder.recyclerView.adapter = dataEntryAdapter
   }
 
@@ -343,4 +371,3 @@ class DataEntryAdapter(
     return dbDataEntryFormList.size
   }
 }
-

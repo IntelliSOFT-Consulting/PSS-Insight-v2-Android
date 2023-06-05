@@ -388,7 +388,6 @@ class RetrofitCalls {
                   val json = Gson().fromJson(converters, JsonObject::class.java)
 
                   val jsonArray = json.getAsJsonArray("details")
-                  //                  myViewModel.deleteAllOrganizations()
                   for (i in 0 until jsonArray.size()) {
                     val jsonObject = jsonArray.get(i).asJsonObject
                     val id = jsonObject.get("id").asString

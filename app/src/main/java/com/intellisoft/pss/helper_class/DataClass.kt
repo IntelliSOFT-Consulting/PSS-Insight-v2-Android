@@ -134,7 +134,13 @@ data class DbIndicatorsDetails(
     val indicatorDataValue: List<DbIndicators>
 )
 
-data class DbIndicators(val code: String, val name: String, val id: String, val valueType: String)
+data class DbIndicators(
+    val code: String,
+    val name: String,
+    val id: String,
+    val valueType: String,
+    var canAnswer: Boolean = true
+    )
 
 data class DbSaveDataEntry(
     val orgUnit: String,
