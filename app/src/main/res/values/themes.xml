@@ -12,6 +12,8 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+<!--        <item name="android:typeface"></item>-->
+        <item name="android:fontFamily">@font/black</item>
     </style>
 
     <style name="NoActionBar" parent="Theme.Pss">

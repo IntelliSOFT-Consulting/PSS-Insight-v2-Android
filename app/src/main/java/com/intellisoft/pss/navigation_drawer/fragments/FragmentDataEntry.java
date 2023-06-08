@@ -318,6 +318,13 @@ public class FragmentDataEntry extends Fragment {
         });
 
         loadOrganizations();
+
+        if (checkIfSubmitted()){
+            autoCompleteTextView.setAdapter(null);
+            etPeriod.setAdapter(null);
+            autoCompleteTextView.setEnabled(false);
+            etPeriod.setEnabled(false);
+        }
     }
 
 

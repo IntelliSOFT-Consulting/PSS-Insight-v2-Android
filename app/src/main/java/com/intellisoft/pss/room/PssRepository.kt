@@ -182,7 +182,7 @@ class PssRepository(private val roomDao: RoomDao) {
       val dataEntryPerson =
           DataEntryPerson(
               "$id", username = userId, firstName = "$firstName", surname = "$userSurname")
-      return DbSaveDataEntry("", "2023", "COMPLETED", userId, "", dbResponsesList, dataEntryPerson)
+      return DbSaveDataEntry("", "2023", "COMPLETED", userId, "", dbResponsesList, true,dataEntryPerson)
     }
     return null
   }
@@ -232,7 +232,7 @@ class PssRepository(private val roomDao: RoomDao) {
               "COMPLETED",
               "$id",
               submissions.date,
-              dbResponsesList,
+              dbResponsesList,  true,
               dataEntryPerson)
       Log.e("TAG", "Responses $data")
       return data

@@ -119,7 +119,8 @@ data class DbOrganizationEntry(
     val username: String,
     val surname: String,
     val firstName: String,
-    val organisationUnits: List<DbOrganizationEntryDetails>)
+    val organisationUnits: List<DbOrganizationEntryDetails>
+)
 
 data class DbSubmissionEntry(val count: Int, val details: List<DbSubmissionEntryDetails>)
 
@@ -140,7 +141,7 @@ data class DbIndicators(
     val id: String,
     val valueType: String,
     var canAnswer: Boolean = true
-    )
+)
 
 data class DbSaveDataEntry(
     val orgUnit: String,
@@ -149,6 +150,7 @@ data class DbSaveDataEntry(
     val dataEntryPersonId: String,
     val dataEntryDate: String,
     val responses: List<DbResponses>,
+    val isPublished: Boolean = true,
     val dataEntryPerson: DataEntryPerson
 )
 
