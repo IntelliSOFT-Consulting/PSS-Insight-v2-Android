@@ -11,6 +11,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
@@ -52,6 +54,7 @@ public class FragmentHome extends Fragment {
 
         return rootView;
     }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.sync_menu, menu);
@@ -73,6 +76,49 @@ public class FragmentHome extends Fragment {
     private void selectAllSubmittedSubmissions() {
 
 
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+//                showCancelAlertDialog();
+                formatterClass.saveSharedPref(NavigationValues.NAVIGATION.name(),
+                        NavigationValues.HOME.name(), requireContext());
+                Intent intent = new Intent(requireContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+        });
+    }
+
+
+    private void showCancelAlertDialog() {
+        // Implement your custom logic here
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Confirmation");
+        builder.setMessage("Are you sure you want to cancel?");
+        builder.setPositiveButton("Yes", (dialog, which) -> {
+            // Handle "Yes" button action
+            // ...
+            dialog.dismiss();
+            formatterClass.saveSharedPref(NavigationValues.NAVIGATION.name(),
+                    NavigationValues.HOME.name(), requireContext());
+            Intent intent = new Intent(requireContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            // Handle "Cancel" button action or do nothing
+            // ...
+            dialog.dismiss();
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     @Override

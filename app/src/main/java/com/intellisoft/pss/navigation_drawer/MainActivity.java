@@ -213,7 +213,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (navigation == null) {
             selectItem(0);
         } else {
-            if (navigation.equals(NavigationValues.SUBMISSION.name())) {
+            if (navigation.equals(NavigationValues.HOME.name())) {
+                selectItem(0);
+            } else if (navigation.equals(NavigationValues.SUBMISSION.name())) {
                 selectItem(7);
             } else if (navigation.equals(NavigationValues.DATA_ENTRY.name())) {
                 selectItem(8);

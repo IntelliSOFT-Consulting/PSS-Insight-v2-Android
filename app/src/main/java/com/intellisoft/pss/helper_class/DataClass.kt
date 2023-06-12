@@ -5,6 +5,7 @@ import com.intellisoft.pss.R
 
 enum class NavigationValues {
   NAVIGATION,
+  HOME,
   SUBMISSION,
   DATA_ENTRY
 }

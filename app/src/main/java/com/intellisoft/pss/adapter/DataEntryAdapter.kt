@@ -96,8 +96,10 @@ class DataEntryAdapter(
         val pos = adapterPosition
         val current = hidden.text
         val forms = dbDataEntryFormList[pos].forms
+        val formsCount = forms.count()
 
         if (checked) {
+          fragmentDataEntry.considerParentIgnoreChildren(1, formsCount, true, false)
           myViewModel.deleteAllSubmitted(context, current.toString(), currentSession)
           etValue.isEnabled = false
           radioYes.isEnabled = false
@@ -113,6 +115,7 @@ class DataEntryAdapter(
             }
           }
         } else {
+          fragmentDataEntry.considerParentIgnoreChildren(1, formsCount, false, false)
           etValue.isEnabled = true
           radioYes.isEnabled = true
           radioNo.isEnabled = true
@@ -276,6 +279,7 @@ class DataEntryAdapter(
     formsList.forEach {
       if (it.code == indicatorCode) {
         //
+        fragmentDataEntry.considerParentIgnoreChildren(1, 10, true, true)
         defaultCode = it.id
         defaultName = it.name
         holder.hidden.text = it.id
