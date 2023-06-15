@@ -495,11 +495,7 @@ public class FragmentDataEntry extends Fragment {
         } else {
             Submissions submission = myViewModel.getSubmission(submissionId, requireContext());
             if (submission != null) {
-//                if (submission.getServerId().isEmpty()) {
-//                    loadPublishedIndicators();
-//                } else {
                 loadRetrievedIndicators(submission);
-//                }
             }
         }
     }
@@ -655,11 +651,17 @@ public class FragmentDataEntry extends Fragment {
             if (percentInt > 100) {
                 percentInt = 100;
             }
+            if (percentInt < 0) {
+                percentInt = 0;
+            }
             progressBar.setProgress(percentInt);
             progressText.setText(percentInt + "% done");
 
+//            Toast.makeText(requireContext(), "Percentage" + percentInt, Toast.LENGTH_SHORT).show();
+
         } catch (Exception e) {
             e.printStackTrace();
+//            Toast.makeText(requireContext(), "Error" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -749,6 +751,87 @@ public class FragmentDataEntry extends Fragment {
 
 
     public void considerParentIgnoreChildren(int parentItem, int childItems, boolean removeParent, boolean initial) {
-        
+
+        if (initial) {
+            /*
+             * Remove all parent indicators
+             */
+            String indicatorSize = formatterClass.getSharedPref("indicatorSize", requireContext());
+            try {
+                int current = Integer.parseInt(indicatorSize);
+                int results = current - parentItem;
+                formatterClass.saveSharedPref("indicatorSize", String.valueOf(results), requireContext());
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+        else {
+/*            Submissions submission = myViewModel.getSubmission(submissionId, requireContext());
+            if (submission != null) {
+                recountIndicators(submission);
+            }
+            String totalCount = formatterClass.getSharedPref("indicatorSize", requireContext());
+            if (removeParent) {
+                try {
+                    int current = Integer.parseInt(totalCount);
+                    int results = current - parentItem;
+                    formatterClass.saveSharedPref("indicatorSize", String.valueOf(results), requireContext());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(requireContext(), "Remove Parent Error"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                try {
+                    int current = Integer.parseInt(totalCount);
+                    int results = current - childItems;
+                    formatterClass.saveSharedPref("indicatorSize", String.valueOf(results), requireContext());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(requireContext(), "Remove Children Error"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }*/
+        }
+
+        updateProgress();
+    }
+
+    private void recountIndicators(Submissions data) {
+        if (data != null) {
+            try {
+                int indicatorSize = 0;
+                Converters converters = new Converters();
+                DbDataEntrySubmit dataEntry = converters.fromResubmitJson(data.getJsonData());
+                List<DbDataEntryDetails> detailsList = dataEntry.getDetails();
+                if (!detailsList.isEmpty()) {
+                    for (int j = 0; j < detailsList.size(); j++) {
+
+                        List<DbIndicatorsDetails> indicators = detailsList.get(j).getIndicators();
+
+                        for (int i = 0; i < indicators.size(); i++) {
+                            ArrayList<DbIndicators> indicatorsList = (ArrayList<DbIndicators>) indicators.get(i).getIndicatorDataValue();
+                            indicatorSize = indicatorSize + indicatorsList.size();
+                        }
+                    }
+                    formatterClass.saveSharedPref("indicatorSize",
+                            String.valueOf(indicatorSize), requireContext());
+
+                } else {
+                    Toast.makeText(requireContext(), "There are no published indicators. Please try again later!!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(requireContext(), MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(requireContext(), "There are no published indicators. Please try again later!!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(requireContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            }
+        }
     }
 }
