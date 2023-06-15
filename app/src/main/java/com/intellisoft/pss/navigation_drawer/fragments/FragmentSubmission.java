@@ -9,18 +9,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.intellisoft.pss.SubmissionsStatus;
-import com.intellisoft.pss.adapter.DataEntryAdapter;
+import com.intellisoft.pss.helper_class.DbDataEntry;
+import com.intellisoft.pss.helper_class.DbDataEntryDetails;
+import com.intellisoft.pss.helper_class.DbDataEntryForm;
+import com.intellisoft.pss.helper_class.PositionStatus;
+import com.intellisoft.pss.helper_class.SubmissionQueue;
+import com.intellisoft.pss.helper_class.SubmissionsStatus;
 import com.intellisoft.pss.adapter.SubmissionAdapter;
 import com.intellisoft.pss.helper_class.FormatterClass;
-import com.intellisoft.pss.NavigationValues;
+import com.intellisoft.pss.helper_class.NavigationValues;
 import com.intellisoft.pss.R;
 import com.intellisoft.pss.navigation_drawer.MainActivity;
+import com.intellisoft.pss.room.Converters;
+import com.intellisoft.pss.room.IndicatorsData;
 import com.intellisoft.pss.room.PssViewModel;
 import com.intellisoft.pss.room.Submissions;
 
@@ -33,13 +42,16 @@ public class FragmentSubmission extends Fragment {
     private FormatterClass formatterClass = new FormatterClass();
     private PssViewModel myViewModel;
     private RecyclerView mRecyclerView;
+    ArrayList<Submissions> submissionArrayList;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_submission, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
+        submissionArrayList = new ArrayList<>();
         myViewModel = new PssViewModel(((Application) requireContext().getApplicationContext()));
         mRecyclerView = rootView.findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
@@ -62,20 +74,80 @@ public class FragmentSubmission extends Fragment {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void saveSubmission(String status){
+    private void saveSubmission(String status) {
         //Create a entity of the date it was pressed
         String userId = formatterClass.getSharedPref("username", requireContext());
-        if (userId != null){
+        formatterClass.deleteSharedPref(PositionStatus.CURRENT.name(), requireContext());
+        if (userId != null) {
             String date = formatterClass.getCurrentDate();
             String year = formatterClass.getYear();
             Submissions submissions = new Submissions(
                     date,
+                    "",
+                    "",
                     status,
                     userId,
-                    year
+                    year,loadInitialData(),"",false
             );
-            myViewModel.addSubmissions(submissions);
+            myViewModel.initiateSubmissions(submissions);
+            formatterClass.saveSharedPref(SubmissionQueue.INITIATED.name(), "", requireContext());
         }
+    }
+
+    private String loadInitialData() {
+        IndicatorsData indicatorsData = myViewModel.getAllMyData(requireContext());
+        if (indicatorsData != null) {
+            String jsonData = indicatorsData.getJsonData();
+            Converters converters = new Converters();
+            DbDataEntry dataEntry = converters.fromJson(jsonData);
+            String referenceSheet = dataEntry.getReferenceSheet();
+            formatterClass.saveSharedPref("referenceSheet", referenceSheet, requireContext());
+            return jsonData;
+        }
+        return null;
+    }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+//                showCancelAlertDialog();
+                formatterClass.saveSharedPref(NavigationValues.NAVIGATION.name(),
+                        NavigationValues.HOME.name(), requireContext());
+                Intent intent = new Intent(requireContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+        });
+    }
+
+
+
+    private void showCancelAlertDialog() {
+        // Implement your custom logic here
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Confirmation");
+        builder.setMessage("Are you sure you want to cancel?");
+        builder.setPositiveButton("Yes", (dialog, which) -> {
+            // Handle "Yes" button action
+            // ...
+            dialog.dismiss();
+            formatterClass.saveSharedPref(NavigationValues.NAVIGATION.name(),
+                    NavigationValues.HOME.name(), requireContext());
+            Intent intent = new Intent(requireContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            // Handle "Cancel" button action or do nothing
+            // ...
+            dialog.dismiss();
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     @Override
@@ -88,9 +160,8 @@ public class FragmentSubmission extends Fragment {
     private void getSubmissions() {
 
         List<Submissions> submissionList = myViewModel.getSubmissions(requireContext());
+
         SubmissionAdapter dataEntryAdapter = new SubmissionAdapter((ArrayList<Submissions>) submissionList, requireContext());
         mRecyclerView.setAdapter(dataEntryAdapter);
-
-
     }
 }

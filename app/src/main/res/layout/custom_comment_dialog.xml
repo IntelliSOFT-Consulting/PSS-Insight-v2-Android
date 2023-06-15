@@ -5,10 +5,10 @@
     android:layout_margin="10dp">
 
     <LinearLayout
-        android:padding="10dp"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
 
         <TextView
             android:id="@+id/dialog_title"
@@ -19,36 +19,36 @@
             android:textStyle="bold" />
 
         <EditText
-            android:padding="10dp"
-            android:background="@drawable/edittext_border"
             android:id="@+id/dialog_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
             android:layout_marginTop="8dp"
-            android:hint="Type here" />
+            android:background="@drawable/edittext_border"
+            android:hint="Type here"
+            android:inputType="textCapSentences"
+            android:padding="10dp" />
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <Button
-                android:layout_weight="1"
                 android:id="@+id/dialog_button_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/dialog_edittext"
+                android:layout_weight="1"
                 android:text="Cancel" />
 
             <Button
-                android:layout_marginStart="10dp"
-                android:layout_weight="1"
                 android:id="@+id/dialog_button_ok"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/dialog_edittext"
+                android:layout_marginStart="10dp"
                 android:layout_toRightOf="@id/dialog_button_cancel"
+                android:layout_weight="1"
                 android:text="OK" />
 
 
@@ -56,7 +56,6 @@
 
 
     </LinearLayout>
-
 
 
 </androidx.cardview.widget.CardView>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "752444414940",
+    "project_id": "pss-insight-survey",
+    "storage_bucket": "pss-insight-survey.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:752444414940:android:4a46001e6035d8284a4d19",
+        "android_client_info": {
+          "package_name": "com.intellisoft.pss"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "752444414940-uee7t2lmus768a9s8eug1oi0uf8nqtp7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB92ttISwSTxW1-B2_UQ5SlJ7GeXK7JrFI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "752444414940-uee7t2lmus768a9s8eug1oi0uf8nqtp7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

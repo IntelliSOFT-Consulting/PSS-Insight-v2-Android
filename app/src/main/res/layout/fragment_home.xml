@@ -5,12 +5,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
-        android:textColor="@color/black"
         android:gravity="center"
         android:id="@+id/title_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="QUICK ACTIONS"
+        android:text="@string/quick_actions"
         android:textStyle="bold"
         android:textSize="18sp"
         android:padding="16dp"/>
@@ -55,8 +54,7 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="PSS INSIGHT V2 DATA ENTRY"
-                    android:textColor="@color/primary"/>
+                    android:text="@string/pss_insight_v2_data_entry" />
 
             </LinearLayout>
 

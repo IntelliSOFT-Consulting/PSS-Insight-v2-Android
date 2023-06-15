@@ -4,78 +4,75 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <TableRow
-        android:background="@drawable/submission_border">
+    <TableRow android:background="@drawable/submission_border">
 
         <!-- Status icon -->
         <ImageView
-            android:padding="7dp"
             android:id="@+id/statusIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="7dp"
             android:src="@drawable/ic_submitted_synced" />
 
 
         <LinearLayout
-            android:background="@drawable/submission_border"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:layout_weight="1"
+            android:background="@drawable/submission_border"
+            android:gravity="center"
             android:orientation="horizontal">
 
             <!-- Date text -->
             <TextView
-                android:padding="5dp"
                 android:id="@+id/tvDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:text="12/03/2023" />
-
+                android:padding="5dp"
+                android:text="12/03/2023"
+                android:textSize="12sp" />
 
 
             <!-- Status text -->
             <TextView
-                android:padding="5dp"
-                android:background="@drawable/submission_border"
                 android:id="@+id/tvSubmitted"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="16sp"
-                android:text="Submitted" />
+                android:layout_gravity="center"
+                android:background="@drawable/submission_border"
+                android:gravity="start|center"
+                android:padding="5dp"
+                android:text="Submitted"
+                android:textSize="12sp" />
 
         </LinearLayout>
 
 
-
         <LinearLayout
             android:id="@+id/linearView"
-            android:layout_marginEnd="10dp"
-            android:padding="5dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:padding="5dp">
 
             <!-- Status icon -->
             <ImageView
                 android:id="@+id/ic_status_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:src="@drawable/ic_synch" />
 
             <!-- Status text -->
             <TextView
-                android:layout_marginStart="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
                 android:text="View" />
 
         </LinearLayout>
 
     </TableRow>
-
-
-
-
 
 
 </TableLayout>

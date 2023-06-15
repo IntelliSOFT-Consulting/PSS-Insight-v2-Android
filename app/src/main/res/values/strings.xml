@@ -1,9 +1,26 @@
 <resources>
-    <string name="app_name">Pss</string>
-    <string name="pss_title">Pharmaceutical Systems Strengthening Insights tool v2</string>
+    <string name="app_name">PSS Insight</string>
+    <string name="pss_title">PSS Insight</string>
     <string name="syncing">Syncing Your Configurations</string>
     <string name="navigation">navigation</string>
+    <string name="app_name_refined">PSS Insight Mobile App</string>
     <string name="base_url">navigation</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign In</string>
+    <string name="username">Username</string>
+    <string name="server_url">Server URL</string>
+    <string name="pss_insight_v2_data_entry">PSS INSIGHT DATA ENTRY</string>
+    <string name="quick_actions">QUICK ACTIONS</string>
+    <string name="your_submissions">Your Submissions</string>
+    <string name="new_survey">New Data Entry</string>
+    <string name="back">Back</string>
+    <string name="submit">Submit</string>
+    <string name="safe_draft">Save Draft</string>
+    <string name="please_answer_these_questions">Please answer these questions</string>
+    <string name="_20_done">20% done</string>
+    <string name="select_year">Select Year*</string>
+    <string name="next">Next</string>
+    <string name="current_page">Page 1/2</string>
 
     <string-array name="navigation_drawer_items_array">
         <item>Connect</item>
@@ -15,5 +32,34 @@
         <item>Draft</item>
         <item>Submit</item>
     </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="action_organization">Organization</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="saved_successfully">Saved Successfully</string>
+    <string name="your_responses_have_been_submitted_successfully">Your responses have been submitted successfully</string>
+    <string name="address_123_main_st_pss_kenya">Address: 123 Main St, PSS Kenya</string>
+    <string name="phone_254_700_111_222">Phone: +254 700 111-222</string>
+    <string name="email_apps_intellisoftkenya_com">Email: apps@intellisoftkenya.com</string>
+    <string name="contact_us">Contact Us</string>
+    <string name="image_upload">Image Upload</string>
+    <string name="app_in_progress">In Progress</string>
+    <string name="select_organization">Select Organization</string>
+    <string name="action_accept">Accept</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_local_data">Delete Local Data</string>
+    <string name="delete_local_data_message">Non synchronized data will be lost. Do you really want to continue?</string>
+    <string name="is_there_a_national_list_of_essential_medicines">Is there a national list of essential medicines?</string>
+    <string name="period">Year</string>
+    <string name="user_comment">User Comment</string>
+    <string name="user_attachment">Attachment</string>
+    <string name="set_new_pin">Set New Pin</string>
+    <string name="unblock">Unblock Session</string>
+    <string name="forgot">Forgot Pin? Reset</string>
+    <string name="this_is_the_information_field">This is the information field.</string>
+    <string name="ps01_definition">PS01 Definition</string>
+    <string name="reference_sheet">Reference Sheet</string>
+    <string name="fill_assessment_question">Fill Assessment Question</string>
 
 </resources>

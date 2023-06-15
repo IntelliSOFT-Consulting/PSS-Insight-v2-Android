@@ -17,17 +17,16 @@
             android:layout_weight="1"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textStyle="bold"
-            android:textColor="@color/black"
             android:id="@+id/tvSubmissionText"
-            android:text="Your Submissions"
+            android:text="@string/your_submissions"
             android:padding="10dp"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"/>
 
         <Button
             android:id="@+id/btnAdd"
             android:textAllCaps="false"
-            android:text="New Survey"
+            android:text="@string/new_survey"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
