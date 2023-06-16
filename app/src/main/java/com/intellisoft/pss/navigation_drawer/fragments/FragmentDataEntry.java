@@ -61,8 +61,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class FragmentDataEntry extends Fragment {
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 102;
@@ -544,6 +546,7 @@ public class FragmentDataEntry extends Fragment {
                             String.valueOf(indicatorSize), requireContext());
 
                     controlPagination(indicatorSize);
+                    checkUniqueIndicators(dbDataEntryFormList);
                 } else {
                     Toast.makeText(requireContext(), "There are no published indicators. Please try again later!!", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(requireContext(), MainActivity.class);
@@ -600,15 +603,42 @@ public class FragmentDataEntry extends Fragment {
 
                 formatterClass.saveSharedPref("indicatorSize",
                         String.valueOf(indicatorSize), requireContext());
-
+                Log.e("Data", "Data::: Launch" + indicatorSize);
                 controlPagination(indicatorSize);
+
+                checkUniqueIndicators(dbDataEntryFormList);
             } else {
                 Toast.makeText(requireContext(), "There are no published indicators. Please try again later!!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(requireContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
         }
+    }
+
+    private void checkUniqueIndicators(ArrayList<DbDataEntryForm> dbDataEntryFormList) {
+        int count = 0;
+        List<String> codeList = new ArrayList<>();
+        for (DbDataEntryForm def : dbDataEntryFormList) {
+            List<DbIndicators> forms = def.getForms();
+            String parent = def.getCategoryName();
+//            Generate a list of string codes
+            for (DbIndicators form : forms) {
+                String code = form.getCode();
+                if (!parent.equalsIgnoreCase(code)) {
+                    count++;
+                    codeList.add(code);
+                }
+            }
+        }
+
+        // Create a Set to store unique items
+        Set<String> uniqueCodes = new HashSet<>(codeList);
+        // Convert the Set back to a List, if needed
+        List<String> uniqueCodeList = new ArrayList<>(uniqueCodes);
+        formatterClass.saveSharedPref("indicatorSize",
+                String.valueOf(uniqueCodeList.size()), requireContext());
     }
 
     private void controlPagination(int count) {
@@ -654,6 +684,9 @@ public class FragmentDataEntry extends Fragment {
             int percentInt = (int) percent;
             if (percentInt > 100) {
                 percentInt = 100;
+            }
+            if (percentInt < 0) {
+                percentInt = 0;
             }
             progressBar.setProgress(percentInt);
             progressText.setText(percentInt + "% done");
@@ -749,6 +782,7 @@ public class FragmentDataEntry extends Fragment {
 
 
     public void considerParentIgnoreChildren(int parentItem, int childItems, boolean removeParent, boolean initial) {
-        
+
+        updateProgress();
     }
 }

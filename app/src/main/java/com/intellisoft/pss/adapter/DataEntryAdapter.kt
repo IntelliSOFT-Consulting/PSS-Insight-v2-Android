@@ -10,6 +10,7 @@ import android.text.Editable
 import android.text.Html
 import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -278,7 +279,6 @@ class DataEntryAdapter(
 
     formsList.forEach {
       if (it.code == indicatorCode) {
-        //
         fragmentDataEntry.considerParentIgnoreChildren(1, 10, true, true)
         defaultCode = it.id
         defaultName = it.name
@@ -299,7 +299,6 @@ class DataEntryAdapter(
         }
         handleSavedResponse(holder, it, userId.toString(), viewModel)
       } else {
-
         forms.add(it)
       }
     }
@@ -318,7 +317,7 @@ class DataEntryAdapter(
         it.canAnswer = true
       }
     }
-
+    Log.e("Data Entry Adapter", "active forms ${forms.count()}")
     val dataEntryAdapter =
         DataEntryFormsAdapter(forms, context, currentSession, fragmentDataEntry, status)
     holder.recyclerView.adapter = dataEntryAdapter

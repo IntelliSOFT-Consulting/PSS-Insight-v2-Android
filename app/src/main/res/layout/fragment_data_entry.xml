@@ -167,11 +167,11 @@
                 android:text="@string/back"
                 android:textAllCaps="false"
                 android:textSize="10sp"
-                android:visibility="invisible"/>
-<!--                app:icon="@drawable/baseline_arrow_back_ios_new_24"-->
-<!--                app:iconGravity="textStart"-->
-<!--                app:iconPadding="2dp"-->
-<!--                app:iconSize="24dp" />-->
+                android:visibility="invisible" />
+            <!--                app:icon="@drawable/baseline_arrow_back_ios_new_24"-->
+            <!--                app:iconGravity="textStart"-->
+            <!--                app:iconPadding="2dp"-->
+            <!--                app:iconSize="24dp" />-->
 
             <!--Draft Button-->
             <com.google.android.material.button.MaterialButton
@@ -182,11 +182,11 @@
                 android:layout_weight="1"
                 android:text="@string/safe_draft"
                 android:textAllCaps="false"
-                android:textSize="10sp"/>
-<!--                app:icon="@drawable/baseline_save_24"-->
-<!--                app:iconGravity="textStart"-->
-<!--                app:iconPadding="2dp"-->
-<!--                app:iconSize="24dp" />-->
+                android:textSize="10sp" />
+            <!--                app:icon="@drawable/baseline_save_24"-->
+            <!--                app:iconGravity="textStart"-->
+            <!--                app:iconPadding="2dp"-->
+            <!--                app:iconSize="24dp" />-->
 
             <!-- Submit Button -->
             <com.google.android.material.button.MaterialButton
