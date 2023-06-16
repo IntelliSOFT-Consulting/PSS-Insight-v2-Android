@@ -138,16 +138,6 @@ class DataEntryAdapter(
       tvAttachment.setOnClickListener(this)
       tvUserAttachment.setOnClickListener(this)
       etValue.addTextChangedListener(this)
-      radioYes.setOnCheckedChangeListener { _, isChecked ->
-        if (isChecked) {
-          val pos = adapterPosition
-          val id = defaultCode
-          val name = defaultName
-          val indicatorResponse = IndicatorResponse(userId.toString(), currentSession, id, "Yes")
-          myViewModel.addResponse(indicatorResponse)
-          Handler().postDelayed({ fragmentDataEntry.updateProgress() }, 2000)
-        }
-      }
     }
     override fun onClick(view: View) {
       val pos = adapterPosition
@@ -302,7 +292,14 @@ class DataEntryAdapter(
         forms.add(it)
       }
     }
-
+    holder.radioYes.setOnCheckedChangeListener { _, isChecked ->
+      if (isChecked) {
+        val id = holder.hidden.text.toString()
+        val indicatorResponse = IndicatorResponse(userId.toString(), currentSession, id, "Yes")
+        viewModel.addResponse(indicatorResponse)
+        Handler().postDelayed({ fragmentDataEntry.updateProgress() }, 2000)
+      }
+    }
     holder.radioNo.setOnCheckedChangeListener { _, isChecked ->
       if (isChecked) {
         val id = holder.hidden.text.toString()
