@@ -780,9 +780,58 @@ public class FragmentDataEntry extends Fragment {
     }
 
 
-    public void considerParentIgnoreChildren(int parentItem, int childItems, boolean removeParent, boolean initial) {
+    public void considerParentIgnoreChildren(boolean removeParent, String code) {
+//        Load the refined indicators
+        int count = 0;
+        String userId = formatterClass.getSharedPref("username", requireContext());
+        if (userId != null) {
+            Submissions submission = myViewModel.getSubmissionsById(requireContext(), userId, submissionId);
+            if (submission != null) {
+                try {
+                    Converters converters = new Converters();
+                    DbDataEntrySubmit dataEntry = converters.fromResubmitJson(submission.getJsonData());
+                    List<DbDataEntryDetails> detailsList = dataEntry.getDetails();
+                    if (!detailsList.isEmpty()) {
+                        for (int j = 0; j < detailsList.size(); j++) {
+                            List<DbIndicatorsDetails> inner = detailsList.get(j).getIndicators();
+                            for (DbIndicatorsDetails dbi : inner) {
+                                String codeCat = dbi.getCategoryName();
+                                if (codeCat.equalsIgnoreCase(code)) {
+                                    count = dbi.getIndicatorDataValue().size() - 1;
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        Log.e("Json", "Indicators:::: " + count);
 
+        String indicatorSize = formatterClass.getSharedPref("indicatorSize", requireContext());
+        if (removeParent) {
+            // Remove Parent (1) add count
+            try {
+                int current = Integer.parseInt(indicatorSize);
+                int lessParent = current - 1;
+                int addChildren = lessParent + count;
+                formatterClass.saveSharedPref("indicatorSize", String.valueOf(addChildren),requireContext());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            //Remove count add parent (1)
+            try {
+                int current = Integer.parseInt(indicatorSize);
+                int addParent = current + 1;
+                int lessChildren = addParent -count;
+                formatterClass.saveSharedPref("indicatorSize", String.valueOf(lessChildren),requireContext());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
+        }
         updateProgress();
     }
 
