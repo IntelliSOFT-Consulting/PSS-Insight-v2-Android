@@ -73,6 +73,9 @@ class PssViewModel(application: Application) : AndroidViewModel(application) {
   fun getUnsyncedSubmissions(context: Context, status: String) = runBlocking {
     repository.getUnsyncedSubmissions(context, status)
   }
+  fun getSyncedSubmissions(context: Context, status: String) = runBlocking {
+    repository.getSyncedSubmissions(context, status)
+  }
   fun markSynced(context: Context, id: String) = runBlocking { repository.markSynced(context, id) }
 
   fun getSubmissionResponses(context: Context, submissionId: String) = runBlocking {

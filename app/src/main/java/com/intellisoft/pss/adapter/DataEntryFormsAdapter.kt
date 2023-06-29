@@ -113,78 +113,81 @@ class DataEntryFormsAdapter(
   override fun onBindViewHolder(holder: Pager2ViewHolder, position: Int) {
     val myViewModel = PssViewModel(context.applicationContext as Application)
     val userId = FormatterClass().getSharedPref("username", context)
-    val name = dbDataEntryFormList[position].name
-    val indicatorId = dbDataEntryFormList[position].id
-    val canAnswer = dbDataEntryFormList[position].canAnswer
+    try {
+      val name = dbDataEntryFormList[position].name
+      val indicatorId = dbDataEntryFormList[position].id
+      val canAnswer = dbDataEntryFormList[position].canAnswer
 
-    when (dbDataEntryFormList[position].valueType) {
-      "BOOLEAN" -> {
-        holder.radioGroup.visibility = VISIBLE
-        holder.etValue.visibility = GONE
+      when (dbDataEntryFormList[position].valueType) {
+        "BOOLEAN" -> {
+          holder.radioGroup.visibility = VISIBLE
+          holder.etValue.visibility = GONE
+        }
+        "NUMBER" -> {
+          holder.radioGroup.visibility = GONE
+          holder.etValue.visibility = VISIBLE
+        }
+        else -> {
+          holder.radioGroup.visibility = GONE
+          holder.etValue.visibility = VISIBLE
+        }
       }
-      "NUMBER" -> {
-        holder.radioGroup.visibility = GONE
-        holder.etValue.visibility = VISIBLE
-      }
-      else -> {
-        holder.radioGroup.visibility = GONE
-        holder.etValue.visibility = VISIBLE
-      }
-    }
 
-    // Get saved responses
-    val value = holder.myViewModel.getMyResponse(context, indicatorId, submissionId)
-    val comment = holder.myViewModel.getMyComment(context, indicatorId, submissionId)
-    val image = holder.myViewModel.getMyImage(context, indicatorId, submissionId)
-    if (value != null) {
-      holder.etValue.setText(value)
-      if (value == "Yes") {
-        holder.radioYes.isChecked = true
-      } else {
-        holder.radioNo.isChecked = true
+      // Get saved responses
+      val value = holder.myViewModel.getMyResponse(context, indicatorId, submissionId)
+      val comment = holder.myViewModel.getMyComment(context, indicatorId, submissionId)
+      val image = holder.myViewModel.getMyImage(context, indicatorId, submissionId)
+      if (value != null) {
+        holder.etValue.setText(value)
+        if (value == "Yes") {
+          holder.radioYes.isChecked = true
+        } else {
+          holder.radioNo.isChecked = true
+        }
       }
-    }
-    if (comment != null) {
-      holder.lnComment.visibility = VISIBLE
-      holder.tvUserComment.text = comment
-    }
-    if (image != null) {
-      holder.lnAttachment.visibility = VISIBLE
+      if (comment != null) {
+        holder.lnComment.visibility = VISIBLE
+        holder.tvUserComment.text = comment
+      }
+      if (image != null) {
+        holder.lnAttachment.visibility = VISIBLE
 
-      val spanned = Html.fromHtml(Utils().generateHypeLink(image))
-      holder.tvUserAttachment.text = spanned
-      holder.tvUserAttachment.movementMethod = LinkMovementMethod.getInstance()
-    }
-    holder.tvQuestion.text = name
-    if (status == SubmissionsStatus.SUBMITTED.name || status == SubmissionsStatus.PUBLISHED.name) {
-      holder.radioNo.isEnabled = false
-      holder.radioYes.isEnabled = false
-      holder.etValue.isEnabled = false
-      holder.tvAttachment.isEnabled = false
-      holder.tvComment.isEnabled = false
-    } else {
-      if (canAnswer) {
-        holder.radioNo.isEnabled = true
-        holder.radioYes.isEnabled = true
-        holder.etValue.isEnabled = true
-        holder.tvAttachment.isEnabled = true
-        holder.tvComment.isEnabled = true
-      }else{
+        val spanned = Html.fromHtml(Utils().generateHypeLink(image))
+        holder.tvUserAttachment.text = spanned
+        holder.tvUserAttachment.movementMethod = LinkMovementMethod.getInstance()
+      }
+      holder.tvQuestion.text = name
+      if (status == SubmissionsStatus.SUBMITTED.name ||
+          status == SubmissionsStatus.PUBLISHED.name) {
         holder.radioNo.isEnabled = false
         holder.radioYes.isEnabled = false
         holder.etValue.isEnabled = false
         holder.tvAttachment.isEnabled = false
         holder.tvComment.isEnabled = false
+      } else {
+        if (canAnswer) {
+          holder.radioNo.isEnabled = true
+          holder.radioYes.isEnabled = true
+          holder.etValue.isEnabled = true
+          holder.tvAttachment.isEnabled = true
+          holder.tvComment.isEnabled = true
+        } else {
+          holder.radioNo.isEnabled = false
+          holder.radioYes.isEnabled = false
+          holder.etValue.isEnabled = false
+          holder.tvAttachment.isEnabled = false
+          holder.tvComment.isEnabled = false
+        }
       }
-    }
-    holder.radioNo.setOnCheckedChangeListener { _, isChecked ->
-      if (isChecked) {
-        val id = dbDataEntryFormList[position].id
-        val indicatorResponse = IndicatorResponse(userId.toString(), submissionId, id, "No")
-        myViewModel.addResponse(indicatorResponse)
-        Handler().postDelayed({ fragmentDataEntry.updateProgress() }, 2000)
+      holder.radioNo.setOnCheckedChangeListener { _, isChecked ->
+        if (isChecked) {
+          val id = dbDataEntryFormList[position].id
+          val indicatorResponse = IndicatorResponse(userId.toString(), submissionId, id, "No")
+          myViewModel.addResponse(indicatorResponse)
+          Handler().postDelayed({ fragmentDataEntry.updateProgress() }, 2000)
+        }
       }
-    }
+    } catch (e: Exception) {}
   }
 
   override fun getItemCount(): Int {

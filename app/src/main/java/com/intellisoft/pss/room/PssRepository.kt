@@ -301,6 +301,13 @@ class PssRepository(private val roomDao: RoomDao) {
     }
     return emptyList()
   }
+  fun getSyncedSubmissions(context: Context, status: String): List<Submissions> {
+    val userId = formatterClass.getSharedPref("username", context)
+    if (userId != null) {
+      return roomDao.getSyncedSubmissions(userId, status)
+    }
+    return emptyList()
+  }
 
   fun markSynced(context: Context, id: String): Boolean {
     val userId = formatterClass.getSharedPref("username", context)

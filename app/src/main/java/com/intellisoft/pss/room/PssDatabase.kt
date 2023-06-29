@@ -15,7 +15,7 @@ import androidx.room.TypeConverters
             Comments::class,
             Organizations::class,
             Image::class],
-    version = 1,
+    version = 2,
     exportSchema = false)
 @TypeConverters(Converters::class)
 public abstract class PssDatabase : RoomDatabase() {

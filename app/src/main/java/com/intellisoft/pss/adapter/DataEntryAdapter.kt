@@ -102,6 +102,7 @@ class DataEntryAdapter(
           fragmentDataEntry.considerParentIgnoreChildren(true,code)
           myViewModel.deleteAllSubmitted(context, current.toString(), currentSession)
           etValue.isEnabled = false
+          etValue.setText("")
           radioYes.isEnabled = false
           radioNo.isEnabled = false
           radioYes.isChecked = false

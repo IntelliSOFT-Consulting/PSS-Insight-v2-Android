@@ -99,6 +99,10 @@ interface RoomDao {
       "SELECT * FROM submissions WHERE userId =:userId AND status =:status AND is_synced = 0 ORDER BY id DESC")
   fun getUnsyncedSubmissions(userId: String, status: String): List<Submissions>
 
+  @Query(
+      "SELECT * FROM submissions WHERE userId =:userId AND status =:status AND is_synced = 1 ORDER BY id DESC")
+  fun getSyncedSubmissions(userId: String, status: String): List<Submissions>
+
   @Query("UPDATE submissions SET is_synced =:is_synced WHERE id =:id")
   fun updateSubmissionSync(is_synced: Boolean, id: String)
   //  @Query("UPDATE images SET is_synced =:is_synced WHERE id =:id")

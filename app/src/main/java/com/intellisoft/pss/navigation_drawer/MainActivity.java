@@ -100,9 +100,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (intent.getAction().equals("dhis2")) {
                 // Call your function here
                 autoSyncSubmissions(true);
+                updateSubmittedSynced();
             }
         }
     };
+
+    private void updateSubmittedSynced() {
+
+        if (activeInternetConnection()) {
+            try {
+                List<Submissions> submissionList = myViewModel.getSyncedSubmissions(this, SubmissionsStatus.SUBMITTED.name());
+                for (Submissions sm : submissionList) {
+                    DbSaveDataEntry dataEntry = myViewModel.getSubmitSync(this, sm);
+                    if (dataEntry != null) {
+                        retrofitCalls.submitSyncData(this, dataEntry, sm, myViewModel);
+
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
 
     private void autoSyncSubmissions(Boolean confirm) {
 
