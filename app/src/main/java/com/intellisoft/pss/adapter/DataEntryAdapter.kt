@@ -67,6 +67,7 @@ class DataEntryAdapter(
     val lnParent: LinearLayout = itemView.findViewById(R.id.ln_parent)
     val hidden: TextView = itemView.findViewById(R.id.hidden)
     val cbAssessmentQuestion: CheckBox = itemView.findViewById(R.id.cb_assessment_question)
+    val lnBenchmarks: LinearLayout = itemView.findViewById(R.id.ln_benchmarks)
 
     init {
       val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -313,7 +314,6 @@ class DataEntryAdapter(
         it.canAnswer = true
       }
     }
-    Log.e("Data Entry Adapter", "active forms ${forms.count()}")
     val dataEntryAdapter =
         DataEntryFormsAdapter(forms, context, currentSession, fragmentDataEntry, status)
     holder.recyclerView.adapter = dataEntryAdapter

@@ -9,7 +9,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="85dp"
+        android:layout_above="@id/ln_bottom"
         android:orientation="vertical"
         android:padding="2dp">
 
@@ -53,14 +53,11 @@
 
                 </RelativeLayout>
 
-                <!-- Select Progress LAbel -->
                 <TextView
                     android:id="@+id/progress_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:layout_marginTop="10dp" />
 
                 <!-- Select Year Label -->
                 <TextView
@@ -98,7 +95,8 @@
                     android:layout_marginTop="4dp"
                     android:text="@string/select_organization"
                     android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
                 <com.google.android.material.textfield.TextInputLayout
 
@@ -107,6 +105,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:hint="@string/action_organization"
+                    android:visibility="gone"
                     app:boxBackgroundMode="outline">
 
                     <AutoCompleteTextView
@@ -140,6 +139,7 @@
 
     <!-- Submit and Close Buttons -->
     <LinearLayout
+        android:id="@+id/ln_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -148,7 +148,7 @@
         <View
             android:layout_width="wrap_content"
             android:layout_height="1dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="1dp"
             android:background="@color/gray" />
 
         <LinearLayout

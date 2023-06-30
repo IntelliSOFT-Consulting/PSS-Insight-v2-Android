@@ -86,13 +86,16 @@
 
             <include
                 android:id="@+id/inc_parent"
-                layout="@layout/data_entry_form" />
+                layout="@layout/data_entry_form_parent" />
 
             <CheckBox
                 android:id="@+id/cb_assessment_question"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:gravity="center_vertical"
                 android:text="@string/fill_assessment_question" />
 
         </LinearLayout>
