@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
@@ -84,13 +85,7 @@ public class FragmentHome extends Fragment {
         requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-//                showCancelAlertDialog();
-                formatterClass.saveSharedPref(NavigationValues.NAVIGATION.name(),
-                        NavigationValues.HOME.name(), requireContext());
-                Intent intent = new Intent(requireContext(), MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                showCancelAlertDialog();
             }
         });
     }
@@ -100,17 +95,23 @@ public class FragmentHome extends Fragment {
         // Implement your custom logic here
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Confirmation");
-        builder.setMessage("Are you sure you want to cancel?");
+        builder.setMessage("Are you sure you want to exit?");
         builder.setPositiveButton("Yes", (dialog, which) -> {
             // Handle "Yes" button action
             // ...
             dialog.dismiss();
             formatterClass.saveSharedPref(NavigationValues.NAVIGATION.name(),
                     NavigationValues.HOME.name(), requireContext());
-            Intent intent = new Intent(requireContext(), MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+
+            //close all activities and exit app with a toast
+            // Close all open activities
+           try {
+               getActivity().finishAffinity();
+               // Display a toast to indicate app exit
+               Toast.makeText(requireContext(), "App is exiting...", Toast.LENGTH_SHORT).show();
+           }catch (Exception e){
+               e.printStackTrace();
+           }
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> {
             // Handle "Cancel" button action or do nothing
