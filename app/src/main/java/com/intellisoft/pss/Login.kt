@@ -67,9 +67,6 @@ class Login : AppCompatActivity() {
                                 val url = serverUrlEdittext.text.toString()
                                 val fileUrl = url + REFERENCE_URL
                                 serverUrl += PORT
-                                Log.e("TAG","Server URL $serverUrl")
-                                Log.e("TAG","Server URL $url")
-
 
                                 formatterClass.saveSharedPref("serverUrl1", serverUrl, this@Login)
                                 formatterClass.saveSharedPref(
