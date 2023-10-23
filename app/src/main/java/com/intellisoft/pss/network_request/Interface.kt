@@ -7,26 +7,26 @@ import retrofit2.http.*
 
 interface Interface {
 
-  @POST("data-entry/response/save")
+  @POST("/api/v1/data-entry/response/save")
   suspend fun submitData(@Body dbSaveDataEntry: DbSaveDataEntry): Response<Any>
-  @PUT("data-entry/response/{id}")
+  @PUT("/api/v1/data-entry/response/{id}")
   suspend fun reSubmitData(
     @Path("id") id: String,
     @Body dbSaveDataEntry: DbSaveDataEntry
   ): Response<Any>
 
-  @GET("national-template/published-indicators") suspend fun getDataEntry(): Response<DbDataEntry>
-  @GET("data-entry/response")
+  @GET("/api/v1/national-template/published-indicators") suspend fun getDataEntry(): Response<DbDataEntry>
+  @GET("/api/v1/data-entry/response")
   suspend fun getResponses(
       @Query("dataEntryPersonId") dataEntryPersonId: String
   ): Response<DbSubmissionEntry>
-  @GET("data-entry/response/{id}")
+  @GET("/api/v1/data-entry/response/{id}")
   suspend fun getResponseDetails(@Path("id") id: String): Response<DbReportDetailsEntry>
 
   @GET("/api/me.json?fields=id,username,surname,firstName,organisationUnits[name,id]")
   suspend fun getOrganizations(): Response<DbOrganizationEntry>
 
   @Multipart
-  @POST("file/upload")
+  @POST("/api/v1/file/upload")
   suspend fun uploadImageFileData(@Part file: MultipartBody.Part): Response<ImageResponse>
 }
